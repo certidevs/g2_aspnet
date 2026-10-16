@@ -198,3 +198,6 @@ El contenedor queda disponible en `http://localhost:10000`.
 ## IDEs
 
 En VS Code, selecciona el perfil `http` y pulsa F5 para depurar. Las tareas `G2: compilar` y `G2: ejecutar tests` están disponibles en **Terminal → Run Task**. En Windows, Visual Studio 2026 también abre `G2AspNet.sln`; consulta [la guía de IDEs](docs/IDE-SETUP.md).
+
+
+[ Firmado por Poulgar usando Push ]
