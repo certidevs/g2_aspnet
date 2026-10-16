@@ -201,3 +201,5 @@ En VS Code, selecciona el perfil `http` y pulsa F5 para depurar. Las tareas `G2:
 
 
 [ Firmado por Poulgar usando Push ]
+[ Firmado por Alfonso usando Push y rama auxiliar]
+
