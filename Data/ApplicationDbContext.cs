@@ -16,6 +16,14 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
     }
 
+
+
+    /// AQUI van los db que creamos
+    public DbSet<Grade> Grades => Set<Grade>();
+
+
+
+
     /// <summary>Configura las columnas añadidas a la tabla de usuarios de Identity.</summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
