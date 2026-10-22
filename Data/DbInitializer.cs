@@ -38,6 +38,17 @@ public static class DbInitializer
             displayName: "Usuario de demo",
             password: "User123!",
             role: RoleNames.User);
+
+        
+        if (!context.Grades.Any())
+        {
+            context.Grades.AddRange(
+                new Grade { NameStudent = "Alfonso", GradeStudent = 8.8, Description = "Bien Hecho"},
+                new Grade { NameStudent = "Ruben", GradeStudent = 10, Description = "Excelente"}
+            );
+
+            context.SaveChanges();
+        }
     }
 
     private static async Task EnsureRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)
