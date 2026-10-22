@@ -28,4 +28,6 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(user => user.CreatedAt).IsRequired();
         });
     }
+
+    public DbSet<Course> Courses => Set<Course>();
 }
