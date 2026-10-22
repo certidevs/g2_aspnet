@@ -1,0 +1,37 @@
+@model Grade
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Nueva nota" : "Editar nota";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Save" method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label class="form-label" asp-for="NameStudent">Alumno</label>
+            <input class="form-control" asp-for="NameStudent" />
+            <span class="text-danger" asp-validation-for="NameStudent"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label" asp-for="GradeStudent">Nota (0-10)</label>
+            <input class="form-control" asp-for="GradeStudent" type="number" step="0.01" />
+            <span class="text-danger" asp-validation-for="GradeStudent"></span>
+        </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Comments">Comentarios</label>
+        <textarea class="form-control" asp-for="Comments" rows="4"></textarea>
+    </div>
+
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

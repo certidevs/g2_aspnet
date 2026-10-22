@@ -13,7 +13,6 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Nombre</th>
             <th>Alumno</th>
             <th>Nota</th>
             <th>Calificación</th>
@@ -24,7 +23,6 @@
         @foreach (var grade in Model)
         {
             <tr>
-                <td>@grade.Name</td>
                 <td>@grade.NameStudent</td>
                 <td>@grade.GradeStudent</td>
                 <td>@Html.DisplayFor(m => grade.GradeEnum)</td>
