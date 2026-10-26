@@ -136,14 +136,14 @@ namespace G2AspNet.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("GradeStudent")
-                        .HasColumnType("REAL");
-
                     b.Property<int?>("GradeType")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("GradedAt")
                         .HasColumnType("TEXT");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("REAL");
 
                     b.HasKey("Id");
 
