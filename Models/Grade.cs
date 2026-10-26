@@ -23,8 +23,6 @@ public class Grade
 
     public GradeType? GradeType { get; set; }
 
-
-
     public GradeEnum? GradeEnum
     {
         get
@@ -37,5 +35,4 @@ public class Grade
     }
 
     //public List<Entity> Entitys { get; set; } = new();
-
 }
