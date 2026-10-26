@@ -16,12 +16,10 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
     }
 
-
-
     /// AQUI van los db que creamos
+    public DbSet<Academy> Academies => Set<Academy>();
+    public DbSet<Classroom> Classrooms => Set<Classroom>();
     public DbSet<Grade> Grades => Set<Grade>();
-
-
 
 
     /// <summary>Configura las columnas añadidas a la tabla de usuarios de Identity.</summary>

@@ -34,18 +34,47 @@ public static class DbInitializer
             role: RoleNames.Admin);
         await EnsureUserAsync(
             userManager,
-            username: "teacher",
-            email: "teacher@g2.local",
-            displayName: "Profesor de demo",
-            password: "Teacher123!",
-            role: RoleNames.Teacher);
-        await EnsureUserAsync(
-            userManager,
-            username: "student",
-            email: "student@g2.local",
-            displayName: "Estudiante de demo",
-            password: "Student123!",
-            role: RoleNames.Student);
+            username: "user",
+            email: "user@g2.local",
+            displayName: "Usuario de demo",
+            password: "User123!",
+            role: RoleNames.User);
+
+        if (!context.Academies.Any())
+        {
+            context.Academies.AddRange(
+                new Academy { Name = "Adecco School", Description = "Compañía de RRHH.", Location = "Global" },
+                new Academy { Name = "España Educa", Location = "España" },
+                new Academy { Name = "Instituto de Camuflaje" } // Para comprobar como se comporta la BBDD con datos en blanco.
+            );
+
+            context.SaveChanges();
+        }
+
+        if (!context.Classrooms.Any())
+        {
+            var adeccoSchool = context.Academies.First(a => a.Name == "Adecco School");
+            var espanaEduca = context.Academies.First(a => a.Name == "España Educa");
+            var institutoCamuflaje = context.Academies.First(a => a.Name == "Instituto de Camuflaje");
+
+            context.Classrooms.AddRange(
+                new Classroom { Name = "Primer Año", Capacity = 30, IsActive = true},
+                new Classroom { Name = "Segundo Año", Capacity = 25, IsActive = false},
+                new Classroom { Name = "Adecco Online", Capacity = 15, MeetingUrl = "inserturl", IsActive = true}
+            );
+
+            context.SaveChanges();
+        }
+
+        if (!context.Grades.Any())
+        {
+            context.Grades.AddRange(
+                new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho" },
+                new Grade { EnrollmentId = 2, Value = 10, Comments = "Excelente" }
+            );
+
+            context.SaveChanges();
+        }
     }
 
     private static async Task EnsureRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)
