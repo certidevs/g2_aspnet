@@ -15,7 +15,7 @@ public class GradesController : Controller
 
     public IActionResult Index()
     {
-        var grades = context.Grades.OrderBy(g => g.NameStudent).ToList();
+        var grades = context.Grades.OrderBy(g => g.EnrollmentId).ToList();
         return View(grades);
     }
 
