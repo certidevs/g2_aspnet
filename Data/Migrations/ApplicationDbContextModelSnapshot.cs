@@ -117,7 +117,6 @@ namespace G2AspNet.Data.Migrations
                 });
 
             modelBuilder.Entity("G2AspNet.Models.Course", b =>
-            modelBuilder.Entity("G2AspNet.Models.Course", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
