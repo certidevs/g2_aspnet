@@ -41,6 +41,8 @@
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class='@NavClass("Home")' asp-controller="Home" asp-action="Index">Inicio</a></li>
+                        <li class="nav-item"><a class='@NavClass("Academy")' asp-controller="Academy" asp-action="Index">Centros</a></li>
+                        <li class="nav-item"><a class='@NavClass("Course")' asp-controller="Course" asp-action="Index">Cursos</a></li>
                         <li class="nav-item"><a class='@NavClass("Grades")' asp-controller="Grades" asp-action="Index">Notas</a></li>
                         @if (User.IsInRole(RoleNames.Admin))
                         {

@@ -51,7 +51,7 @@ public sealed class UserService
             rows.Add(new UserListItemViewModel
             {
                 User = user,
-                Role = roles.FirstOrDefault() ?? RoleNames.User
+                Role = roles.FirstOrDefault() ?? RoleNames.Teacher
             });
         }
 
@@ -161,7 +161,7 @@ public sealed class UserService
             DisplayName = user.DisplayName ?? user.UserName ?? string.Empty,
             Email = user.Email ?? string.Empty,
             IsActive = user.IsActive,
-            Role = roles.FirstOrDefault() ?? RoleNames.User
+            Role = roles.FirstOrDefault() ?? RoleNames.Teacher
         };
     }
 

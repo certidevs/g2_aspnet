@@ -20,8 +20,9 @@ public static class DbInitializer
         }
 
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        await EnsureRoleAsync(roleManager, RoleNames.User);
         await EnsureRoleAsync(roleManager, RoleNames.Admin);
+        await EnsureRoleAsync(roleManager, RoleNames.Teacher);
+        await EnsureRoleAsync(roleManager, RoleNames.Student);
 
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         await EnsureUserAsync(
@@ -39,12 +40,37 @@ public static class DbInitializer
             password: "User123!",
             role: RoleNames.User);
 
-        
+        if (!context.Academies.Any())
+        {
+            context.Academies.AddRange(
+                new Academy { Name = "Adecco School", Description = "Compañía de RRHH.", Location = "Global" },
+                new Academy { Name = "España Educa", Location = "España" },
+                new Academy { Name = "Instituto de Camuflaje" } // Para comprobar como se comporta la BBDD con datos en blanco.
+            );
+
+            context.SaveChanges();
+        }
+
+        if (!context.Classrooms.Any())
+        {
+            var adeccoSchool = context.Academies.First(a => a.Name == "Adecco School");
+            var espanaEduca = context.Academies.First(a => a.Name == "España Educa");
+            var institutoCamuflaje = context.Academies.First(a => a.Name == "Instituto de Camuflaje");
+
+            context.Classrooms.AddRange(
+                new Classroom { Name = "Primer Año", Capacity = 30, IsActive = true},
+                new Classroom { Name = "Segundo Año", Capacity = 25, IsActive = false},
+                new Classroom { Name = "Adecco Online", Capacity = 15, MeetingUrl = "inserturl", IsActive = true}
+            );
+
+            context.SaveChanges();
+        }
+
         if (!context.Grades.Any())
         {
             context.Grades.AddRange(
-                new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho"},
-                new Grade { EnrollmentId = 2, Value = 10, Comments = "Excelente"}
+                new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho" },
+                new Grade { EnrollmentId = 2, Value = 10, Comments = "Excelente" }
             );
 
             context.SaveChanges();

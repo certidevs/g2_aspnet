@@ -33,7 +33,7 @@ public sealed class CreateUserViewModel
     public string ConfirmPassword { get; set; } = string.Empty;
 
     [Required]
-    public string Role { get; set; } = RoleNames.User;
+    public string Role { get; set; } = RoleNames.Teacher;
 
     [Display(Name = "Cuenta activa")]
     public bool IsActive { get; set; } = true;

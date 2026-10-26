@@ -17,6 +17,27 @@ namespace G2AspNet.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.11");
 
+            modelBuilder.Entity("G2AspNet.Models.Academy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Academies");
+                });
+
             modelBuilder.Entity("G2AspNet.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -96,6 +117,7 @@ namespace G2AspNet.Data.Migrations
                 });
 
             modelBuilder.Entity("G2AspNet.Models.Course", b =>
+            modelBuilder.Entity("G2AspNet.Models.Course", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,7 +126,13 @@ namespace G2AspNet.Data.Migrations
                     b.Property<int>("AcademyId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("AcademyId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly>("DurationFrom")
                         .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("DurationFrom")
@@ -140,6 +168,7 @@ namespace G2AspNet.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("GradedAt")
+                        .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Value")
@@ -147,7 +176,9 @@ namespace G2AspNet.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Grades");
+                    b.HasIndex("AcademyId");
+
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -278,6 +309,15 @@ namespace G2AspNet.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("G2AspNet.Models.Course", b =>
+                {
+                    b.HasOne("G2AspNet.Models.Academy", null)
+                        .WithMany("Courses")
+                        .HasForeignKey("AcademyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -327,6 +367,11 @@ namespace G2AspNet.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Academy", b =>
+                {
+                    b.Navigation("Courses");
                 });
 #pragma warning restore 612, 618
         }
