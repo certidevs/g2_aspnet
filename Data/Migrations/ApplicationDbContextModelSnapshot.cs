@@ -132,12 +132,17 @@ namespace G2AspNet.Data.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("EnrollmentId")
+                        .HasMaxLength(50)
+                        .HasColumnType("INTEGER");
+
                     b.Property<double>("GradeStudent")
                         .HasColumnType("REAL");
 
-                    b.Property<string>("NameStudent")
-                        .IsRequired()
-                        .HasMaxLength(50)
+                    b.Property<int?>("GradeType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("GradedAt")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
