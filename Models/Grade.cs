@@ -8,8 +8,7 @@ public class Grade
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Debes proporcionar el nombre del alumno")]
-    [StringLength(50, ErrorMessage = "El nombre no debe tener más de 50 caracteres")]
+    [Required(ErrorMessage = "Debes proporcionar el nombre del alumno (Un numero temporalmente)")]
     public int EnrollmentId { get; set; }
 
     [Required(ErrorMessage = "Debes proporcionar la nota")]
