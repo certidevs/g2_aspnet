@@ -43,6 +43,7 @@
                         <li class="nav-item"><a class='@NavClass("Home")' asp-controller="Home" asp-action="Index">Inicio</a></li>
                         <li class="nav-item"><a class='@NavClass("Academy")' asp-controller="Academy" asp-action="Index">Centros</a></li>
                         <li class="nav-item"><a class='@NavClass("Course")' asp-controller="Course" asp-action="Index">Cursos</a></li>
+                        <li class="nav-item"><a class='@NavClass("Grades")' asp-controller="Grades" asp-action="Index">Notas</a></li>
                         @if (User.IsInRole(RoleNames.Admin))
                         {
                             <li class="nav-item"><a class='@NavClass("Users")' asp-controller="Users" asp-action="Index">Administración de usuarios</a></li>
