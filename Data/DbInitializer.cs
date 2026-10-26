@@ -43,8 +43,8 @@ public static class DbInitializer
         if (!context.Grades.Any())
         {
             context.Grades.AddRange(
-                new Grade { EnrollmentId = 1, GradeStudent = 8.8, Comments = "Bien Hecho"},
-                new Grade { EnrollmentId = 2, GradeStudent = 10, Comments = "Excelente"}
+                new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho"},
+                new Grade { EnrollmentId = 2, Value = 10, Comments = "Excelente"}
             );
 
             context.SaveChanges();

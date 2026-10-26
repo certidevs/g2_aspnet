@@ -14,7 +14,7 @@ public class Grade
 
     [Required(ErrorMessage = "Debes proporcionar la nota")]
     [Range(0, 10, ErrorMessage = "La nota debe estar entre 0 y 10")]
-    public double? GradeStudent { get; set; }
+    public double? Value { get; set; }
 
     [StringLength(3000, ErrorMessage = "Los comentarios no puede contener más de 3000 caracteres")]
     public string? Comments { get; set; }
@@ -29,9 +29,9 @@ public class Grade
     {
         get
         {
-            if (GradeStudent >= 9) return Models.GradeEnum.GradeA;
-            if (GradeStudent >= 7) return Models.GradeEnum.GradeB;
-            if (GradeStudent >= 5) return Models.GradeEnum.GradeC;
+            if (Value >= 9) return Models.GradeEnum.GradeA;
+            if (Value >= 7) return Models.GradeEnum.GradeB;
+            if (Value >= 5) return Models.GradeEnum.GradeC;
             return Models.GradeEnum.GradeD;
         }
     }
