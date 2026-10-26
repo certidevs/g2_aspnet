@@ -18,6 +18,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     /// AQUI van los db que creamos
     public DbSet<Academy> Academies => Set<Academy>();
+    public DbSet<Course> Courses => Set<Course>();
     public DbSet<Classroom> Classrooms => Set<Classroom>();
     public DbSet<Grade> Grades => Set<Grade>();
 
@@ -35,6 +36,4 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         });
     }
 
-    public DbSet<Course> Courses => Set<Course>();
-    public DbSet<Academy> Academies => Set<Academy>();
 }
