@@ -24,7 +24,7 @@ public sealed class EditUserViewModel
     public string? NewPassword { get; set; }
 
     [Required]
-    public string Role { get; set; } = RoleNames.User;
+    public string Role { get; set; } = RoleNames.Teacher;
 
     [Display(Name = "Cuenta activa")]
     public bool IsActive { get; set; }
