@@ -116,14 +116,37 @@ namespace G2AspNet.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("G2AspNet.Models.Course", b =>
-            modelBuilder.Entity("G2AspNet.Models.Course", b =>
+            modelBuilder.Entity("G2AspNet.Models.Classroom", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AcademyId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MeetingUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Classrooms");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AcademyId")
@@ -135,17 +158,17 @@ namespace G2AspNet.Data.Migrations
                     b.Property<DateOnly>("DurationFrom")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly>("DurationFrom")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateOnly>("DurationTo")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AcademyId");
 
                     b.ToTable("Courses");
                 });
@@ -161,14 +184,12 @@ namespace G2AspNet.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("EnrollmentId")
-                        .HasMaxLength(50)
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("GradeType")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("GradedAt")
-                        .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Value")
@@ -176,9 +197,7 @@ namespace G2AspNet.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AcademyId");
-
-                    b.ToTable("Courses");
+                    b.ToTable("Grades");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

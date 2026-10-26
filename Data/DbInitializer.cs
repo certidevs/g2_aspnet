@@ -38,7 +38,7 @@ public static class DbInitializer
             email: "user@g2.local",
             displayName: "Usuario de demo",
             password: "User123!",
-            role: RoleNames.User);
+            role: RoleNames.Teacher);
 
         if (!context.Academies.Any())
         {

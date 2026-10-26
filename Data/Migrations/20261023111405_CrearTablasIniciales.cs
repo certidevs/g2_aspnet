@@ -11,9 +11,6 @@ namespace G2AspNet.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Grades");
-
             migrationBuilder.CreateTable(
                 name: "Courses",
                 columns: table => new
@@ -37,22 +34,6 @@ namespace G2AspNet.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Courses");
-
-            migrationBuilder.CreateTable(
-                name: "Grades",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 3000, nullable: false),
-                    GradeStudent = table.Column<double>(type: "REAL", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    NameStudent = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Grades", x => x.Id);
-                });
         }
     }
 }
