@@ -10,7 +10,7 @@ public class Grade
 
     [Required(ErrorMessage = "Debes proporcionar el nombre del alumno")]
     [StringLength(50, ErrorMessage = "El nombre no debe tener más de 50 caracteres")]
-    public string EnrollmentId { get; set; }
+    public int EnrollmentId { get; set; }
 
     [Required(ErrorMessage = "Debes proporcionar la nota")]
     [Range(0, 10, ErrorMessage = "La nota debe estar entre 0 y 10")]
