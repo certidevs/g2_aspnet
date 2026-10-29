@@ -192,6 +192,9 @@ namespace G2AspNet.Data.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("TEXT");
 

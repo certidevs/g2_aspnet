@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace G2AspNet.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261029125108_AddCourses")]
+    [Migration("20261029131544_AddCourses")]
     partial class AddCourses
     {
         /// <inheritdoc />
@@ -193,6 +193,9 @@ namespace G2AspNet.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("StartDate")
