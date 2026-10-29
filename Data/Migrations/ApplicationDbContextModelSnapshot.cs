@@ -135,6 +135,8 @@ namespace G2AspNet.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LessonId");
+
                     b.ToTable("Attendances");
                 });
 
@@ -236,6 +238,41 @@ namespace G2AspNet.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Grades");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Lesson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ClassroomId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassroomId");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Lessons");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -366,6 +403,15 @@ namespace G2AspNet.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("G2AspNet.Models.Attendance", b =>
+                {
+                    b.HasOne("G2AspNet.Models.Lesson", null)
+                        .WithMany("Attendances")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("G2AspNet.Models.Course", b =>
                 {
                     b.HasOne("G2AspNet.Models.Academy", null)
@@ -373,6 +419,23 @@ namespace G2AspNet.Data.Migrations
                         .HasForeignKey("AcademyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Lesson", b =>
+                {
+                    b.HasOne("G2AspNet.Models.Classroom", "Classroom")
+                        .WithMany()
+                        .HasForeignKey("ClassroomId");
+
+                    b.HasOne("G2AspNet.Models.Course", "Course")
+                        .WithMany("Lessons")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Classroom");
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -429,6 +492,16 @@ namespace G2AspNet.Data.Migrations
             modelBuilder.Entity("G2AspNet.Models.Academy", b =>
                 {
                     b.Navigation("Courses");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Course", b =>
+                {
+                    b.Navigation("Lessons");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Lesson", b =>
+                {
+                    b.Navigation("Attendances");
                 });
 #pragma warning restore 612, 618
         }
