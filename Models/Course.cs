@@ -11,6 +11,7 @@ public class Course
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public CourseLevel Level { get; set; }
+    public decimal Price { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
     public int MaxStudents { get; set; }

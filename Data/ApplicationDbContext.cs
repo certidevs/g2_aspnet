@@ -19,6 +19,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     /// AQUI van los db que creamos
     public DbSet<Academy> Academies => Set<Academy>();
     public DbSet<Course> Courses => Set<Course>();
+    public DbSet<Attendance> Attendances => Set<Attendance>();
     public DbSet<Classroom> Classrooms => Set<Classroom>();
     public DbSet<Grade> Grades => Set<Grade>();
 
