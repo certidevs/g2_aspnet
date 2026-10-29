@@ -15,8 +15,10 @@ public class Enrollment
     public EnrollmentStatus? EnrollmentStatus { get; set; }
 
 
+    // public int StudentId { get; set; }
     // public int CourseId { get; set; }
 
 
-    //public List<Entity> Entitys { get; set; } = new();
+    //public List<Grade> Grades { get; set; } = new();
+    //public List<Attendance> Attendances { get; set; } = new();
 }
