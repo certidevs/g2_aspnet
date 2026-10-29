@@ -39,6 +39,13 @@ public static class DbInitializer
             displayName: "Usuario de demo",
             password: "User123!",
             role: RoleNames.Teacher);
+        await EnsureUserAsync(
+            userManager,
+            username: "student",
+            email: "student@g2.local",
+            displayName: "Estudiante de demo",
+            password: "Student123!",
+            role: RoleNames.Student);
 
         if (!context.Academies.Any())
         {
