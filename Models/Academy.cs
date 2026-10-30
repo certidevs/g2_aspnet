@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace G2AspNet.Models;
 
@@ -14,4 +14,5 @@ public class Academy
     public string? Description { get; set; }
     public string? Location { get; set; }
     public List<Course> Courses { get; set; } = new();
+    public List<Classroom> Classrooms { get; set; } = new();
 }

@@ -16,8 +16,13 @@ public class Course
     public DateOnly EndDate { get; set; }
     public int MaxStudents { get; set; }
     public CourseStatus Status { get; set; }
+
     public int AcademyId { get; set; }
+    public Academy? Academy { get; set; }
+
     public string? TeacherId { get; set; }
+    public ApplicationUser? Teacher { get; set; }
 
     public List<Lesson> Lessons { get; set; } = new();
+    public List<Enrollment> Enrollments { get; set; } = new();
 }

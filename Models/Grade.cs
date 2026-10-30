@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Net.Http.Headers;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace G2AspNet.Models;
 
@@ -8,8 +6,8 @@ public class Grade
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Debes proporcionar el nombre del alumno (Un numero temporalmente)")]
     public int EnrollmentId { get; set; }
+    public Enrollment? Enrollment { get; set; }
 
     [Required(ErrorMessage = "Debes proporcionar la nota")]
     [Range(0, 10, ErrorMessage = "La nota debe estar entre 0 y 10")]
@@ -26,6 +24,7 @@ public class Grade
     {
         get
         {
+            if (Value is null) return null;
             if (Value >= 9) return Models.GradeEnum.GradeA;
             if (Value >= 7) return Models.GradeEnum.GradeB;
             if (Value >= 5) return Models.GradeEnum.GradeC;

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Models;
 
@@ -23,6 +23,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Attendance> Attendances => Set<Attendance>();
     public DbSet<Classroom> Classrooms => Set<Classroom>();
     public DbSet<Grade> Grades => Set<Grade>();
+    public DbSet<Enrollment> Enrollments => Set<Enrollment>();
 
 
     /// <summary>Configura las columnas añadidas a la tabla de usuarios de Identity.</summary>
