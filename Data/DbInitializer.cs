@@ -144,38 +144,19 @@ public static class DbInitializer
 
             context.SaveChanges();
         }
-        
-        if (!context.Grades.Any())
+
+        /* if (!context.Grades.Any())
         {
-            // No se deben usar IDs supuestos: la base de datos puede estar vacía
-            // o haber asignado otros valores durante la migración.
-            var enrollments = context.Enrollments
-                .OrderBy(enrollment => enrollment.Id)
-                .Take(2)
-                .ToList();
+            context.Grades.AddRange(
+                new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho" },
+                new Grade { EnrollmentId = 2, Value = 10, Comments = "Excelente" }
+            );
 
-            if (enrollments.Count > 0)
-            {
-                var grades = new List<Grade>
-                {
-                    new() { EnrollmentId = enrollments[0].Id, Value = 8.8, Comments = "Bien hecho" }
-                };
+            context.SaveChanges();
 
-                if (enrollments.Count > 1)
-                {
-                    grades.Add(new Grade
-                    {
-                        EnrollmentId = enrollments[1].Id,
-                        Value = 10,
-                        Comments = "Excelente"
-                    });
-                }
-
-                context.Grades.AddRange(grades);
-                context.SaveChanges();
-            }
-        }
+        } */
     }
+
 
     private static async Task EnsureRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)
     {
