@@ -19,5 +19,5 @@ public class Course
     public int AcademyId { get; set; }
     public string? TeacherId { get; set; }
 
-    // public List<Lesson> Lessons { get; set; } = new();
+    public List<Lesson> Lessons { get; set; } = new();
 }
