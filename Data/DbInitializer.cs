@@ -147,12 +147,33 @@ public static class DbInitializer
         
         if (!context.Grades.Any())
         {
-            context.Grades.AddRange(
-                new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho" },
-                new Grade { EnrollmentId = 2, Value = 10, Comments = "Excelente" }
-            );
+            // No se deben usar IDs supuestos: la base de datos puede estar vacía
+            // o haber asignado otros valores durante la migración.
+            var enrollments = context.Enrollments
+                .OrderBy(enrollment => enrollment.Id)
+                .Take(2)
+                .ToList();
 
-            context.SaveChanges();
+            if (enrollments.Count > 0)
+            {
+                var grades = new List<Grade>
+                {
+                    new() { EnrollmentId = enrollments[0].Id, Value = 8.8, Comments = "Bien hecho" }
+                };
+
+                if (enrollments.Count > 1)
+                {
+                    grades.Add(new Grade
+                    {
+                        EnrollmentId = enrollments[1].Id,
+                        Value = 10,
+                        Comments = "Excelente"
+                    });
+                }
+
+                context.Grades.AddRange(grades);
+                context.SaveChanges();
+            }
         }
     }
 
