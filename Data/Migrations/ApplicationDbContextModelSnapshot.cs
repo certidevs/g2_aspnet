@@ -135,6 +135,8 @@ namespace G2AspNet.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EnrollmentId");
+
                     b.HasIndex("LessonId");
 
                     b.ToTable("Attendances");
@@ -164,6 +166,8 @@ namespace G2AspNet.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AcademyId");
 
                     b.ToTable("Classrooms");
                 });
@@ -210,7 +214,40 @@ namespace G2AspNet.Data.Migrations
 
                     b.HasIndex("AcademyId");
 
+                    b.HasIndex("TeacherId");
+
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Enrollment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("EnrolledAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("StudentId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Enrollments");
                 });
 
             modelBuilder.Entity("G2AspNet.Models.Grade", b =>
@@ -236,6 +273,8 @@ namespace G2AspNet.Data.Migrations
                         .HasColumnType("REAL");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EnrollmentId");
 
                     b.ToTable("Grades");
                 });
@@ -405,26 +444,85 @@ namespace G2AspNet.Data.Migrations
 
             modelBuilder.Entity("G2AspNet.Models.Attendance", b =>
                 {
-                    b.HasOne("G2AspNet.Models.Lesson", null)
+                    b.HasOne("G2AspNet.Models.Enrollment", "Enrollment")
+                        .WithMany("Attendances")
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G2AspNet.Models.Lesson", "Lesson")
                         .WithMany("Attendances")
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Enrollment");
+
+                    b.Navigation("Lesson");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Classroom", b =>
+                {
+                    b.HasOne("G2AspNet.Models.Academy", "Academy")
+                        .WithMany("Classrooms")
+                        .HasForeignKey("AcademyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Academy");
                 });
 
             modelBuilder.Entity("G2AspNet.Models.Course", b =>
                 {
-                    b.HasOne("G2AspNet.Models.Academy", null)
+                    b.HasOne("G2AspNet.Models.Academy", "Academy")
                         .WithMany("Courses")
                         .HasForeignKey("AcademyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("G2AspNet.Models.ApplicationUser", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId");
+
+                    b.Navigation("Academy");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Enrollment", b =>
+                {
+                    b.HasOne("G2AspNet.Models.Course", "Course")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G2AspNet.Models.ApplicationUser", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Grade", b =>
+                {
+                    b.HasOne("G2AspNet.Models.Enrollment", "Enrollment")
+                        .WithMany("Grades")
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Enrollment");
                 });
 
             modelBuilder.Entity("G2AspNet.Models.Lesson", b =>
                 {
                     b.HasOne("G2AspNet.Models.Classroom", "Classroom")
-                        .WithMany()
+                        .WithMany("Lessons")
                         .HasForeignKey("ClassroomId");
 
                     b.HasOne("G2AspNet.Models.Course", "Course")
@@ -491,12 +589,28 @@ namespace G2AspNet.Data.Migrations
 
             modelBuilder.Entity("G2AspNet.Models.Academy", b =>
                 {
+                    b.Navigation("Classrooms");
+
                     b.Navigation("Courses");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Classroom", b =>
+                {
+                    b.Navigation("Lessons");
                 });
 
             modelBuilder.Entity("G2AspNet.Models.Course", b =>
                 {
+                    b.Navigation("Enrollments");
+
                     b.Navigation("Lessons");
+                });
+
+            modelBuilder.Entity("G2AspNet.Models.Enrollment", b =>
+                {
+                    b.Navigation("Attendances");
+
+                    b.Navigation("Grades");
                 });
 
             modelBuilder.Entity("G2AspNet.Models.Lesson", b =>
