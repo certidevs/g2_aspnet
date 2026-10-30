@@ -1,31 +1,78 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using G2AspNet.Data;
+using G2AspNet.Models;
 
 namespace G2AspNet.Controllers;
 
-public class CourseController : Controller
+public class CoursesController : Controller
 {
     private readonly ApplicationDbContext context;
 
-    public CourseController(ApplicationDbContext context)
+    public CoursesController(ApplicationDbContext context)
     {
         this.context = context;
     }
 
     public IActionResult Index()
     {
-        var course = context.Courses.OrderBy(a => a.Name).ToList();
-        return View(course);
+        var courses = context.Courses.OrderBy(c => c.Name).ToList();
+        return View(courses);
     }
-    /* public IActionResult Details(int id)
+
+    [HttpGet]
+    public IActionResult Create()
     {
-        var course = context.Courses.Include(a => a.Lessons).FirstOrDefault(a => a.Id == id);
+        return View("Form", new Course());
+    }
+
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var course = context.Courses.Find(id);
         if (course == null)
         {
             return NotFound();
         }
 
-        return View(course);
-    } */
+        return View("Form", course);
+    }
+
+    [HttpPost]
+    public IActionResult Save(Course course)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("Form", course);
+        }
+
+        if (course.Id == 0)
+        {
+            context.Courses.Add(course);
+        }
+        else
+        {
+            context.Courses.Update(course);
+        }
+
+        context.SaveChanges();
+
+        TempData["Message"] = "Curso guardado correctamente.";
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        var course = context.Courses.Find(id);
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        context.Courses.Remove(course);
+        context.SaveChanges();
+
+        TempData["Message"] = "Curso borrado correctamente.";
+        return RedirectToAction("Index");
+    }
 }
