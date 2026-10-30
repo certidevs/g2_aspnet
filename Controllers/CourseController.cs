@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using G2AspNet.Data;
 using G2AspNet.Models;
+using G2AspNet.ViewModels.Courses;
+using Microsoft.EntityFrameworkCore;
 
 namespace G2AspNet.Controllers;
 
@@ -13,10 +15,24 @@ public class CoursesController : Controller
         this.context = context;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string? search)
     {
-        var courses = context.Courses.OrderBy(c => c.Name).ToList();
-        return View(courses);
+        var query = context.Courses.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(course => course.Name.Contains(search));
+        }
+
+        var model = new CourseIndexViewModel
+        {
+            Search = search,
+            Courses = query
+                .OrderBy(course => course.Name)
+                .Select(course => new CourseListItemViewModel { Course = course })
+                .ToList()
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -37,7 +53,20 @@ public class CoursesController : Controller
         return View("Form", course);
     }
 
+    [HttpGet]
+    public IActionResult Details(int id)
+    {
+        var course = context.Courses.Include(c => c.Academy).Include(c => c.Teacher).FirstOrDefault(c => c.Id == id);
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        return View("Details", course);
+    }
+
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult Save(Course course)
     {
         if (!ModelState.IsValid)
@@ -61,6 +90,7 @@ public class CoursesController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult Delete(int id)
     {
         var course = context.Courses.Find(id);
