@@ -4,23 +4,31 @@ using G2AspNet.Data;
 
 namespace G2AspNet.Controllers;
 
-public class AcademyController : Controller
+public class AcademyController(ApplicationDbContext context) : Controller
 {
-    private readonly ApplicationDbContext context;
+    private readonly ApplicationDbContext context = context;
 
-    public AcademyController(ApplicationDbContext context)
+    public async Task<IActionResult> Index(string? search, string? location)
     {
-        this.context = context;
-    }
+        var query = context.Academies.AsQueryable();
 
-    public IActionResult Index()
-    {
-        var academies = context.Academies.Include(a => a.Courses).OrderBy(a => a.Name).ToList();
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(a => a.Name.ToLower().Contains(search, StringComparison.CurrentCultureIgnoreCase));
+
+        if (location != null) query = query.Where(a => a.Location == location);
+
+        ViewBag.Search = search;
+        ViewBag.Location = location;
+
+        var academies = await query.OrderBy(a => a.Name).ToListAsync();
         return View(academies);
     }
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        var academy = context.Academies.Include(a => a.Courses).FirstOrDefault(a => a.Id == id);
+        var academy = await context.Academies
+        .Include(a => a.Courses)
+        .Include(a => a.Classrooms)
+        .FirstOrDefaultAsync(a => a.Id == id);
+        
         if (academy == null)
         {
             return NotFound();
