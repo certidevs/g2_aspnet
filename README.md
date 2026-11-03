@@ -102,7 +102,7 @@ dotnet tool restore
 dotnet run --project G2AspNet.csproj --launch-profile http
 ```
 
-Abre `http://localhost:5107`. El primer arranque crea `App_Data/g2.db`, aplica la migración de Identity y añade los usuarios demo:
+Abre `http://localhost:5108`. El primer arranque crea `App_Data/g2.db`, aplica la migración de Identity y añade los usuarios demo:
 
 - `admin` / `Admin123!`
 - `user` / `User123!`

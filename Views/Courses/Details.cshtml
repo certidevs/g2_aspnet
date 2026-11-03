@@ -1,0 +1,46 @@
+@using G2AspNet.Models
+@model Course
+@{
+    ViewData["Title"] = "Detalle de curso";
+}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h2 mb-0">Detalle de curso</h1>
+    <div class="d-flex gap-2">
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline"
+              onsubmit="return confirm('¿Estás seguro de que deseas eliminar este curso?');">
+            <button type="submit" class="btn btn-outline-danger">Eliminar</button>
+        </form>
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Editar</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div>
+                <h2 class="h4 mb-0">@Model.Name</h2><span class="text-secondary">@Model.Description</span>
+            </div>
+        </div>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Nivel</dt>
+            <dd class="col-sm-9">@Model.Level</dd>
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@(Model.Status)</dd>
+            <dt class="col-sm-3">Precio</dt>
+            <dd class="col-sm-9">@Model.Price.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-ES"))
+            </dd>
+            <dt class="col-sm-3">Fecha de inicio</dt>
+            <dd class="col-sm-9">@Model.StartDate.ToString("dd/MM/yyyy")</dd>
+            <dt class="col-sm-3">Fecha de finalización</dt>
+            <dd class="col-sm-9">@Model.EndDate.ToString("dd/MM/yyyy")</dd>
+            <dt class="col-sm-3">Plazas máximas</dt>
+            <dd class="col-sm-9">@Model.MaxStudents</dd>
+            <dt class="col-sm-3">Centro de estudios</dt>
+            <dd class="col-sm-9">@Model.Academy?.Name</dd>
+            <dt class="col-sm-3">Profesor</dt>
+            <dd class="col-sm-9">@Model.Teacher?.UserName</dd>
+        </dl>
+    </div>
+    <div class="card-footer bg-transparent"><a class="btn btn-outline-secondary" asp-action="Index">Volver a cursos</a>
+    </div>
+</div>

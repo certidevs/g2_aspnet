@@ -6,5 +6,5 @@ namespace G2AspNet.ViewModels.Courses;
 public sealed class CourseIndexViewModel
 {
     public string? Search { get; init; }
-    public List<CourseListItemViewModel> Users { get; init; } = [];
+    public List<CourseListItemViewModel> Courses { get; init; } = [];
 }

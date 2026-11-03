@@ -39,13 +39,33 @@ public static class DbInitializer
             displayName: "Usuario de demo",
             password: "User123!",
             role: RoleNames.Teacher);
+        await EnsureUserAsync(
+            userManager,
+            username: "student",
+            email: "student@g2.local",
+            displayName: "Estudiante de demo",
+            password: "Student123!",
+            role: RoleNames.Student);
 
         if (!context.Academies.Any())
         {
             context.Academies.AddRange(
-                new Academy { Name = "Adecco School", Description = "Compañía de RRHH.", Location = "Global" },
-                new Academy { Name = "España Educa", Location = "España" },
-                new Academy { Name = "Instituto de Camuflaje" } // Para comprobar como se comporta la BBDD con datos en blanco.
+                new Academy { Name = "Adecco School", Description = "Compañía especializada en recursos humanos y formación profesional.", Location = "Global" },
+                new Academy { Name = "España Educa", Description = "Centro dedicado a la formación online y presencial para estudiantes y profesionales.", Location = "España" },
+                new Academy { Name = "Instituto de Camuflaje", Description = "Academia experimental utilizada para pruebas y validaciones de la aplicación.", Location = "Madrid" },
+                new Academy { Name = "Tech Masters", Description = "Escuela enfocada en programación, desarrollo web y nuevas tecnologías.", Location = "Barcelona" },
+                new Academy { Name = "Business Academy", Description = "Formación especializada en gestión empresarial, finanzas y liderazgo.", Location = "Valencia" },
+                new Academy { Name = "Digital Skills Hub", Description = "Centro de capacitación en marketing digital, SEO y analítica web.", Location = "Sevilla" },
+                new Academy { Name = "Creative Design Lab", Description = "Academia centrada en diseño gráfico, UX/UI e ilustración digital.", Location = "Bilbao" },
+                new Academy { Name = "Future Coders", Description = "Programas formativos para desarrolladores junior y perfiles tecnológicos.", Location = "Málaga" },
+                new Academy { Name = "Global Languages", Description = "Escuela de idiomas con cursos de inglés, francés y alemán.", Location = "Madrid" },
+                new Academy { Name = "Health Learning Center", Description = "Academia especializada en formación sanitaria y bienestar personal.", Location = "Zaragoza" },
+                new Academy { Name = "Industrial Training", Description = "Centro de formación técnica para sectores industriales y productivos.", Location = "Vigo" },
+                new Academy { Name = "Data Science Academy", Description = "Cursos avanzados de análisis de datos, IA y aprendizaje automático.", Location = "Barcelona" },
+                new Academy { Name = "Green Energy School", Description = "Formación en energías renovables, sostenibilidad y medio ambiente.", Location = "Pamplona" },
+                new Academy { Name = "Hospitality Experts", Description = "Academia orientada al turismo, hostelería y atención al cliente.", Location = "Palma de Mallorca" },
+                new Academy { Name = "Cyber Security Hub", Description = "Centro especializado en ciberseguridad, redes y protección de sistemas.", Location = "Alicante" },
+                new Academy { Name = "Innovation Academy", Description = "Escuela de innovación, emprendimiento y gestión de proyectos digitales.", Location = "Granada" }
             );
 
             context.SaveChanges();
@@ -56,17 +76,157 @@ public static class DbInitializer
             var adeccoSchool = context.Academies.First(a => a.Name == "Adecco School");
             var espanaEduca = context.Academies.First(a => a.Name == "España Educa");
             var institutoCamuflaje = context.Academies.First(a => a.Name == "Instituto de Camuflaje");
+            var techMasters = context.Academies.First(a => a.Name == "Tech Masters");
+            var businessAcademy = context.Academies.First(a => a.Name == "Business Academy");
+            var digitalSkillsHub = context.Academies.First(a => a.Name == "Digital Skills Hub");
+            var creativeDesignLab = context.Academies.First(a => a.Name == "Creative Design Lab");
+            var futureCoders = context.Academies.First(a => a.Name == "Future Coders");
+            var globalLanguages = context.Academies.First(a => a.Name == "Global Languages");
+            var dataScienceAcademy = context.Academies.First(a => a.Name == "Data Science Academy");
+            var cyberSecurityHub = context.Academies.First(a => a.Name == "Cyber Security Hub");
 
             context.Classrooms.AddRange(
-                new Classroom { Name = "Primer Año", Capacity = 30, IsActive = true},
-                new Classroom { Name = "Segundo Año", Capacity = 25, IsActive = false},
-                new Classroom { Name = "Adecco Online", Capacity = 15, MeetingUrl = "inserturl", IsActive = true}
+                new Classroom { Name = "Primer Año", Capacity = 30, IsActive = true, AcademyId = adeccoSchool.Id },
+                new Classroom { Name = "Segundo Año", Capacity = 25, IsActive = false, AcademyId = adeccoSchool.Id },
+                new Classroom { Name = "Adecco Online", Capacity = 15, MeetingUrl = "https://meet.adecco.com/aula1", IsActive = true, AcademyId = adeccoSchool.Id },
+                new Classroom { Name = "Sala Norte", Capacity = 28, IsActive = true, AcademyId = adeccoSchool.Id },
+
+                new Classroom { Name = "Historia Moderna", Capacity = 40, IsActive = true, AcademyId = espanaEduca.Id },
+                new Classroom { Name = "Matemáticas A", Capacity = 32, IsActive = true, AcademyId = espanaEduca.Id },
+                new Classroom { Name = "Lengua Castellana", Capacity = 30, IsActive = true, AcademyId = espanaEduca.Id },
+                new Classroom { Name = "Aula Virtual ESO", Capacity = 50, MeetingUrl = "https://campus.espanaeduca.es/eso", IsActive = true, AcademyId = espanaEduca.Id },
+
+                new Classroom { Name = "Sigilo I", Capacity = 15, IsActive = true, AcademyId = institutoCamuflaje.Id },
+                new Classroom { Name = "Camuflaje Urbano", Capacity = 18, IsActive = true, AcademyId = institutoCamuflaje.Id },
+                new Classroom { Name = "Centro de Mando", Capacity = 25, IsActive = true, AcademyId = institutoCamuflaje.Id },
+                new Classroom { Name = "Online Encubierto", Capacity = 30, MeetingUrl = "https://camuflaje.edu/online", IsActive = true, AcademyId = institutoCamuflaje.Id },
+
+                new Classroom { Name = "Programación Web", Capacity = 24, IsActive = true, AcademyId = techMasters.Id },
+                new Classroom { Name = "Angular Lab", Capacity = 20, IsActive = true, AcademyId = techMasters.Id },
+                new Classroom { Name = "NET Advanced", Capacity = 18, IsActive = true, AcademyId = techMasters.Id },
+                new Classroom { Name = "DevOps Online", Capacity = 30, MeetingUrl = "https://techmasters.com/devops", IsActive = true, AcademyId = techMasters.Id },
+
+                new Classroom { Name = "Finanzas 101", Capacity = 25, IsActive = true, AcademyId = businessAcademy.Id },
+                new Classroom { Name = "Dirección Estratégica", Capacity = 22, IsActive = true, AcademyId = businessAcademy.Id },
+                new Classroom { Name = "Gestión de Equipos", Capacity = 20, IsActive = false, AcademyId = businessAcademy.Id },
+                new Classroom { Name = "MBA Virtual", Capacity = 45, MeetingUrl = "https://businessacademy.edu/mba", IsActive = true, AcademyId = businessAcademy.Id },
+
+                new Classroom { Name = "SEO Fundamentals", Capacity = 16, IsActive = true, AcademyId = digitalSkillsHub.Id },
+                new Classroom { Name = "Google Ads Pro", Capacity = 18, IsActive = true, AcademyId = digitalSkillsHub.Id },
+                new Classroom { Name = "Social Media Lab", Capacity = 20, IsActive = true, AcademyId = digitalSkillsHub.Id },
+                new Classroom { Name = "Marketing Online", Capacity = 35, MeetingUrl = "https://dshub.es/online", IsActive = true, AcademyId = digitalSkillsHub.Id },
+
+                new Classroom { Name = "Diseño UX", Capacity = 15, IsActive = true, AcademyId = creativeDesignLab.Id },
+                new Classroom { Name = "Diseño UI", Capacity = 15, IsActive = true, AcademyId = creativeDesignLab.Id },
+                new Classroom { Name = "Figma Studio", Capacity = 20, IsActive = true, AcademyId = creativeDesignLab.Id },
+                new Classroom { Name = "Arte Digital", Capacity = 25, IsActive = false, AcademyId = creativeDesignLab.Id },
+
+                new Classroom { Name = "Coding Basics", Capacity = 30, IsActive = true, AcademyId = futureCoders.Id },
+                new Classroom { Name = "Java Essentials", Capacity = 24, IsActive = true, AcademyId = futureCoders.Id },
+                new Classroom { Name = "Python Lab", Capacity = 20, IsActive = true, AcademyId = futureCoders.Id },
+                new Classroom { Name = "Bootcamp Remote", Capacity = 40, MeetingUrl = "https://futurecoders.dev/remote", IsActive = true, AcademyId = futureCoders.Id },
+
+                new Classroom { Name = "English A1", Capacity = 22, IsActive = true, AcademyId = globalLanguages.Id },
+                new Classroom { Name = "English C1", Capacity = 18, IsActive = true, AcademyId = globalLanguages.Id },
+                new Classroom { Name = "French B1", Capacity = 20, IsActive = true, AcademyId = globalLanguages.Id },
+                new Classroom { Name = "German Online", Capacity = 30, MeetingUrl = "https://languages.global/german", IsActive = true, AcademyId = globalLanguages.Id },
+
+                new Classroom { Name = "Machine Learning", Capacity = 20, IsActive = true, AcademyId = dataScienceAcademy.Id },
+                new Classroom { Name = "Data Analytics", Capacity = 25, IsActive = true, AcademyId = dataScienceAcademy.Id },
+                new Classroom { Name = "Power BI Lab", Capacity = 18, IsActive = false, AcademyId = dataScienceAcademy.Id },
+                new Classroom { Name = "Big Data Online", Capacity = 45, MeetingUrl = "https://datascience.academy/bigdata", IsActive = true, AcademyId = dataScienceAcademy.Id },
+
+                new Classroom { Name = "Ethical Hacking", Capacity = 16, IsActive = true, AcademyId = cyberSecurityHub.Id },
+                new Classroom { Name = "Network Security", Capacity = 22, IsActive = true, AcademyId = cyberSecurityHub.Id },
+                new Classroom { Name = "SOC Operations", Capacity = 18, IsActive = true, AcademyId = cyberSecurityHub.Id },
+                new Classroom { Name = "Cyber Range", Capacity = 30, MeetingUrl = "https://cyberhub.org/range", IsActive = true, AcademyId = cyberSecurityHub.Id }
             );
 
             context.SaveChanges();
         }
 
-        if (!context.Grades.Any())
+        if (!context.Courses.Any())
+        {
+            // Las referencias se declaran en este ámbito porque las variables
+            // usadas al crear las aulas pertenecen a un bloque distinto.
+            var adeccoSchool = context.Academies.First(a => a.Name == "Adecco School");
+            var espanaEduca = context.Academies.First(a => a.Name == "España Educa");
+            var institutoCamuflaje = context.Academies.First(a => a.Name == "Instituto de Camuflaje");
+            var techMasters = context.Academies.First(a => a.Name == "Tech Masters");
+            var businessAcademy = context.Academies.First(a => a.Name == "Business Academy");
+            var digitalSkillsHub = context.Academies.First(a => a.Name == "Digital Skills Hub");
+            var creativeDesignLab = context.Academies.First(a => a.Name == "Creative Design Lab");
+            var futureCoders = context.Academies.First(a => a.Name == "Future Coders");
+            var globalLanguages = context.Academies.First(a => a.Name == "Global Languages");
+            var dataScienceAcademy = context.Academies.First(a => a.Name == "Data Science Academy");
+            var cyberSecurityHub = context.Academies.First(a => a.Name == "Cyber Security Hub");
+            var healthLearningCenter = context.Academies.First(a => a.Name == "Health Learning Center");
+            var industrialTraining = context.Academies.First(a => a.Name == "Industrial Training");
+            var greenEnergySchool = context.Academies.First(a => a.Name == "Green Energy School");
+            var hospitalityExperts = context.Academies.First(a => a.Name == "Hospitality Experts");
+            var innovationAcademy = context.Academies.First(a => a.Name == "Innovation Academy");
+
+            context.Courses.AddRange(
+                new Course { Name = "Primeros pasos en la gestión de personas", Description = "Fundamentos de selección, acogida y desarrollo profesional.", Level = CourseLevel.Beginner, Price = 180, StartDate = new DateOnly(2026, 11, 3), EndDate = new DateOnly(2026, 12, 1), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = adeccoSchool.Id },
+                new Course { Name = "Historia de España en movimiento", Description = "Recorrido por los cambios sociales y culturales de la España contemporánea.", Level = CourseLevel.Intermediate, Price = 210, StartDate = new DateOnly(2026, 11, 5), EndDate = new DateOnly(2026, 12, 10), MaxStudents = 30, Status = CourseStatus.Open, AcademyId = espanaEduca.Id },
+                new Course { Name = "Observación y sigilo operativo", Description = "Técnicas de observación, desplazamiento discreto y análisis del entorno.", Level = CourseLevel.Beginner, Price = 240, StartDate = new DateOnly(2026, 11, 9), EndDate = new DateOnly(2026, 12, 14), MaxStudents = 15, Status = CourseStatus.Open, AcademyId = institutoCamuflaje.Id },
+                new Course { Name = "Interfaces web con componentes modernos", Description = "Construcción de interfaces mantenibles con componentes reutilizables.", Level = CourseLevel.Intermediate, Price = 320, StartDate = new DateOnly(2026, 11, 10), EndDate = new DateOnly(2027, 1, 12), MaxStudents = 24, Status = CourseStatus.Open, AcademyId = techMasters.Id },
+
+                new Course { Name = "Finanzas para decisiones valientes", Description = "Presupuestos, tesorería y lectura de indicadores para pequeños negocios.", Level = CourseLevel.Beginner, Price = 220, StartDate = new DateOnly(2026, 11, 12), EndDate = new DateOnly(2026, 12, 17), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = businessAcademy.Id },
+                new Course { Name = "SEO con brújula y palabras clave", Description = "Planificación de contenidos y posicionamiento orgánico con criterio.", Level = CourseLevel.Intermediate, Price = 260, StartDate = new DateOnly(2026, 11, 16), EndDate = new DateOnly(2026, 12, 21), MaxStudents = 16, Status = CourseStatus.Open, AcademyId = digitalSkillsHub.Id },
+                new Course { Name = "Prototipos que cuentan historias", Description = "Diseño de experiencias y prototipos navegables centrados en las personas.", Level = CourseLevel.Intermediate, Price = 280, StartDate = new DateOnly(2026, 11, 18), EndDate = new DateOnly(2027, 1, 20), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = creativeDesignLab.Id },
+                new Course { Name = "Código limpio para mentes curiosas", Description = "Bases sólidas de programación, pruebas y buenas prácticas.", Level = CourseLevel.Beginner, Price = 240, StartDate = new DateOnly(2026, 11, 23), EndDate = new DateOnly(2027, 1, 18), MaxStudents = 30, Status = CourseStatus.Open, AcademyId = futureCoders.Id },
+
+                new Course { Name = "English for the next challenge", Description = "Inglés práctico para entrevistas, reuniones y proyectos internacionales.", Level = CourseLevel.Intermediate, Price = 230, StartDate = new DateOnly(2026, 11, 24), EndDate = new DateOnly(2027, 1, 26), MaxStudents = 22, Status = CourseStatus.Open, AcademyId = globalLanguages.Id },
+                new Course { Name = "Primeros auxilios en acción", Description = "Respuesta inicial ante emergencias habituales en el entorno laboral.", Level = CourseLevel.Beginner, Price = 190, StartDate = new DateOnly(2026, 12, 1), EndDate = new DateOnly(2026, 12, 22), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = healthLearningCenter.Id },
+                new Course { Name = "Mantenimiento industrial sin secretos", Description = "Principios de mantenimiento preventivo para instalaciones y maquinaria.", Level = CourseLevel.Intermediate, Price = 310, StartDate = new DateOnly(2026, 12, 2), EndDate = new DateOnly(2027, 1, 28), MaxStudents = 24, Status = CourseStatus.Open, AcademyId = industrialTraining.Id },
+                new Course { Name = "Datos que explican el mundo", Description = "Introducción al análisis exploratorio y a la comunicación de resultados.", Level = CourseLevel.Beginner, Price = 300, StartDate = new DateOnly(2026, 12, 3), EndDate = new DateOnly(2027, 1, 21), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = dataScienceAcademy.Id },
+
+                new Course { Name = "Energía solar desde el tejado", Description = "Diseño básico de instalaciones solares y cálculo de rendimiento.", Level = CourseLevel.Intermediate, Price = 270, StartDate = new DateOnly(2026, 12, 7), EndDate = new DateOnly(2027, 1, 25), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = greenEnergySchool.Id },
+                new Course { Name = "Anfitriones que dejan huella", Description = "Comunicación, hospitalidad y resolución de situaciones con clientes.", Level = CourseLevel.Beginner, Price = 180, StartDate = new DateOnly(2026, 12, 9), EndDate = new DateOnly(2027, 1, 13), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = hospitalityExperts.Id },
+                new Course { Name = "Defensa digital para equipos", Description = "Hábitos y controles esenciales para proteger cuentas y dispositivos.", Level = CourseLevel.Beginner, Price = 250, StartDate = new DateOnly(2026, 12, 10), EndDate = new DateOnly(2027, 1, 14), MaxStudents = 16, Status = CourseStatus.Open, AcademyId = cyberSecurityHub.Id },
+                new Course { Name = "Ideas con rumbo de proyecto", Description = "De la intuición inicial a un plan de proyecto comprobable.", Level = CourseLevel.Beginner, Price = 210, StartDate = new DateOnly(2026, 12, 14), EndDate = new DateOnly(2027, 1, 18), MaxStudents = 22, Status = CourseStatus.Open, AcademyId = innovationAcademy.Id },
+
+                new Course { Name = "Entrevistas que encuentran talento", Description = "Preparación de entrevistas estructuradas y evaluación responsable.", Level = CourseLevel.Advanced, Price = 260, StartDate = new DateOnly(2027, 1, 11), EndDate = new DateOnly(2027, 2, 8), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = adeccoSchool.Id },
+                new Course { Name = "Matemáticas para resolver problemas", Description = "Estrategias prácticas para razonar, estimar y comprobar resultados.", Level = CourseLevel.Beginner, Price = 170, StartDate = new DateOnly(2027, 1, 12), EndDate = new DateOnly(2027, 2, 9), MaxStudents = 32, Status = CourseStatus.Open, AcademyId = espanaEduca.Id },
+                new Course { Name = "Camuflaje urbano y lectura del terreno", Description = "Prácticas de adaptación visual y orientación en entornos urbanos.", Level = CourseLevel.Intermediate, Price = 260, StartDate = new DateOnly(2027, 1, 13), EndDate = new DateOnly(2027, 2, 17), MaxStudents = 18, Status = CourseStatus.Open, AcademyId = institutoCamuflaje.Id },
+                new Course { Name = "Servicios web con .NET", Description = "Diseño de APIs y servicios robustos para aplicaciones conectadas.", Level = CourseLevel.Advanced, Price = 360, StartDate = new DateOnly(2027, 1, 18), EndDate = new DateOnly(2027, 3, 2), MaxStudents = 18, Status = CourseStatus.Open, AcademyId = techMasters.Id },
+
+                new Course { Name = "Liderazgo sereno en tiempos de cambio", Description = "Herramientas para coordinar equipos y tomar decisiones con claridad.", Level = CourseLevel.Intermediate, Price = 290, StartDate = new DateOnly(2027, 1, 20), EndDate = new DateOnly(2027, 2, 24), MaxStudents = 22, Status = CourseStatus.Open, AcademyId = businessAcademy.Id },
+                new Course { Name = "Campañas digitales con propósito", Description = "Planificación, segmentación y medición de campañas digitales.", Level = CourseLevel.Intermediate, Price = 280, StartDate = new DateOnly(2027, 1, 21), EndDate = new DateOnly(2027, 2, 25), MaxStudents = 18, Status = CourseStatus.Open, AcademyId = digitalSkillsHub.Id },
+                new Course { Name = "Tipografía, color y jerarquía visual", Description = "Decisiones visuales para crear piezas claras, atractivas y coherentes.", Level = CourseLevel.Beginner, Price = 230, StartDate = new DateOnly(2027, 1, 25), EndDate = new DateOnly(2027, 2, 22), MaxStudents = 15, Status = CourseStatus.Open, AcademyId = creativeDesignLab.Id },
+                new Course { Name = "Java para construir soluciones", Description = "Programación orientada a objetos y resolución de problemas reales.", Level = CourseLevel.Intermediate, Price = 310, StartDate = new DateOnly(2027, 1, 27), EndDate = new DateOnly(2027, 3, 10), MaxStudents = 24, Status = CourseStatus.Open, AcademyId = futureCoders.Id },
+
+                new Course { Name = "Français pour voyager et travailler", Description = "Francés funcional para viajes, atención al público y trabajo.", Level = CourseLevel.Beginner, Price = 220, StartDate = new DateOnly(2027, 2, 1), EndDate = new DateOnly(2027, 3, 8), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = globalLanguages.Id },
+                new Course { Name = "Bienestar y hábitos sostenibles", Description = "Rutinas saludables y prevención del desgaste en la vida diaria.", Level = CourseLevel.Beginner, Price = 160, StartDate = new DateOnly(2027, 2, 3), EndDate = new DateOnly(2027, 2, 24), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = healthLearningCenter.Id },
+                new Course { Name = "Soldadura y unión de materiales", Description = "Principios de seguridad y técnicas básicas de unión industrial.", Level = CourseLevel.Intermediate, Price = 340, StartDate = new DateOnly(2027, 2, 8), EndDate = new DateOnly(2027, 3, 19), MaxStudents = 18, Status = CourseStatus.Open, AcademyId = industrialTraining.Id },
+                new Course { Name = "Python para explorar datos", Description = "Automatización y análisis de datos con Python desde cero.", Level = CourseLevel.Intermediate, Price = 330, StartDate = new DateOnly(2027, 2, 10), EndDate = new DateOnly(2027, 3, 24), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = dataScienceAcademy.Id },
+
+                new Course { Name = "Eficiencia energética en edificios", Description = "Medición del consumo y propuestas para reducir la huella energética.", Level = CourseLevel.Advanced, Price = 300, StartDate = new DateOnly(2027, 2, 15), EndDate = new DateOnly(2027, 3, 22), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = greenEnergySchool.Id },
+                new Course { Name = "Diseño de experiencias gastronómicas", Description = "Creación de propuestas memorables para restaurantes y eventos.", Level = CourseLevel.Intermediate, Price = 250, StartDate = new DateOnly(2027, 2, 17), EndDate = new DateOnly(2027, 3, 17), MaxStudents = 22, Status = CourseStatus.Open, AcademyId = hospitalityExperts.Id },
+                new Course { Name = "Ethical Hacking: pensar como un atacante", Description = "Reconocimiento, amenazas y defensa desde una perspectiva responsable.", Level = CourseLevel.Advanced, Price = 390, StartDate = new DateOnly(2027, 2, 22), EndDate = new DateOnly(2027, 4, 5), MaxStudents = 16, Status = CourseStatus.Open, AcademyId = cyberSecurityHub.Id },
+                new Course { Name = "Prototipado rápido de nuevos servicios", Description = "Experimentación, entrevistas y validación de ideas en poco tiempo.", Level = CourseLevel.Intermediate, Price = 270, StartDate = new DateOnly(2027, 2, 24), EndDate = new DateOnly(2027, 3, 31), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = innovationAcademy.Id },
+
+                new Course { Name = "Nóminas y relaciones laborales", Description = "Conceptos esenciales para comprender la gestión laboral cotidiana.", Level = CourseLevel.Intermediate, Price = 240, StartDate = new DateOnly(2027, 3, 1), EndDate = new DateOnly(2027, 3, 29), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = adeccoSchool.Id },
+                new Course { Name = "Lengua para comunicar mejor", Description = "Escritura, expresión oral y comprensión para contextos académicos.", Level = CourseLevel.Beginner, Price = 160, StartDate = new DateOnly(2027, 3, 3), EndDate = new DateOnly(2027, 3, 31), MaxStudents = 30, Status = CourseStatus.Open, AcademyId = espanaEduca.Id },
+                new Course { Name = "Centro de mando y coordinación", Description = "Organización de equipos, comunicaciones y toma de decisiones bajo presión.", Level = CourseLevel.Advanced, Price = 320, StartDate = new DateOnly(2027, 3, 8), EndDate = new DateOnly(2027, 4, 12), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = institutoCamuflaje.Id },
+                new Course { Name = "DevOps para equipos pequeños", Description = "Automatización, integración continua y entregas repetibles.", Level = CourseLevel.Advanced, Price = 370, StartDate = new DateOnly(2027, 3, 10), EndDate = new DateOnly(2027, 4, 21), MaxStudents = 30, Status = CourseStatus.Open, AcademyId = techMasters.Id },
+
+                new Course { Name = "Emprender con números claros", Description = "Modelo de negocio, costes y decisiones financieras para emprender.", Level = CourseLevel.Intermediate, Price = 270, StartDate = new DateOnly(2027, 3, 15), EndDate = new DateOnly(2027, 4, 19), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = businessAcademy.Id },
+                new Course { Name = "Analítica web para mejorar", Description = "Lectura de métricas y experimentos para optimizar resultados.", Level = CourseLevel.Advanced, Price = 310, StartDate = new DateOnly(2027, 3, 17), EndDate = new DateOnly(2027, 4, 14), MaxStudents = 18, Status = CourseStatus.Open, AcademyId = digitalSkillsHub.Id },
+                new Course { Name = "Figma: del boceto al prototipo", Description = "Flujos, componentes y prototipos interactivos en Figma.", Level = CourseLevel.Intermediate, Price = 290, StartDate = new DateOnly(2027, 3, 22), EndDate = new DateOnly(2027, 4, 26), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = creativeDesignLab.Id },
+                new Course { Name = "Python para automatizar tareas", Description = "Scripts útiles para ahorrar tiempo y trabajar con archivos y datos.", Level = CourseLevel.Beginner, Price = 280, StartDate = new DateOnly(2027, 3, 24), EndDate = new DateOnly(2027, 4, 28), MaxStudents = 20, Status = CourseStatus.Open, AcademyId = futureCoders.Id },
+
+                new Course { Name = "Deutsch im digitalen Büro", Description = "Alemán práctico para correos, reuniones y herramientas de trabajo.", Level = CourseLevel.Intermediate, Price = 230, StartDate = new DateOnly(2027, 4, 5), EndDate = new DateOnly(2027, 5, 10), MaxStudents = 30, Status = CourseStatus.Open, AcademyId = globalLanguages.Id },
+                new Course { Name = "Ciencia de datos para decisiones", Description = "Modelos sencillos y visualización para convertir datos en acción.", Level = CourseLevel.Advanced, Price = 380, StartDate = new DateOnly(2027, 4, 7), EndDate = new DateOnly(2027, 5, 19), MaxStudents = 25, Status = CourseStatus.Open, AcademyId = dataScienceAcademy.Id },
+                new Course { Name = "Redes industriales conectadas", Description = "Comunicación entre dispositivos y fundamentos de automatización industrial.", Level = CourseLevel.Advanced, Price = 360, StartDate = new DateOnly(2027, 4, 12), EndDate = new DateOnly(2027, 5, 24), MaxStudents = 22, Status = CourseStatus.Open, AcademyId = industrialTraining.Id },
+                new Course { Name = "Innovación responsable y sostenible", Description = "Diseño de soluciones nuevas con impacto social y ambiental positivo.", Level = CourseLevel.Advanced, Price = 300, StartDate = new DateOnly(2027, 4, 14), EndDate = new DateOnly(2027, 5, 26), MaxStudents = 22, Status = CourseStatus.Open, AcademyId = innovationAcademy.Id }
+            );
+
+            context.SaveChanges();
+        }
+
+        /* if (!context.Grades.Any())
         {
             context.Grades.AddRange(
                 new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho" },
@@ -74,8 +234,10 @@ public static class DbInitializer
             );
 
             context.SaveChanges();
-        }
+
+        } */
     }
+
 
     private static async Task EnsureRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)
     {
