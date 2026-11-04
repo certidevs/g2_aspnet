@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Data;
 
@@ -10,7 +10,8 @@ public class ClassroomController(ApplicationDbContext context) : Controller
 
     public IActionResult Index()
     {
-        var classrooms = context.Classrooms.Include(c => c.Name).OrderBy(c => c.Name).ToList();
+        var classrooms = context.Classrooms.OrderBy(c => c.Name).ToList();
+        
         return View(classrooms);
     }
 /*     public IActionResult Details(int id)

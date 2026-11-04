@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Data;
 
@@ -12,7 +12,10 @@ public class AcademyController(ApplicationDbContext context) : Controller
     {
         var query = context.Academies.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(a => a.Name.ToLower().Contains(search, StringComparison.CurrentCultureIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(a => a.Name.ToLower().Contains(search.ToLower()));
+        }
 
         if (location != null) query = query.Where(a => a.Location == location);
 
