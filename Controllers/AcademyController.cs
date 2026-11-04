@@ -8,19 +8,19 @@ public class AcademyController(ApplicationDbContext context) : Controller
 {
     private readonly ApplicationDbContext context = context;
 
-    public async Task<IActionResult> Index(string? search, string? location)
+    public async Task<IActionResult> Index(string? search, string? city)
     {
         var query = context.Academies.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            query = query.Where(a => a.Name.ToLower().Contains(search.ToLower()));
+            query = query.Where(a => a.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        if (location != null) query = query.Where(a => a.Location == location);
+        if (city != null) query = query.Where(a => a.City == city);
 
         ViewBag.Search = search;
-        ViewBag.Location = location;
+        ViewBag.City = city;
 
         var academies = await query.OrderBy(a => a.Name).ToListAsync();
         return View(academies);

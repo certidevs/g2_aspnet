@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Models;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace G2AspNet.Data;
 
@@ -50,22 +51,22 @@ public static class DbInitializer
         if (!context.Academies.Any())
         {
             context.Academies.AddRange(
-                new Academy { Name = "Adecco School", Description = "Compañía especializada en recursos humanos y formación profesional.", Location = "Global" },
-                new Academy { Name = "España Educa", Description = "Centro dedicado a la formación online y presencial para estudiantes y profesionales.", Location = "España" },
-                new Academy { Name = "Instituto de Camuflaje", Description = "Academia experimental utilizada para pruebas y validaciones de la aplicación.", Location = "Madrid" },
-                new Academy { Name = "Tech Masters", Description = "Escuela enfocada en programación, desarrollo web y nuevas tecnologías.", Location = "Barcelona" },
-                new Academy { Name = "Business Academy", Description = "Formación especializada en gestión empresarial, finanzas y liderazgo.", Location = "Valencia" },
-                new Academy { Name = "Digital Skills Hub", Description = "Centro de capacitación en marketing digital, SEO y analítica web.", Location = "Sevilla" },
-                new Academy { Name = "Creative Design Lab", Description = "Academia centrada en diseño gráfico, UX/UI e ilustración digital.", Location = "Bilbao" },
-                new Academy { Name = "Future Coders", Description = "Programas formativos para desarrolladores junior y perfiles tecnológicos.", Location = "Málaga" },
-                new Academy { Name = "Global Languages", Description = "Escuela de idiomas con cursos de inglés, francés y alemán.", Location = "Madrid" },
-                new Academy { Name = "Health Learning Center", Description = "Academia especializada en formación sanitaria y bienestar personal.", Location = "Zaragoza" },
-                new Academy { Name = "Industrial Training", Description = "Centro de formación técnica para sectores industriales y productivos.", Location = "Vigo" },
-                new Academy { Name = "Data Science Academy", Description = "Cursos avanzados de análisis de datos, IA y aprendizaje automático.", Location = "Barcelona" },
-                new Academy { Name = "Green Energy School", Description = "Formación en energías renovables, sostenibilidad y medio ambiente.", Location = "Pamplona" },
-                new Academy { Name = "Hospitality Experts", Description = "Academia orientada al turismo, hostelería y atención al cliente.", Location = "Palma de Mallorca" },
-                new Academy { Name = "Cyber Security Hub", Description = "Centro especializado en ciberseguridad, redes y protección de sistemas.", Location = "Alicante" },
-                new Academy { Name = "Innovation Academy", Description = "Escuela de innovación, emprendimiento y gestión de proyectos digitales.", Location = "Granada" }
+                new Academy { Name = "Adecco School", Description = "Compañía especializada en recursos humanos y formación profesional.", Address = "Calle de la Innovación, 12", City = "Madrid", Phone = "+34 912 345 678" },
+                new Academy { Name = "España Educa", Description = "Centro dedicado a la formación online y presencial para estudiantes y profesionales.", Address = "Avenida del Conocimiento, 45", City = "Barcelona", Phone = "+34 934 567 890" },
+                new Academy { Name = "Instituto de Camuflaje", Description = "Academia experimental utilizada para pruebas y validaciones de la aplicación.", Address = "Calle del Camuflaje, 1", City = "Madrid", Phone = "+34 912 345 678" },
+                new Academy { Name = "Tech Masters", Description = "Escuela enfocada en programación, desarrollo web y nuevas tecnologías.", Address = "Avenida de la Tecnología, 100", City = "Barcelona", Phone = "+34 934 567 890" },
+                new Academy { Name = "Business Academy", Description = "Formación especializada en gestión empresarial, finanzas y liderazgo.", Address = "Calle del Negocio, 25", City = "Valencia", Phone = "+34 963 123 456" },
+                new Academy { Name = "Digital Skills Hub", Description = "Centro de capacitación en marketing digital, SEO y analítica web.", Address = "Avenida de los Datos, 75", City = "Sevilla", Phone = "+34 954 987 654" },
+                new Academy { Name = "Creative Design Lab", Description = "Academia centrada en diseño gráfico, UX/UI e ilustración digital.", Address = "Calle del Diseño, 50", City = "Bilbao", Phone = "+34 944 111 222" },
+                new Academy { Name = "Future Coders", Description = "Programas formativos para desarrolladores junior y perfiles tecnológicos.", Address = "Avenida de la Tecnología, 150", City = "Málaga", Phone = "+34 952 345 678" },
+                new Academy { Name = "Global Languages", Description = "Escuela de idiomas con cursos de inglés, francés y alemán.", Address = "Calle del Idioma, 30", City = "Madrid", Phone = "+34 912 345 678" },
+                new Academy { Name = "Health Learning Center", Description = "Academia especializada en formación sanitaria y bienestar personal.", Address = "Avenida de la Salud, 20", City = "Zaragoza", Phone = "+34 976 123 456" },
+                new Academy { Name = "Industrial Training", Description = "Centro de formación técnica para sectores industriales y productivos.", Address = "Calle Industrial, 10", City = "Vigo", Phone = "+34 986 789 012" },
+                new Academy { Name = "Data Science Academy", Description = "Cursos avanzados de análisis de datos, IA y aprendizaje automático.", Address = "Avenida de los Datos, 80", City = "Barcelona", Phone = "+34 934 567 890" },
+                new Academy { Name = "Green Energy School", Description = "Formación en energías renovables, sostenibilidad y medio ambiente.", Address = "Calle de la Energía, 40", City = "Pamplona", Phone = "+34 948 567 890" },
+                new Academy { Name = "Hospitality Experts", Description = "Academia orientada al turismo, hostelería y atención al cliente.", Address = "Avenida del Turismo, 60", City = "Palma de Mallorca", Phone = "+34 971 234 567" },
+                new Academy { Name = "Cyber Security Hub", Description = "Centro especializado en ciberseguridad, redes y protección de sistemas.", Address = "Calle de la Seguridad, 25", City = "Alicante", Phone = "+34 965 432 109" },
+                new Academy { Name = "Innovation Academy", Description = "Escuela de innovación, emprendimiento y gestión de proyectos digitales.", Address = "Avenida de la Innovación, 100", City = "Granada", Phone = "+34 958 765 432" }
             );
 
             context.SaveChanges();
@@ -86,60 +87,60 @@ public static class DbInitializer
             var cyberSecurityHub = context.Academies.First(a => a.Name == "Cyber Security Hub");
 
             context.Classrooms.AddRange(
-                new Classroom { Name = "Primer Año", Capacity = 30, IsActive = true, AcademyId = adeccoSchool.Id },
-                new Classroom { Name = "Segundo Año", Capacity = 25, IsActive = false, AcademyId = adeccoSchool.Id },
-                new Classroom { Name = "Adecco Online", Capacity = 15, MeetingUrl = "https://meet.adecco.com/aula1", IsActive = true, AcademyId = adeccoSchool.Id },
-                new Classroom { Name = "Sala Norte", Capacity = 28, IsActive = true, AcademyId = adeccoSchool.Id },
+                new Classroom { Name = "Primer Año", Capacity = 30, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = adeccoSchool },
+                new Classroom { Name = "Segundo Año", Capacity = 25, ClassroomType = ClassroomType.Physic, IsActive = false, Academy = adeccoSchool },
+                new Classroom { Name = "Adecco Online", Capacity = 15, ClassroomType = ClassroomType.Online, MeetingUrl = "https://meet.adecco.com/aula1", IsActive = true, Academy = adeccoSchool },
+                new Classroom { Name = "Sala Norte", Capacity = 28, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = adeccoSchool },
 
-                new Classroom { Name = "Historia Moderna", Capacity = 40, IsActive = true, AcademyId = espanaEduca.Id },
-                new Classroom { Name = "Matemáticas A", Capacity = 32, IsActive = true, AcademyId = espanaEduca.Id },
-                new Classroom { Name = "Lengua Castellana", Capacity = 30, IsActive = true, AcademyId = espanaEduca.Id },
-                new Classroom { Name = "Aula Virtual ESO", Capacity = 50, MeetingUrl = "https://campus.espanaeduca.es/eso", IsActive = true, AcademyId = espanaEduca.Id },
+                new Classroom { Name = "Historia Moderna", Capacity = 40, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = espanaEduca },
+                new Classroom { Name = "Matemáticas A", Capacity = 32, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = espanaEduca },
+                new Classroom { Name = "Lengua Castellana", Capacity = 30, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = espanaEduca },
+                new Classroom { Name = "Aula Virtual ESO", Capacity = 50, ClassroomType = ClassroomType.Online, MeetingUrl = "https://campus.espanaeduca.es/eso", IsActive = true, Academy = espanaEduca },
 
-                new Classroom { Name = "Sigilo I", Capacity = 15, IsActive = true, AcademyId = institutoCamuflaje.Id },
-                new Classroom { Name = "Camuflaje Urbano", Capacity = 18, IsActive = true, AcademyId = institutoCamuflaje.Id },
-                new Classroom { Name = "Centro de Mando", Capacity = 25, IsActive = true, AcademyId = institutoCamuflaje.Id },
-                new Classroom { Name = "Online Encubierto", Capacity = 30, MeetingUrl = "https://camuflaje.edu/online", IsActive = true, AcademyId = institutoCamuflaje.Id },
+                new Classroom { Name = "Sigilo I", Capacity = 15, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = institutoCamuflaje },
+                new Classroom { Name = "Camuflaje Urbano", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = institutoCamuflaje },
+                new Classroom { Name = "Centro de Mando", Capacity = 25, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = institutoCamuflaje },
+                new Classroom { Name = "Online Encubierto", Capacity = 30, ClassroomType = ClassroomType.Online, MeetingUrl = "https://camuflaje.edu/online", IsActive = true, Academy = institutoCamuflaje },
 
-                new Classroom { Name = "Programación Web", Capacity = 24, IsActive = true, AcademyId = techMasters.Id },
-                new Classroom { Name = "Angular Lab", Capacity = 20, IsActive = true, AcademyId = techMasters.Id },
-                new Classroom { Name = "NET Advanced", Capacity = 18, IsActive = true, AcademyId = techMasters.Id },
-                new Classroom { Name = "DevOps Online", Capacity = 30, MeetingUrl = "https://techmasters.com/devops", IsActive = true, AcademyId = techMasters.Id },
+                new Classroom { Name = "Programación Web", Capacity = 24, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = techMasters },
+                new Classroom { Name = "Angular Lab", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = techMasters },
+                new Classroom { Name = "NET Advanced", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = techMasters },
+                new Classroom { Name = "DevOps Online", Capacity = 30, ClassroomType = ClassroomType.Online, MeetingUrl = "https://techmasters.com/devops", IsActive = true, Academy = techMasters },
 
-                new Classroom { Name = "Finanzas 101", Capacity = 25, IsActive = true, AcademyId = businessAcademy.Id },
-                new Classroom { Name = "Dirección Estratégica", Capacity = 22, IsActive = true, AcademyId = businessAcademy.Id },
-                new Classroom { Name = "Gestión de Equipos", Capacity = 20, IsActive = false, AcademyId = businessAcademy.Id },
-                new Classroom { Name = "MBA Virtual", Capacity = 45, MeetingUrl = "https://businessacademy.edu/mba", IsActive = true, AcademyId = businessAcademy.Id },
+                new Classroom { Name = "Finanzas 101", Capacity = 25, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = businessAcademy },
+                new Classroom { Name = "Dirección Estratégica", Capacity = 22, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = businessAcademy },
+                new Classroom { Name = "Gestión de Equipos", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = false, Academy = businessAcademy },
+                new Classroom { Name = "MBA Virtual", Capacity = 45, ClassroomType = ClassroomType.Online, MeetingUrl = "https://businessacademy.edu/mba", IsActive = true, Academy = businessAcademy },
 
-                new Classroom { Name = "SEO Fundamentals", Capacity = 16, IsActive = true, AcademyId = digitalSkillsHub.Id },
-                new Classroom { Name = "Google Ads Pro", Capacity = 18, IsActive = true, AcademyId = digitalSkillsHub.Id },
-                new Classroom { Name = "Social Media Lab", Capacity = 20, IsActive = true, AcademyId = digitalSkillsHub.Id },
-                new Classroom { Name = "Marketing Online", Capacity = 35, MeetingUrl = "https://dshub.es/online", IsActive = true, AcademyId = digitalSkillsHub.Id },
+                new Classroom { Name = "SEO Fundamentals", Capacity = 16, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = digitalSkillsHub },
+                new Classroom { Name = "Google Ads Pro", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = digitalSkillsHub },
+                new Classroom { Name = "Social Media Lab", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = digitalSkillsHub },
+                new Classroom { Name = "Marketing Online", Capacity = 35, ClassroomType = ClassroomType.Online, MeetingUrl = "https://dshub.es/online", IsActive = true, Academy = digitalSkillsHub },
 
-                new Classroom { Name = "Diseño UX", Capacity = 15, IsActive = true, AcademyId = creativeDesignLab.Id },
-                new Classroom { Name = "Diseño UI", Capacity = 15, IsActive = true, AcademyId = creativeDesignLab.Id },
-                new Classroom { Name = "Figma Studio", Capacity = 20, IsActive = true, AcademyId = creativeDesignLab.Id },
-                new Classroom { Name = "Arte Digital", Capacity = 25, IsActive = false, AcademyId = creativeDesignLab.Id },
+                new Classroom { Name = "Diseño UX", Capacity = 15, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = creativeDesignLab },
+                new Classroom { Name = "Diseño UI", Capacity = 15, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = creativeDesignLab },
+                new Classroom { Name = "Figma Studio", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = creativeDesignLab },
+                new Classroom { Name = "Arte Digital", Capacity = 25, ClassroomType = ClassroomType.Physic, IsActive = false, Academy = creativeDesignLab },
 
-                new Classroom { Name = "Coding Basics", Capacity = 30, IsActive = true, AcademyId = futureCoders.Id },
-                new Classroom { Name = "Java Essentials", Capacity = 24, IsActive = true, AcademyId = futureCoders.Id },
-                new Classroom { Name = "Python Lab", Capacity = 20, IsActive = true, AcademyId = futureCoders.Id },
-                new Classroom { Name = "Bootcamp Remote", Capacity = 40, MeetingUrl = "https://futurecoders.dev/remote", IsActive = true, AcademyId = futureCoders.Id },
+                new Classroom { Name = "Coding Basics", Capacity = 30, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = futureCoders },
+                new Classroom { Name = "Java Essentials", Capacity = 24, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = futureCoders },
+                new Classroom { Name = "Python Lab", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = futureCoders },
+                new Classroom { Name = "Bootcamp Remote", Capacity = 40, ClassroomType = ClassroomType.Online, MeetingUrl = "https://futurecoders.dev/remote", IsActive = true, Academy = futureCoders },
 
-                new Classroom { Name = "English A1", Capacity = 22, IsActive = true, AcademyId = globalLanguages.Id },
-                new Classroom { Name = "English C1", Capacity = 18, IsActive = true, AcademyId = globalLanguages.Id },
-                new Classroom { Name = "French B1", Capacity = 20, IsActive = true, AcademyId = globalLanguages.Id },
-                new Classroom { Name = "German Online", Capacity = 30, MeetingUrl = "https://languages.global/german", IsActive = true, AcademyId = globalLanguages.Id },
+                new Classroom { Name = "English A1", Capacity = 22, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = globalLanguages },
+                new Classroom { Name = "English C1", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = globalLanguages },
+                new Classroom { Name = "French B1", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = globalLanguages },
+                new Classroom { Name = "German Online", Capacity = 30, ClassroomType = ClassroomType.Online, MeetingUrl = "https://languages.global/german", IsActive = true, Academy = globalLanguages },
 
-                new Classroom { Name = "Machine Learning", Capacity = 20, IsActive = true, AcademyId = dataScienceAcademy.Id },
-                new Classroom { Name = "Data Analytics", Capacity = 25, IsActive = true, AcademyId = dataScienceAcademy.Id },
-                new Classroom { Name = "Power BI Lab", Capacity = 18, IsActive = false, AcademyId = dataScienceAcademy.Id },
-                new Classroom { Name = "Big Data Online", Capacity = 45, MeetingUrl = "https://datascience.academy/bigdata", IsActive = true, AcademyId = dataScienceAcademy.Id },
+                new Classroom { Name = "Machine Learning", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = dataScienceAcademy },
+                new Classroom { Name = "Data Analytics", Capacity = 25, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = dataScienceAcademy },
+                new Classroom { Name = "Power BI Lab", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = false, Academy = dataScienceAcademy },
+                new Classroom { Name = "Big Data Online", Capacity = 45, ClassroomType = ClassroomType.Online, MeetingUrl = "https://datascience.academy/bigdata", IsActive = true, Academy = dataScienceAcademy },
 
-                new Classroom { Name = "Ethical Hacking", Capacity = 16, IsActive = true, AcademyId = cyberSecurityHub.Id },
-                new Classroom { Name = "Network Security", Capacity = 22, IsActive = true, AcademyId = cyberSecurityHub.Id },
-                new Classroom { Name = "SOC Operations", Capacity = 18, IsActive = true, AcademyId = cyberSecurityHub.Id },
-                new Classroom { Name = "Cyber Range", Capacity = 30, MeetingUrl = "https://cyberhub.org/range", IsActive = true, AcademyId = cyberSecurityHub.Id }
+                new Classroom { Name = "Ethical Hacking", Capacity = 16, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = cyberSecurityHub },
+                new Classroom { Name = "Network Security", Capacity = 22, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = cyberSecurityHub },
+                new Classroom { Name = "SOC Operations", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = cyberSecurityHub },
+                new Classroom { Name = "Cyber Range", Capacity = 30, ClassroomType = ClassroomType.Online, MeetingUrl = "https://cyberhub.org/range", IsActive = true, Academy = cyberSecurityHub }
             );
 
             context.SaveChanges();

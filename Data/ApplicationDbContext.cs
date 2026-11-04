@@ -29,6 +29,17 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     /// <summary>Configura las columnas añadidas a la tabla de usuarios de Identity.</summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Course>()
+            .HasOne(c => c.Academy)
+            .WithMany(a => a.Courses)
+            .HasForeignKey(c => c.AcademyId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Classroom>()
+            .HasOne(c => c.Academy)
+            .WithMany(a => a.Classrooms)
+            .HasForeignKey(c => c.AcademyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<ApplicationUser>(entity =>
