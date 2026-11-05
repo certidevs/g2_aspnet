@@ -11,9 +11,11 @@
 
     <div class="row">
         <div class="col-md-8 mb-3">
-            <label class="form-label" asp-for="StudentId">Alumno</label>
-            <input class="form-control" asp-for="StudentId" />
-            <span class="text-danger" asp-validation-for="StudentId"></span>
+            <label class="form-label" asp-for="CourseId">Curso</label>
+            <select class="form-select" asp-for="CourseId" asp-items="ViewBag.Courses">
+                <option value="">Selecciona un curso</option>
+            </select>
+            <span class="text-danger" asp-validation-for="CourseId"></span>
         </div>
         
         <div class="form-check form-switch mb-3">
