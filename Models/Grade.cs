@@ -6,9 +6,6 @@ public class Grade
 {
     public int Id { get; set; }
 
-    public int EnrollmentId { get; set; }
-    public Enrollment? Enrollment { get; set; }
-
     [Required(ErrorMessage = "Debes proporcionar la nota")]
     [Range(0, 10, ErrorMessage = "La nota debe estar entre 0 y 10")]
     public double? Value { get; set; }
@@ -32,5 +29,9 @@ public class Grade
         }
     }
 
-    //public List<Entity> Entitys { get; set; } = new();
+
+    // FKs
+    public int EnrollmentId { get; set; }
+    public Enrollment? Enrollment { get; set; }
+
 }
