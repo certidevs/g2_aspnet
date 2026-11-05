@@ -6,8 +6,6 @@ namespace G2AspNet.Controllers;
 
 public class AcademyController(ApplicationDbContext context) : Controller
 {
-    private readonly ApplicationDbContext context = context;
-
     public async Task<IActionResult> Index(string? search, string? city)
     {
         var query = context.Academies.AsQueryable();

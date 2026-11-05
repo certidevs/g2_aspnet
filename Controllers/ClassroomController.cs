@@ -1,27 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Data;
+using G2AspNet.Models;
 
 namespace G2AspNet.Controllers;
 
 public class ClassroomController(ApplicationDbContext context) : Controller
 {
-    private readonly ApplicationDbContext context = context;
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var classrooms = context.Classrooms.OrderBy(c => c.Name).ToList();
-        
-        return View(classrooms);
+        var classroom = await context.Classrooms
+        .Include(c => c.Academy)
+        .OrderBy(c => c.Name)
+        .ToListAsync();
+
+        return View(classroom);
     }
-/*     public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        var academy = context.Academies.Include(a => a.Courses).FirstOrDefault(a => a.Id == id);
-        if (academy == null)
+        var classroom = await context.Classrooms
+        .Include(c => c.Academy)
+        .Include(c => c.Lessons)
+        .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (classroom == null)
         {
             return NotFound();
         }
 
-        return View(academy);
-    } */
+        return View(classroom);
+    }
 }
