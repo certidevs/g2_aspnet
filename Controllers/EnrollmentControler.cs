@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace G2AspNet.Controllers;
 
-public class EnrollementController : Controller
+public class EnrollmentController : Controller
 {
     private readonly ApplicationDbContext context;
 
-    public EnrollementController(ApplicationDbContext context)
+    public EnrollmentController(ApplicationDbContext context)
     {
         this.context = context;
     }

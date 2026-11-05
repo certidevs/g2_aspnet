@@ -20,7 +20,7 @@ public class Enrollment
     public Course? Course { get; set; }
 
 
-    // Lists (entities that have Enrollement as FK)
+    // Lists (entities that have Enrollment as FK)
     public List<Grade> Grades { get; set; } = new();
     public List<Attendance> Attendances { get; set; } = new();
 }
