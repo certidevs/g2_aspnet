@@ -13,6 +13,10 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            @if (User.IsInRole(RoleNames.Admin))
+            {
+                <th>Alumno</th>
+            }
             <th>Curso</th>
             <th>Fecha Matriculación</th>
             <th>Estatus matrícula</th>
@@ -23,6 +27,10 @@
         @foreach (var enrollment in Model)
         {
             <tr>
+                @if (User.IsInRole(RoleNames.Admin))
+                {
+                    <td>@(enrollment.Student?.DisplayName ?? enrollment.Student?.UserName ?? "Anónimo")</td>
+                }
                 <td>@enrollment.Course?.Name</td>
                 <td>@enrollment.EnrolledAt</td>
                 <td>@Html.DisplayFor(m => enrollment.Status)</td>
