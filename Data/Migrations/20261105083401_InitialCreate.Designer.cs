@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace G2AspNet.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261105082521_InitialCreate")]
+    [Migration("20261105083401_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
