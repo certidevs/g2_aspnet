@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace G2AspNet.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261030105944_InitialCreate")]
+    [Migration("20261105082521_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -26,16 +26,26 @@ namespace G2AspNet.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Location")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(30)
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -155,6 +165,9 @@ namespace G2AspNet.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Capacity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClassroomType")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsActive")
@@ -469,7 +482,7 @@ namespace G2AspNet.Data.Migrations
                     b.HasOne("G2AspNet.Models.Academy", "Academy")
                         .WithMany("Classrooms")
                         .HasForeignKey("AcademyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Academy");
@@ -480,7 +493,7 @@ namespace G2AspNet.Data.Migrations
                     b.HasOne("G2AspNet.Models.Academy", "Academy")
                         .WithMany("Courses")
                         .HasForeignKey("AcademyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("G2AspNet.Models.ApplicationUser", "Teacher")
