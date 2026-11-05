@@ -17,9 +17,11 @@ namespace G2AspNet.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    Location = table.Column<string>(type: "TEXT", nullable: true)
+                    Address = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    City = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -77,6 +79,7 @@ namespace G2AspNet.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
                     Capacity = table.Column<int>(type: "INTEGER", nullable: false),
+                    ClassroomType = table.Column<int>(type: "INTEGER", nullable: false),
                     MeetingUrl = table.Column<string>(type: "TEXT", nullable: true),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
                     AcademyId = table.Column<int>(type: "INTEGER", nullable: false)
@@ -89,7 +92,7 @@ namespace G2AspNet.Data.Migrations
                         column: x => x.AcademyId,
                         principalTable: "Academies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -223,7 +226,7 @@ namespace G2AspNet.Data.Migrations
                         column: x => x.AcademyId,
                         principalTable: "Academies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Courses_AspNetUsers_TeacherId",
                         column: x => x.TeacherId,
@@ -237,11 +240,11 @@ namespace G2AspNet.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    StudentId = table.Column<string>(type: "TEXT", nullable: false),
-                    CourseId = table.Column<int>(type: "INTEGER", nullable: false),
                     EnrolledAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsPaid = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false)
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    StudentId = table.Column<string>(type: "TEXT", nullable: false),
+                    CourseId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -295,11 +298,11 @@ namespace G2AspNet.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    EnrollmentId = table.Column<int>(type: "INTEGER", nullable: false),
                     Value = table.Column<double>(type: "REAL", nullable: false),
                     Comments = table.Column<string>(type: "TEXT", maxLength: 3000, nullable: true),
                     GradedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    GradeType = table.Column<int>(type: "INTEGER", nullable: true)
+                    GradeType = table.Column<int>(type: "INTEGER", nullable: true),
+                    EnrollmentId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
