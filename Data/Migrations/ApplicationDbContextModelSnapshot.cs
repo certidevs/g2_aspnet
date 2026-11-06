@@ -137,7 +137,8 @@ namespace G2AspNet.Data.Migrations
 
                     b.HasIndex("EnrollmentId");
 
-                    b.HasIndex("LessonId");
+                    b.HasIndex("LessonId", "EnrollmentId")
+                        .IsUnique();
 
                     b.ToTable("Attendances");
                 });

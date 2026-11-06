@@ -21,6 +21,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<Lesson> Lessons => Set<Lesson>();
     public DbSet<Attendance> Attendances => Set<Attendance>();
+
     public DbSet<Classroom> Classrooms => Set<Classroom>();
     public DbSet<Grade> Grades => Set<Grade>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
@@ -37,6 +38,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(user => user.AvatarFileName).HasMaxLength(260);
             entity.Property(user => user.CreatedAt).IsRequired();
         });
+
+        modelBuilder.Entity<Attendance>().HasIndex(a => new { a.LessonId, a.EnrollmentId }).IsUnique();
     }
 
 }
