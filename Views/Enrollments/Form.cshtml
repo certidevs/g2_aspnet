@@ -1,0 +1,37 @@
+@model Enrollment
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Nueva matrícula" : "Editar matrícula";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Save" method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label class="form-label" asp-for="CourseId">Curso</label>
+            <select class="form-select" asp-for="CourseId" asp-items="ViewBag.Courses">
+                <option value="">Selecciona un curso</option>
+            </select>
+            <span class="text-danger" asp-validation-for="CourseId"></span>
+        </div>
+        
+        @if (User.IsInRole(RoleNames.Admin))
+        {
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" asp-for="IsPaid" />
+                <label class="form-check-label" asp-for="IsPaid">Pagado</label>
+            </div>
+        }
+
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

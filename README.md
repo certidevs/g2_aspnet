@@ -20,7 +20,7 @@ Punto de partida común de todos los grupos: **solo la entidad `ApplicationUser`
 | Cuenta | Registro, login por usuario o email, logout y página de acceso denegado. |
 | Perfil | Consulta y edición del perfil, avatar y cambio de contraseña. |
 | Administración | Panel `/Users` (solo `Admin`): alta, edición, activación y borrado de usuarios. |
-| Datos | Entity Framework Core + SQLite (`App_Data/g2.db`), migración inicial de Identity y datos demo al arrancar. |
+| Datos | Entity Framework Core + SQLite (`App_Data/g2.db`), base recreada y datos demo al arrancar. |
 | Imágenes | `ImageStorage` para guardar imágenes subidas; hoy solo avatares (añadid vuestras carpetas en `ImageFolder`). |
 | Interfaz | Razor + Bootstrap 5 en local, con tema claro/oscuro. |
 | Calidad y despliegue | Proyecto de tests xUnit, GitHub Actions (compilar y testear) y `Dockerfile`. |
@@ -102,36 +102,63 @@ dotnet tool restore
 dotnet run --project G2AspNet.csproj --launch-profile http
 ```
 
-Abre `http://localhost:5108`. El primer arranque crea `App_Data/g2.db`, aplica la migración de Identity y añade los usuarios demo:
+Abre `http://localhost:5108`. El primer arranque crea `App_Data/g2.db`, crea las tablas y añade los usuarios demo:
 
-- `admin` / `Admin123!`
-- `user` / `User123!`
+| Usuario | Contraseña | Rol |
+| --- | --- | --- |
+| `admin` | `Admin123!` | Admin |
+| `user` | `User123!` | Teacher (profesor) |
+| `teacher` | `Teacher123!` | Teacher (profesor) |
+| `student` | `Student123!` | Student (alumno) |
+| `student2` | `Student123!` | Student (alumno) |
+| `student3` | `Student123!` | Student (alumno) |
 
 ## Trabajo en equipo en GitHub
 
 Todo el grupo tiene permiso de escritura en este repositorio. Para no pisaros el trabajo:
 
-1. **Una rama por tarea**, partiendo de `main` actualizado:
-
-   ```bash
-   git switch main
-   git pull
-   git switch -c feature/nombre-corto
-   ```
-
-2. **Commits pequeños y con mensaje claro** (`feat: ...`, `fix: ...`, `docs: ...`).
-3. **Subid la rama y abrid una Pull Request hacia `main`** (`git push -u origin feature/nombre-corto`). Que la revise al menos otra persona del equipo antes de fusionarla y que el *check* de GitHub Actions esté en verde.
-4. **No hagáis `push` directo a `main` ni `git push --force`.**
-5. Antes de abrir la PR, y cada vez que `main` avance, actualizad vuestra rama: `git pull --rebase origin main`.
+1. **Se trabaja directamente en `main`.** Quien ya sepa usar ramas puede usarlas, pero no es obligatorio.
+2. **Siempre `git pull` antes de `git push`** (y también antes de ponerte a trabajar, para tener lo último de los demás).
+3. **Un commit pequeño por cada cambio**, con un mensaje claro que diga qué has hecho y la issue a la que corresponde (por ejemplo, `#12 Añadir el campo IsPaid a Enrollment`).
+4. **No toques la entidad, el controlador ni las vistas de otra persona sin avisarle antes.** La tabla de abajo dice quién hace cada cosa.
+5. **No hagáis `git push --force`.**
 6. Repartid el trabajo con **Issues** (una persona por issue) y, si queréis, un tablero de **Projects**.
 
-### Migraciones de EF Core en equipo
+El ciclo de trabajo diario es siempre el mismo:
 
-Las migraciones (`Data/Migrations`) son lo que más choca al trabajar en paralelo, sobre todo `ApplicationDbContextModelSnapshot.cs`:
+```bash
+git pull
+# haces un cambio pequeño y compruebas que la aplicación arranca
+git add <fichero>
+git commit -m "#12 Descripción corta del cambio"
+git pull
+git push
+```
 
-- Avisad al equipo antes de crear una migración y fusionad su PR cuanto antes.
-- Si al actualizar con `main` hay conflicto en `Data/Migrations`, no lo resolváis a mano: descartad vuestros cambios en esa carpeta, integrad `main`, borrad vuestra base local (`App_Data/*.db`) y volved a crear la migración con `dotnet ef migrations add`.
-- Nunca editéis ni borréis migraciones que ya estén en `main`.
+### Entidades y quién las hace
+
+Tomado de las issues del repositorio. El responsable es la persona asignada a la issue; la entidad, su controlador y sus vistas tienen el mismo responsable.
+
+| Entidad | Controlador | Vistas | Responsable | Ya hecho y pendiente |
+| --- | --- | --- | --- | --- |
+| `Academy` (#5) | `AcademyController` (#17) | `Views/Academy` (#18) | Poulgar | **Ejemplo completo**: listado, detalle, crear, editar, borrar y formulario. |
+| `Classroom` (#13) | `ClassroomController` (#19) | `Views/Classroom` (#20) | Poulgar | Listado y detalle hechos. Pendiente: crear, editar, borrar y formulario. |
+| `Course` (#6) | `CoursesController` (#21) | `Views/Courses` (#22) | rubenbitrian | Listado, detalle, formulario, crear, editar y borrar hechos. Pendiente: que el formulario permita elegir centro y profesor. |
+| `Lesson` (#7) | `LessonsController` (#25) | `Views/Lessons` (#26) | Dracorufo | Listado y detalle hechos. Pendiente: crear, editar, borrar y formulario. |
+| `Attendance` (#14) | `AttendancesController` (#27) | `Views/Attendances` (#28) | rubenbitrian | Listado y detalle hechos. Pendiente: crear, editar, borrar y formulario. |
+| `Enrollment` (#12) | `EnrollmentsController` (#23) | `Views/Enrollments` (#24) | alfonvazquez | Listado, detalle, formulario, crear, editar y borrar hechos. |
+| `Grade` (#4) | `GradesController` (#10) | `Views/Grades` (#9) | alfonvazquez | Listado, detalle, formulario, crear, editar y borrar hechos. Pendiente: elegir la matrícula en una lista desplegable. |
+
+**Ejemplo para copiar:** `Academy` es la entidad completa y funcionando (`AcademyController` y `Views/Academy/Form.cshtml`). En `Classroom`, `Lesson` y `Attendance` el código de crear, editar y borrar ya está escrito pero **comentado**: buscad el marcador `DESCOMENTA` en su controlador, su `Form.cshtml`, `Index` y `Details`, descomentadlo y ajustadlo.
+
+### Base de datos en desarrollo
+
+Este proyecto **no usa migraciones**. Al arrancar, la aplicación borra `App_Data/g2.db`, la vuelve a crear a partir de las entidades y carga los datos demo de `Data/DbInitializer.cs` (es el equivalente a `create-drop` con H2 en Spring Boot). Por eso:
+
+- Si cambias una entidad o una relación, **solo tienes que volver a ejecutar la aplicación**.
+- Si haces `git pull` con cambios de otras personas, **solo tienes que volver a ejecutarla**.
+- No hay que ejecutar `dotnet ef` ni borrar la base a mano.
+- Los datos que crees a mano al probar se pierden al reiniciar. Lo que deba existir siempre se añade a `DbInitializer`.
 
 ## Comandos de trabajo diario
 
@@ -155,18 +182,7 @@ dotnet test G2AspNet.sln
 
 ### Entity Framework y SQLite
 
-`dotnet-ef` está fijado en `.config/dotnet-tools.json`, por lo que `dotnet tool restore` lo deja disponible sin instalar nada de forma global.
-
-```bash
-# Después de cambiar una entidad: crear y aplicar una migración
-dotnet ef migrations add NombreDescriptivo
-dotnet ef database update
-
-# Corregir la última migración solo antes de aplicarla a la base de datos
-dotnet ef migrations remove
-```
-
-Las migraciones se aplican también al arrancar la aplicación. El comando `database update` se incluye para conocer el flujo explícito.
+La base de datos se recrea al arrancar (ver *Base de datos en desarrollo*): no hay migraciones que crear ni aplicar.
 
 ### CI y Docker
 
@@ -184,7 +200,6 @@ El contenedor queda disponible en `http://localhost:10000`.
 ## IDEs
 
 En VS Code, selecciona el perfil `http` y pulsa F5 para depurar. Las tareas `G2: compilar` y `G2: ejecutar tests` están disponibles en **Terminal → Run Task**. En Windows, Visual Studio 2026 también abre `G2AspNet.sln`; consulta [la guía de IDEs](docs/IDE-SETUP.md).
-
 
 [ Firmado por Poulgar usando Push ]
 [ Firmado por Alfonso usando Push y rama auxiliar]

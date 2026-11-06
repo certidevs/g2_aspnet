@@ -1,0 +1,47 @@
+@model List<Enrollment>
+@{
+    ViewData["Title"] = "Mis matrículas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Mis matrículas</h1>
+    <a class="btn btn-success" asp-action="Create">Nueva matrícula</a>
+</div>
+
+<p>Hay @Model.Count matrículas.</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            @if (User.IsInRole(RoleNames.Admin))
+            {
+                <th>Alumno</th>
+            }
+            <th>Curso</th>
+            <th>Fecha Matriculación</th>
+            <th>Estatus matrícula</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var enrollment in Model)
+        {
+            <tr>
+                @if (User.IsInRole(RoleNames.Admin))
+                {
+                    <td>@(enrollment.Student?.DisplayName ?? enrollment.Student?.UserName ?? "Anónimo")</td>
+                }
+                <td>@enrollment.Course?.Name</td>
+                <td>@enrollment.EnrolledAt</td>
+                <td>@Html.DisplayFor(m => enrollment.Status)</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@enrollment.Id">Editar</a>
+                    <form asp-action="Delete" asp-route-id="@enrollment.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Borrar esta matrícula?');">
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Borrar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
