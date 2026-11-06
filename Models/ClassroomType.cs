@@ -4,9 +4,9 @@ namespace G2AspNet.Models;
 
 public enum ClassroomType
 {
-    [Display(Name = "Fisica")]
+    [Display(Name = "Física")]
     Physic,
 
-    [Display(Name = "Telematica")]
+    [Display(Name = "Telemática")]
     Online
 }

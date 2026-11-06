@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Models;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace G2AspNet.Data;
 
-/// <summary>Aplica migraciones y prepara roles y cuentas demo de forma idempotente.</summary>
+/// <summary>Recrea la base de datos desde las entidades y prepara roles y cuentas demo.</summary>
 public static class DbInitializer
 {
     public static async Task InitializeAsync(IServiceProvider services)
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        // Facilita arrancar en clase sin ejecutar comandos SQL manuales.
-        context.Database.Migrate();
+        // Proyecto de clase sin migraciones: la base se borra y se vuelve a crear
+        // desde las entidades en cada arranque (como create-drop con H2 en Spring).
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
 
         var configuration = services.GetRequiredService<IConfiguration>();
         if (!configuration.GetValue("SeedData:Enabled", true))
@@ -47,6 +48,35 @@ public static class DbInitializer
             displayName: "Estudiante de demo",
             password: "Student123!",
             role: RoleNames.Student);
+        // Segundo profesor y dos alumnos más, para repartir cursos, matrículas, notas y asistencias.
+        await EnsureUserAsync(
+            userManager,
+            username: "teacher",
+            email: "teacher@g2.local",
+            displayName: "Marta Ruiz",
+            password: "Teacher123!",
+            role: RoleNames.Teacher);
+        await EnsureUserAsync(
+            userManager,
+            username: "student2",
+            email: "student2@g2.local",
+            displayName: "Carlos Gómez",
+            password: "Student123!",
+            role: RoleNames.Student);
+        await EnsureUserAsync(
+            userManager,
+            username: "student3",
+            email: "student3@g2.local",
+            displayName: "Lucía Fernández",
+            password: "Student123!",
+            role: RoleNames.Student);
+
+        // Cuentas demo ya creadas: "user" y "teacher" son profesores; "student", "student2" y "student3", alumnos.
+        var teacher1 = context.Users.First(u => u.UserName == "user");
+        var teacher2 = context.Users.First(u => u.UserName == "teacher");
+        var student1 = context.Users.First(u => u.UserName == "student");
+        var student2 = context.Users.First(u => u.UserName == "student2");
+        var student3 = context.Users.First(u => u.UserName == "student3");
 
         if (!context.Academies.Any())
         {
@@ -85,6 +115,11 @@ public static class DbInitializer
             var globalLanguages = context.Academies.First(a => a.Name == "Global Languages");
             var dataScienceAcademy = context.Academies.First(a => a.Name == "Data Science Academy");
             var cyberSecurityHub = context.Academies.First(a => a.Name == "Cyber Security Hub");
+            var healthLearningCenter = context.Academies.First(a => a.Name == "Health Learning Center");
+            var industrialTraining = context.Academies.First(a => a.Name == "Industrial Training");
+            var greenEnergySchool = context.Academies.First(a => a.Name == "Green Energy School");
+            var hospitalityExperts = context.Academies.First(a => a.Name == "Hospitality Experts");
+            var innovationAcademy = context.Academies.First(a => a.Name == "Innovation Academy");
 
             context.Classrooms.AddRange(
                 new Classroom { Name = "Primer Año", Capacity = 30, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = adeccoSchool },
@@ -140,7 +175,14 @@ public static class DbInitializer
                 new Classroom { Name = "Ethical Hacking", Capacity = 16, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = cyberSecurityHub },
                 new Classroom { Name = "Network Security", Capacity = 22, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = cyberSecurityHub },
                 new Classroom { Name = "SOC Operations", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = cyberSecurityHub },
-                new Classroom { Name = "Cyber Range", Capacity = 30, ClassroomType = ClassroomType.Online, MeetingUrl = "https://cyberhub.org/range", IsActive = true, Academy = cyberSecurityHub }
+                new Classroom { Name = "Cyber Range", Capacity = 30, ClassroomType = ClassroomType.Online, MeetingUrl = "https://cyberhub.org/range", IsActive = true, Academy = cyberSecurityHub },
+
+                // Un aula para cada academia que aún no tenía ninguna.
+                new Classroom { Name = "Sala de Simulación", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = healthLearningCenter },
+                new Classroom { Name = "Taller de Mantenimiento", Capacity = 15, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = industrialTraining },
+                new Classroom { Name = "Laboratorio Solar", Capacity = 18, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = greenEnergySchool },
+                new Classroom { Name = "Aula de Cocina", Capacity = 20, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = hospitalityExperts },
+                new Classroom { Name = "Innovation Lab", Capacity = 25, ClassroomType = ClassroomType.Physic, IsActive = true, Academy = innovationAcademy }
             );
 
             context.SaveChanges();
@@ -225,18 +267,218 @@ public static class DbInitializer
             );
 
             context.SaveChanges();
-        }
 
-        /* if (!context.Grades.Any())
-        {
-            context.Grades.AddRange(
-                new Grade { EnrollmentId = 1, Value = 8.8, Comments = "Bien Hecho" },
-                new Grade { EnrollmentId = 2, Value = 10, Comments = "Excelente" }
+            // Reparte los cursos anteriores entre los dos profesores demo (Id impar: uno, Id par: el otro).
+            foreach (var course in context.Courses.ToList())
+            {
+                course.TeacherId = course.Id % 2 == 1 ? teacher1.Id : teacher2.Id;
+            }
+
+            // Cursos que ya empezaron o terminaron (para tener lecciones pasadas, notas y asistencias)
+            // y dos borradores sin profesor: TeacherId es opcional y aquí se ven los dos casos.
+            context.Courses.AddRange(
+                new Course { Name = "Excel aplicado a recursos humanos", Description = "Hojas de cálculo para controlar plantillas, ausencias y costes de personal.", Level = CourseLevel.Beginner, Price = 150, StartDate = new DateOnly(2026, 9, 14), EndDate = new DateOnly(2026, 10, 5), MaxStudents = 20, Status = CourseStatus.Finished, AcademyId = adeccoSchool.Id, TeacherId = teacher1.Id },
+                new Course { Name = "Fundamentos de SQL y bases de datos", Description = "Modelo relacional, consultas y diseño de tablas desde cero.", Level = CourseLevel.Beginner, Price = 200, StartDate = new DateOnly(2026, 9, 22), EndDate = new DateOnly(2026, 10, 20), MaxStudents = 20, Status = CourseStatus.Finished, AcademyId = techMasters.Id, TeacherId = teacher2.Id },
+                new Course { Name = "Introducción a ASP.NET Core MVC", Description = "Controladores, vistas Razor y acceso a datos con Entity Framework Core.", Level = CourseLevel.Intermediate, Price = 290, StartDate = new DateOnly(2026, 10, 14), EndDate = new DateOnly(2026, 11, 25), MaxStudents = 18, Status = CourseStatus.InProgress, AcademyId = techMasters.Id, TeacherId = teacher1.Id },
+                new Course { Name = "Inglés para el trabajo", Description = "Presentaciones, reuniones y correos profesionales en inglés.", Level = CourseLevel.Beginner, Price = 200, StartDate = new DateOnly(2026, 10, 15), EndDate = new DateOnly(2026, 12, 3), MaxStudents = 22, Status = CourseStatus.InProgress, AcademyId = globalLanguages.Id, TeacherId = teacher2.Id },
+                new Course { Name = "Gestión del tiempo y productividad", Description = "Planificación semanal, prioridades y hábitos para trabajar con foco.", Level = CourseLevel.Beginner, Price = 120, StartDate = new DateOnly(2027, 5, 3), EndDate = new DateOnly(2027, 6, 7), MaxStudents = 25, Status = CourseStatus.Draft, AcademyId = businessAcademy.Id },
+                new Course { Name = "Fotografía digital para redes sociales", Description = "Composición, luz y edición básica para contenidos de redes sociales.", Level = CourseLevel.Beginner, Price = 180, StartDate = new DateOnly(2027, 5, 10), EndDate = new DateOnly(2027, 6, 14), MaxStudents = 20, Status = CourseStatus.Draft, AcademyId = digitalSkillsHub.Id }
             );
 
             context.SaveChanges();
+        }
 
-        } */
+        // Cursos sobre los que se crean las lecciones, matrículas, notas y asistencias de demo.
+        var excelCourse = context.Courses.First(c => c.Name == "Excel aplicado a recursos humanos");
+        var sqlCourse = context.Courses.First(c => c.Name == "Fundamentos de SQL y bases de datos");
+        var aspnetCourse = context.Courses.First(c => c.Name == "Introducción a ASP.NET Core MVC");
+        var englishCourse = context.Courses.First(c => c.Name == "Inglés para el trabajo");
+        var peopleCourse = context.Courses.First(c => c.Name == "Primeros pasos en la gestión de personas");
+        var historyCourse = context.Courses.First(c => c.Name == "Historia de España en movimiento");
+        var webCourse = context.Courses.First(c => c.Name == "Interfaces web con componentes modernos");
+
+        if (!context.Lessons.Any())
+        {
+            // Cada lección usa un aula de la misma academia que su curso. Dos lecciones futuras
+            // no tienen aula todavía (ClassroomId es opcional), el resto sí.
+            var primerAnio = context.Classrooms.First(c => c.Name == "Primer Año");
+            var adeccoOnline = context.Classrooms.First(c => c.Name == "Adecco Online");
+            var programacionWeb = context.Classrooms.First(c => c.Name == "Programación Web");
+            var netAdvanced = context.Classrooms.First(c => c.Name == "NET Advanced");
+            var angularLab = context.Classrooms.First(c => c.Name == "Angular Lab");
+            var englishA1 = context.Classrooms.First(c => c.Name == "English A1");
+            var historiaModerna = context.Classrooms.First(c => c.Name == "Historia Moderna");
+            var aulaVirtualEso = context.Classrooms.First(c => c.Name == "Aula Virtual ESO");
+
+            context.Lessons.AddRange(
+                // Excel aplicado a recursos humanos: curso finalizado, lunes de 18:00 a 20:00.
+                new Lesson { Name = "Fórmulas y funciones básicas", Description = "Sumas, promedios y funciones condicionales aplicadas a plantillas.", StartDate = new DateTime(2026, 9, 14, 18, 0, 0), EndDate = new DateTime(2026, 9, 14, 20, 0, 0), CourseId = excelCourse.Id, ClassroomId = primerAnio.Id },
+                new Lesson { Name = "Tablas dinámicas", Description = "Resumen de ausencias y costes por departamento.", StartDate = new DateTime(2026, 9, 21, 18, 0, 0), EndDate = new DateTime(2026, 9, 21, 20, 0, 0), CourseId = excelCourse.Id, ClassroomId = primerAnio.Id },
+                new Lesson { Name = "Gráficos para informes", Description = "Gráficos claros para presentar datos de personal.", StartDate = new DateTime(2026, 9, 28, 18, 0, 0), EndDate = new DateTime(2026, 9, 28, 20, 0, 0), CourseId = excelCourse.Id, ClassroomId = primerAnio.Id },
+                new Lesson { Name = "Caso práctico: cálculo de nóminas", Description = "Ejercicio final con una plantilla de ejemplo.", StartDate = new DateTime(2026, 10, 5, 18, 0, 0), EndDate = new DateTime(2026, 10, 5, 20, 0, 0), CourseId = excelCourse.Id, ClassroomId = primerAnio.Id },
+
+                // Fundamentos de SQL: curso finalizado, martes de 18:00 a 20:00.
+                new Lesson { Name = "Modelo relacional", Description = "Tablas, claves primarias y claves foráneas.", StartDate = new DateTime(2026, 9, 22, 18, 0, 0), EndDate = new DateTime(2026, 9, 22, 20, 0, 0), CourseId = sqlCourse.Id, ClassroomId = programacionWeb.Id },
+                new Lesson { Name = "Consultas SELECT y JOIN", Description = "Filtros, ordenación y unión de tablas.", StartDate = new DateTime(2026, 10, 6, 18, 0, 0), EndDate = new DateTime(2026, 10, 6, 20, 0, 0), CourseId = sqlCourse.Id, ClassroomId = programacionWeb.Id },
+                new Lesson { Name = "Diseño de una base de datos", Description = "Del enunciado al esquema de tablas.", StartDate = new DateTime(2026, 10, 20, 18, 0, 0), EndDate = new DateTime(2026, 10, 20, 20, 0, 0), CourseId = sqlCourse.Id, ClassroomId = programacionWeb.Id },
+
+                // Introducción a ASP.NET Core MVC: curso en marcha, miércoles de 18:00 a 20:30.
+                new Lesson { Name = "Controladores y rutas", Description = "Cómo llega una petición a una acción del controlador.", StartDate = new DateTime(2026, 10, 14, 18, 0, 0), EndDate = new DateTime(2026, 10, 14, 20, 30, 0), CourseId = aspnetCourse.Id, ClassroomId = netAdvanced.Id },
+                new Lesson { Name = "Vistas Razor", Description = "Vistas tipadas, layouts y helpers de etiquetas.", StartDate = new DateTime(2026, 10, 21, 18, 0, 0), EndDate = new DateTime(2026, 10, 21, 20, 30, 0), CourseId = aspnetCourse.Id, ClassroomId = netAdvanced.Id },
+                new Lesson { Name = "Entity Framework Core", Description = "DbContext, entidades y consultas con LINQ.", StartDate = new DateTime(2026, 10, 28, 18, 0, 0), EndDate = new DateTime(2026, 10, 28, 20, 30, 0), CourseId = aspnetCourse.Id, ClassroomId = netAdvanced.Id },
+                new Lesson { Name = "Relaciones y claves foráneas", Description = "Asociaciones 1:N y comportamiento al borrar.", StartDate = new DateTime(2026, 11, 4, 18, 0, 0), EndDate = new DateTime(2026, 11, 4, 20, 30, 0), CourseId = aspnetCourse.Id, ClassroomId = netAdvanced.Id },
+                new Lesson { Name = "Formularios y validación", Description = "Crear y editar entidades con validación en servidor.", StartDate = new DateTime(2026, 11, 11, 18, 0, 0), EndDate = new DateTime(2026, 11, 11, 20, 30, 0), CourseId = aspnetCourse.Id, ClassroomId = netAdvanced.Id },
+                new Lesson { Name = "Identity y roles", Description = "Login, cuentas de usuario y permisos por rol.", StartDate = new DateTime(2026, 11, 18, 18, 0, 0), EndDate = new DateTime(2026, 11, 18, 20, 30, 0), CourseId = aspnetCourse.Id },
+
+                // Inglés para el trabajo: curso en marcha, jueves de 16:00 a 17:30.
+                new Lesson { Name = "Presentaciones profesionales", Description = "Cómo presentarse y presentar un proyecto en inglés.", StartDate = new DateTime(2026, 10, 15, 16, 0, 0), EndDate = new DateTime(2026, 10, 15, 17, 30, 0), CourseId = englishCourse.Id, ClassroomId = englishA1.Id },
+                new Lesson { Name = "Reuniones y llamadas", Description = "Vocabulario y frases útiles para reuniones.", StartDate = new DateTime(2026, 10, 22, 16, 0, 0), EndDate = new DateTime(2026, 10, 22, 17, 30, 0), CourseId = englishCourse.Id, ClassroomId = englishA1.Id },
+                new Lesson { Name = "Correos profesionales", Description = "Estructura y tono de un correo de trabajo.", StartDate = new DateTime(2026, 10, 29, 16, 0, 0), EndDate = new DateTime(2026, 10, 29, 17, 30, 0), CourseId = englishCourse.Id, ClassroomId = englishA1.Id },
+                new Lesson { Name = "Entrevistas de trabajo", Description = "Preguntas habituales y cómo responderlas.", StartDate = new DateTime(2026, 11, 12, 16, 0, 0), EndDate = new DateTime(2026, 11, 12, 17, 30, 0), CourseId = englishCourse.Id, ClassroomId = englishA1.Id },
+
+                // Primeros pasos en la gestión de personas: acaba de empezar (martes y jueves, 18:00 a 20:00).
+                new Lesson { Name = "Introducción a la gestión de personas", Description = "Qué hace un departamento de recursos humanos.", StartDate = new DateTime(2026, 11, 3, 18, 0, 0), EndDate = new DateTime(2026, 11, 3, 20, 0, 0), CourseId = peopleCourse.Id, ClassroomId = primerAnio.Id },
+                new Lesson { Name = "Selección y acogida", Description = "Cómo se incorpora a una persona nueva al equipo.", StartDate = new DateTime(2026, 11, 5, 18, 0, 0), EndDate = new DateTime(2026, 11, 5, 20, 0, 0), CourseId = peopleCourse.Id, ClassroomId = adeccoOnline.Id },
+                new Lesson { Name = "Desarrollo profesional", Description = "Planes de formación y carrera.", StartDate = new DateTime(2026, 11, 10, 18, 0, 0), EndDate = new DateTime(2026, 11, 10, 20, 0, 0), CourseId = peopleCourse.Id, ClassroomId = primerAnio.Id },
+                new Lesson { Name = "Evaluación del desempeño", Description = "Objetivos, indicadores y conversaciones de seguimiento.", StartDate = new DateTime(2026, 11, 12, 18, 0, 0), EndDate = new DateTime(2026, 11, 12, 20, 0, 0), CourseId = peopleCourse.Id },
+
+                // Historia de España en movimiento: acaba de empezar (jueves de 10:00 a 12:00).
+                new Lesson { Name = "España a comienzos del siglo XX", Description = "Cambios sociales y políticos de principios de siglo.", StartDate = new DateTime(2026, 11, 5, 10, 0, 0), EndDate = new DateTime(2026, 11, 5, 12, 0, 0), CourseId = historyCourse.Id, ClassroomId = historiaModerna.Id },
+                new Lesson { Name = "La Segunda República", Description = "Reformas y debates de la década de 1930.", StartDate = new DateTime(2026, 11, 12, 10, 0, 0), EndDate = new DateTime(2026, 11, 12, 12, 0, 0), CourseId = historyCourse.Id, ClassroomId = historiaModerna.Id },
+                new Lesson { Name = "La Transición", Description = "El paso a la democracia y la Constitución de 1978.", StartDate = new DateTime(2026, 11, 19, 10, 0, 0), EndDate = new DateTime(2026, 11, 19, 12, 0, 0), CourseId = historyCourse.Id, ClassroomId = aulaVirtualEso.Id },
+
+                // Interfaces web con componentes modernos: empieza la semana que viene (martes de 10:00 a 12:00).
+                new Lesson { Name = "Componentes y plantillas", Description = "Qué es un componente y cómo se reutiliza.", StartDate = new DateTime(2026, 11, 10, 10, 0, 0), EndDate = new DateTime(2026, 11, 10, 12, 0, 0), CourseId = webCourse.Id, ClassroomId = angularLab.Id },
+                new Lesson { Name = "Estado y eventos", Description = "Cómo reacciona un componente a las acciones del usuario.", StartDate = new DateTime(2026, 11, 17, 10, 0, 0), EndDate = new DateTime(2026, 11, 17, 12, 0, 0), CourseId = webCourse.Id, ClassroomId = angularLab.Id }
+            );
+
+            context.SaveChanges();
+        }
+
+        if (!context.Enrollments.Any())
+        {
+            // 15 matrículas: ningún alumno repite curso. Hay matrículas completadas, activas,
+            // pendientes de pago y una abandonada, para ver todos los estados.
+            context.Enrollments.AddRange(
+                new Enrollment { StudentId = student1.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 1, 10, 0, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
+                new Enrollment { StudentId = student2.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 3, 12, 30, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
+                new Enrollment { StudentId = student3.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 5, 9, 15, 0), IsPaid = true, Status = EnrollmentStatus.Dropped },
+
+                new Enrollment { StudentId = student1.Id, CourseId = sqlCourse.Id, EnrolledAt = new DateTime(2026, 9, 8, 11, 0, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
+                new Enrollment { StudentId = student3.Id, CourseId = sqlCourse.Id, EnrolledAt = new DateTime(2026, 9, 10, 16, 45, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
+
+                new Enrollment { StudentId = student1.Id, CourseId = aspnetCourse.Id, EnrolledAt = new DateTime(2026, 9, 28, 10, 20, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student2.Id, CourseId = aspnetCourse.Id, EnrolledAt = new DateTime(2026, 9, 30, 18, 5, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student3.Id, CourseId = aspnetCourse.Id, EnrolledAt = new DateTime(2026, 10, 5, 9, 40, 0), IsPaid = false, Status = EnrollmentStatus.Active },
+
+                new Enrollment { StudentId = student2.Id, CourseId = englishCourse.Id, EnrolledAt = new DateTime(2026, 10, 5, 13, 0, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student3.Id, CourseId = englishCourse.Id, EnrolledAt = new DateTime(2026, 10, 8, 17, 30, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+
+                new Enrollment { StudentId = student1.Id, CourseId = peopleCourse.Id, EnrolledAt = new DateTime(2026, 10, 20, 10, 0, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student2.Id, CourseId = peopleCourse.Id, EnrolledAt = new DateTime(2026, 11, 2, 19, 10, 0), IsPaid = false, Status = EnrollmentStatus.Pending },
+
+                new Enrollment { StudentId = student1.Id, CourseId = historyCourse.Id, EnrolledAt = new DateTime(2026, 10, 28, 12, 0, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student3.Id, CourseId = historyCourse.Id, EnrolledAt = new DateTime(2026, 11, 4, 8, 30, 0), IsPaid = false, Status = EnrollmentStatus.Pending },
+
+                new Enrollment { StudentId = student2.Id, CourseId = webCourse.Id, EnrolledAt = new DateTime(2026, 11, 4, 20, 0, 0), IsPaid = false, Status = EnrollmentStatus.Pending }
+            );
+
+            context.SaveChanges();
+        }
+
+        if (!context.Grades.Any())
+        {
+            // Notas solo de matrículas con curso avanzado o terminado. Algunas sin comentario (es opcional).
+            context.Grades.AddRange(
+                // Excel aplicado a recursos humanos (finalizado)
+                new Grade { EnrollmentId = FindEnrollment(context, student1, excelCourse).Id, Value = 8.5, GradeType = GradeType.Exam, GradedAt = new DateTime(2026, 9, 29), Comments = "Buen dominio de las fórmulas." },
+                new Grade { EnrollmentId = FindEnrollment(context, student1, excelCourse).Id, Value = 9.0, GradeType = GradeType.Final, GradedAt = new DateTime(2026, 10, 8), Comments = "Excelente trabajo final." },
+                new Grade { EnrollmentId = FindEnrollment(context, student2, excelCourse).Id, Value = 7.0, GradeType = GradeType.Assignment, GradedAt = new DateTime(2026, 9, 28) },
+                new Grade { EnrollmentId = FindEnrollment(context, student2, excelCourse).Id, Value = 7.5, GradeType = GradeType.Final, GradedAt = new DateTime(2026, 10, 8), Comments = "Aprobado con buena evolución." },
+                new Grade { EnrollmentId = FindEnrollment(context, student3, excelCourse).Id, Value = 3.5, GradeType = GradeType.Assignment, GradedAt = new DateTime(2026, 9, 22), Comments = "Entrega incompleta." },
+
+                // Fundamentos de SQL (finalizado)
+                new Grade { EnrollmentId = FindEnrollment(context, student1, sqlCourse).Id, Value = 9.5, GradeType = GradeType.Exam, GradedAt = new DateTime(2026, 10, 6), Comments = "Consultas muy bien resueltas." },
+                new Grade { EnrollmentId = FindEnrollment(context, student1, sqlCourse).Id, Value = 9.2, GradeType = GradeType.Final, GradedAt = new DateTime(2026, 10, 21) },
+                new Grade { EnrollmentId = FindEnrollment(context, student3, sqlCourse).Id, Value = 6.0, GradeType = GradeType.Exam, GradedAt = new DateTime(2026, 10, 6), Comments = "Repasar los JOIN." },
+                new Grade { EnrollmentId = FindEnrollment(context, student3, sqlCourse).Id, Value = 6.5, GradeType = GradeType.Final, GradedAt = new DateTime(2026, 10, 21) },
+
+                // Introducción a ASP.NET Core MVC (en marcha)
+                new Grade { EnrollmentId = FindEnrollment(context, student1, aspnetCourse).Id, Value = 8.0, GradeType = GradeType.Assignment, GradedAt = new DateTime(2026, 10, 22), Comments = "Controlador y vistas correctos." },
+                new Grade { EnrollmentId = FindEnrollment(context, student1, aspnetCourse).Id, Value = 7.5, GradeType = GradeType.Exam, GradedAt = new DateTime(2026, 11, 4) },
+                new Grade { EnrollmentId = FindEnrollment(context, student2, aspnetCourse).Id, Value = 9.5, GradeType = GradeType.Assignment, GradedAt = new DateTime(2026, 10, 22), Comments = "Entrega muy cuidada." },
+                new Grade { EnrollmentId = FindEnrollment(context, student3, aspnetCourse).Id, Value = 4.5, GradeType = GradeType.Assignment, GradedAt = new DateTime(2026, 10, 29), Comments = "Faltan validaciones; hay que repetirla." },
+
+                // Inglés para el trabajo (en marcha)
+                new Grade { EnrollmentId = FindEnrollment(context, student2, englishCourse).Id, Value = 7.8, GradeType = GradeType.Assignment, GradedAt = new DateTime(2026, 10, 30) },
+                new Grade { EnrollmentId = FindEnrollment(context, student3, englishCourse).Id, Value = 5.0, GradeType = GradeType.Exam, GradedAt = new DateTime(2026, 10, 30), Comments = "Aprobado justo; reforzar el vocabulario." }
+            );
+
+            context.SaveChanges();
+        }
+
+        if (!context.Attendances.Any())
+        {
+            // Asistencia solo a lecciones ya impartidas (hasta el 5 de noviembre) y de matrículas
+            // que no están pendientes. Una fila por alumno y lección.
+            var present = AttendanceStatus.Present;
+            var absent = AttendanceStatus.Absent;
+            var late = AttendanceStatus.Late;
+            var excused = AttendanceStatus.Excused;
+
+            // Excel (4 lecciones)
+            var excelLessons = LessonsOf(context, excelCourse);
+            AddAttendances(context, FindEnrollment(context, student1, excelCourse), excelLessons, present, present, present, present);
+            AddAttendances(context, FindEnrollment(context, student2, excelCourse), excelLessons, present, late, present, present);
+            AddAttendances(context, FindEnrollment(context, student3, excelCourse), excelLessons, present, absent, absent, absent);
+
+            // SQL (3 lecciones)
+            var sqlLessons = LessonsOf(context, sqlCourse);
+            AddAttendances(context, FindEnrollment(context, student1, sqlCourse), sqlLessons, present, present, excused);
+            AddAttendances(context, FindEnrollment(context, student3, sqlCourse), sqlLessons, present, late, present);
+
+            // ASP.NET (las 4 primeras lecciones; las 2 últimas aún no se han dado)
+            var aspnetLessons = LessonsOf(context, aspnetCourse);
+            AddAttendances(context, FindEnrollment(context, student1, aspnetCourse), aspnetLessons, present, present, present, present);
+            AddAttendances(context, FindEnrollment(context, student2, aspnetCourse), aspnetLessons, present, present, late, present);
+            AddAttendances(context, FindEnrollment(context, student3, aspnetCourse), aspnetLessons, present, absent, present, absent);
+
+            // Inglés (las 3 primeras lecciones)
+            var englishLessons = LessonsOf(context, englishCourse);
+            AddAttendances(context, FindEnrollment(context, student2, englishCourse), englishLessons, present, present, present);
+            AddAttendances(context, FindEnrollment(context, student3, englishCourse), englishLessons, present, excused, present);
+
+            // Cursos que acaban de empezar: solo el alumno con matrícula activa y las lecciones ya dadas
+            AddAttendances(context, FindEnrollment(context, student1, peopleCourse), LessonsOf(context, peopleCourse), present, present);
+            AddAttendances(context, FindEnrollment(context, student1, historyCourse), LessonsOf(context, historyCourse), present);
+
+            context.SaveChanges();
+        }
+    }
+
+    /// <summary>Busca la matrícula de un alumno en un curso (en los datos demo hay una por pareja).</summary>
+    private static Enrollment FindEnrollment(ApplicationDbContext context, ApplicationUser student, Course course)
+    {
+        return context.Enrollments.First(e => e.StudentId == student.Id && e.CourseId == course.Id);
+    }
+
+    /// <summary>Devuelve las lecciones de un curso ordenadas por fecha.</summary>
+    private static List<Lesson> LessonsOf(ApplicationDbContext context, Course course)
+    {
+        return context.Lessons.Where(l => l.CourseId == course.Id).OrderBy(l => l.StartDate).ToList();
+    }
+
+    /// <summary>Apunta la asistencia de una matrícula a las primeras lecciones, una por cada estado indicado.</summary>
+    private static void AddAttendances(
+        ApplicationDbContext context,
+        Enrollment enrollment,
+        List<Lesson> lessons,
+        params AttendanceStatus[] statuses)
+    {
+        for (var i = 0; i < statuses.Length; i++)
+        {
+            context.Attendances.Add(new Attendance { LessonId = lessons[i].Id, EnrollmentId = enrollment.Id, Status = statuses[i] });
+        }
     }
 
 
