@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using G2AspNet.Data;
 using G2AspNet.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using G2AspNet.Utilities;
 
 namespace G2AspNet.Controllers;
 
@@ -13,18 +16,33 @@ public class GradesController : Controller
         this.context = context;
     }
 
+    [Authorize]
     public IActionResult Index()
     {
-        var grades = context.Grades.OrderBy(g => g.EnrollmentId).ToList();
+        var query = context.Grades
+            .Include(g => g.Enrollment).ThenInclude(e => e!.Student)
+            .Include(g => g.Enrollment).ThenInclude(e => e!.Course)
+            .AsQueryable();
+
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        if (!isStaff)
+        {
+            var userId = User.GetRequiredUserId();
+            query = query.Where(g => g.Enrollment!.StudentId == userId);
+        }
+
+        var grades = query.OrderBy(g => g.EnrollmentId).ToList();
         return View(grades);
     }
 
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
     public IActionResult Create()
     {
         return View("Form", new Grade());
     }
 
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
     public IActionResult Edit(int id)
     {
@@ -37,6 +55,7 @@ public class GradesController : Controller
         return View("Form", grade);
     }
 
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpPost]
     public IActionResult Save(Grade grade)
     {
@@ -60,6 +79,7 @@ public class GradesController : Controller
         return RedirectToAction("Index");
     }
 
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpPost]
     public IActionResult Delete(int id)
     {
