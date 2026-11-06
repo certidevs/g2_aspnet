@@ -145,11 +145,11 @@ Tomado de las issues del repositorio. El responsable es la persona asignada a la
 | `Classroom` (#13) | `ClassroomController` (#19) | `Views/Classroom` (#20) | Poulgar | Listado y detalle hechos. Pendiente: crear, editar, borrar y formulario. |
 | `Course` (#6) | `CoursesController` (#21) | `Views/Courses` (#22) | rubenbitrian | Listado, detalle, formulario, crear, editar y borrar hechos. Pendiente: que el formulario permita elegir centro y profesor. |
 | `Lesson` (#7) | `LessonsController` (#25) | `Views/Lessons` (#26) | Dracorufo | Listado y detalle hechos. Pendiente: crear, editar, borrar y formulario. |
-| `Attendance` (#14) | `AttendancesController` (#27) | `Views/Attendances` (#28) | rubenbitrian | Listado y detalle hechos. Pendiente: crear, editar, borrar y formulario. |
+| `Attendance` (#14) | `AttendancesController` (#27) | `Views/Attendances` (#28) | rubenbitrian | Listado, detalle, crear (con formulario) y aviso de duplicados hechos. Pendiente: editar y borrar. |
 | `Enrollment` (#12) | `EnrollmentsController` (#23) | `Views/Enrollments` (#24) | alfonvazquez | Listado, detalle, formulario, crear, editar y borrar hechos. |
 | `Grade` (#4) | `GradesController` (#10) | `Views/Grades` (#9) | alfonvazquez | Listado, detalle, formulario, crear, editar y borrar hechos. Pendiente: elegir la matrícula en una lista desplegable. |
 
-**Ejemplo para copiar:** `Academy` es la entidad completa y funcionando (`AcademyController` y `Views/Academy/Form.cshtml`). En `Classroom`, `Lesson` y `Attendance` el código de crear, editar y borrar ya está escrito pero **comentado**: buscad el marcador `DESCOMENTA` en su controlador, su `Form.cshtml`, `Index` y `Details`, descomentadlo y ajustadlo.
+**Ejemplo para copiar:** `Academy` es la entidad completa y funcionando (`AcademyController` y `Views/Academy/Form.cshtml`). En `Classroom` y `Lesson` el código de crear, editar y borrar ya está escrito pero **comentado**: buscad el marcador `DESCOMENTA` en su controlador, su `Form.cshtml`, `Index` y `Details`, descomentadlo y ajustadlo.
 
 ### Base de datos en desarrollo
 
