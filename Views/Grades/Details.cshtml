@@ -1,11 +1,15 @@
 @model Grade
 @{
     ViewData["Title"] = "Detalle de nota";
+    var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <h1 class="h2 mb-0">Detalle de nota</h1>
-    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Editar</a>
+    @if (isStaff)
+    {
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Editar</a>
+    }
 </div>
 
 <div class="card">
@@ -17,26 +21,28 @@
             <dd class="col-sm-9">
                 @if (Model.Enrollment?.Course is not null)
                 {
-                    <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Enrollment.Course.Id">@Model.Enrollment.Course.Name</a>
+                    <a asp-controller="Courses" asp-action="Details"
+                       asp-route-id="@Model.Enrollment.Course.Id">@Model.Enrollment.Course.Name</a>
                 }
             </dd>
             <dt class="col-sm-3">Matrícula</dt>
             <dd class="col-sm-9">
-                <a asp-controller="Enrollments" asp-action="Details" asp-route-id="@Model.EnrollmentId">Ver matrícula @Model.EnrollmentId</a>
-            </dd>
-            <dt class="col-sm-3">Tipo</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.GradeType)</dd>
-            <dt class="col-sm-3">Nota (0-10)</dt>
-            <dd class="col-sm-9">@Model.Value</dd>
-            <dt class="col-sm-3">Calificación</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.GradeEnum)</dd>
-            <dt class="col-sm-3">Fecha</dt>
-            <dd class="col-sm-9">@Model.GradedAt?.ToString("dd/MM/yyyy")</dd>
-            <dt class="col-sm-3">Comentarios</dt>
-            <dd class="col-sm-9">@Model.Comments</dd>
-        </dl>
+                <a asp-controller="Enrollments" asp-action="Details" asp-route-id="@Model.EnrollmentId">Ver matrícula
+                    @Model.EnrollmentId</a>
+                </dd>
+                <dt class="col-sm-3">Tipo</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.GradeType)</dd>
+                <dt class="col-sm-3">Nota (0-10)</dt>
+                <dd class="col-sm-9">@Model.Value</dd>
+                <dt class="col-sm-3">Calificación</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.GradeEnum)</dd>
+                <dt class="col-sm-3">Fecha</dt>
+                <dd class="col-sm-9">@Model.GradedAt?.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-3">Comentarios</dt>
+                <dd class="col-sm-9">@Model.Comments</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-transparent">
+            <a class="btn btn-outline-secondary" asp-action="Index">Volver a notas</a>
+        </div>
     </div>
-    <div class="card-footer bg-transparent">
-        <a class="btn btn-outline-secondary" asp-action="Index">Volver a notas</a>
-    </div>
-</div>
