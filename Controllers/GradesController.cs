@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; // SelectList (desplegable del formulario)
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Data;
 using G2AspNet.Models;
@@ -60,11 +61,26 @@ public class GradesController : Controller
         return View(grade);
     }
 
+    // Rellena el desplegable del formulario con las matrículas (alumno + curso).
+    // Antes era un campo numérico donde había que teclear el Id: un Id que no existe daba un error 500.
+    private void LoadEnrollments(Grade grade)
+    {
+        var enrollments = context.Enrollments
+            .Include(e => e.Student)
+            .Include(e => e.Course)
+            .OrderBy(e => e.Id)
+            .ToList()
+            .Select(e => new { e.Id, Text = $"{e.Student?.DisplayName ?? e.Student?.UserName} · {e.Course?.Name}" });
+        ViewBag.Enrollments = new SelectList(enrollments, "Id", "Text", grade.EnrollmentId);
+    }
+
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
     public IActionResult Create()
     {
-        return View("Form", new Grade());
+        var grade = new Grade();
+        LoadEnrollments(grade);
+        return View("Form", grade);
     }
 
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
@@ -77,6 +93,7 @@ public class GradesController : Controller
             return NotFound();
         }
 
+        LoadEnrollments(grade);
         return View("Form", grade);
     }
 
@@ -84,8 +101,15 @@ public class GradesController : Controller
     [HttpPost]
     public IActionResult Save(Grade grade)
     {
+        // La matrícula tiene que existir: si no, la base de datos rechaza la clave foránea (error 500).
+        if (!context.Enrollments.Any(e => e.Id == grade.EnrollmentId))
+        {
+            ModelState.AddModelError(nameof(Grade.EnrollmentId), "Selecciona una matrícula.");
+        }
+
         if (!ModelState.IsValid)
         {
+            LoadEnrollments(grade);
             return View("Form", grade);
         }
 

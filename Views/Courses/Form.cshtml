@@ -69,6 +69,23 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label" asp-for="AcademyId">Centro</label>
+            <select class="form-control" asp-for="AcademyId" asp-items="(SelectList)ViewBag.Academies">
+                <option value="">-- Selecciona un centro --</option>
+            </select>
+            <span class="text-danger" asp-validation-for="AcademyId"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label" asp-for="TeacherId">Profesor</label>
+            <select class="form-control" asp-for="TeacherId" asp-items="(SelectList)ViewBag.Teachers">
+                <option value="">Sin profesor asignado</option>
+            </select>
+            <span class="text-danger" asp-validation-for="TeacherId"></span>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-3 mb-3">
             <button class="btn btn-primary" type="submit">Guardar</button>
         </div>

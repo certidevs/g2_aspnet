@@ -156,6 +156,13 @@ public class EnrollmentsController : Controller
             return Forbid();
         }
 
+        // Una matrícula con notas o asistencias es historial (Restrict): no se borra. Se avisa en vez de dar un error 500.
+        if (context.Grades.Any(g => g.EnrollmentId == id) || context.Attendances.Any(a => a.EnrollmentId == id))
+        {
+            TempData["Error"] = "No se puede eliminar la matrícula porque tiene notas o asistencias.";
+            return RedirectToAction("Index");
+        }
+
         context.Enrollments.Remove(enrollment);
         context.SaveChanges();
 

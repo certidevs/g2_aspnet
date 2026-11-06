@@ -11,8 +11,10 @@
 
     <div class="row">
         <div class="col-md-8 mb-3">
-            <label class="form-label" asp-for="EnrollmentId">Alumno</label>
-            <input class="form-control" asp-for="EnrollmentId" />
+            <label class="form-label" asp-for="EnrollmentId">Alumno y curso</label>
+            <select class="form-control" asp-for="EnrollmentId" asp-items="(SelectList)ViewBag.Enrollments">
+                <option value="">-- Selecciona una matrícula --</option>
+            </select>
             <span class="text-danger" asp-validation-for="EnrollmentId"></span>
         </div>
         <div class="col-md-4 mb-3">
