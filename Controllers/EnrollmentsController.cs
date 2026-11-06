@@ -42,6 +42,7 @@ public class EnrollmentsController : Controller
 
     // Detalle de una matrícula con su alumno, su curso, sus notas y sus asistencias.
     // De momento es público: la seguridad (quién puede ver qué matrícula) se verá más adelante.
+    [Authorize]
     [HttpGet]
     public IActionResult Details(int id)
     {
@@ -55,6 +56,12 @@ public class EnrollmentsController : Controller
         if (enrollment == null)
         {
             return NotFound();
+        }
+
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        if (!isStaff && enrollment.StudentId != User.GetRequiredUserId())
+        {
+            return Forbid();
         }
 
         return View(enrollment);
