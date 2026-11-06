@@ -40,6 +40,26 @@ public class EnrollmentsController : Controller
         return View(enrollments);
     }
 
+    // Detalle de una matrícula con su alumno, su curso, sus notas y sus asistencias.
+    // De momento es público: la seguridad (quién puede ver qué matrícula) se verá más adelante.
+    [HttpGet]
+    public IActionResult Details(int id)
+    {
+        var enrollment = context.Enrollments
+            .Include(e => e.Course)
+            .Include(e => e.Student)
+            .Include(e => e.Grades)
+            .Include(e => e.Attendances).ThenInclude(a => a.Lesson)
+            .FirstOrDefault(e => e.Id == id);
+
+        if (enrollment == null)
+        {
+            return NotFound();
+        }
+
+        return View(enrollment);
+    }
+
     [Authorize]
     [HttpGet]
     public IActionResult Create()

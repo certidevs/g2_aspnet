@@ -1,0 +1,79 @@
+@model Classroom
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h2 mb-0">Detalle de aula</h1>
+    <div class="d-flex gap-2">
+        @* DESCOMENTA: <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta aula?');"><button type="submit" class="btn btn-outline-danger">Eliminar</button></form> *@
+        @* DESCOMENTA: <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Editar</a> *@
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body p-4">
+        <h2 class="h4 mb-3">@Model.Name</h2>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Centro</dt>
+            <dd class="col-sm-9">
+                @if (Model.Academy is not null)
+                {
+                    <a asp-controller="Academy" asp-action="Details" asp-route-id="@Model.Academy.Id">@Model.Academy.Name</a>
+                }
+            </dd>
+            <dt class="col-sm-3">Tipo</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.ClassroomType)</dd>
+            <dt class="col-sm-3">Capacidad</dt>
+            <dd class="col-sm-9">@Model.Capacity plazas</dd>
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@(Model.IsActive ? "Activa" : "Inactiva")</dd>
+            <dt class="col-sm-3">Enlace de reunión</dt>
+            <dd class="col-sm-9">
+                @if (string.IsNullOrWhiteSpace(Model.MeetingUrl))
+                {
+                    <span class="text-secondary">Aula presencial (sin enlace)</span>
+                }
+                else
+                {
+                    <a href="@Model.MeetingUrl" target="_blank" rel="noopener noreferrer">@Model.MeetingUrl</a>
+                }
+            </dd>
+        </dl>
+    </div>
+    <div class="card-footer bg-transparent">
+        <a class="btn btn-outline-secondary" asp-action="Index">Volver a aulas</a>
+    </div>
+</div>
+
+<h2 class="h4">Lecciones en esta aula</h2>
+@if (Model.Lessons.Count == 0)
+{
+    <div class="alert alert-info">Todavía no hay lecciones en esta aula.</div>
+}
+else
+{
+    <div class="table-responsive border rounded">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Lección</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var lesson in Model.Lessons.OrderBy(l => l.StartDate))
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id">@lesson.Name</a>
+                        </td>
+                        <td>@lesson.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@lesson.EndDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

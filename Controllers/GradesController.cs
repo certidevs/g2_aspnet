@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using G2AspNet.Data;
 using G2AspNet.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using G2AspNet.Utilities;
 
 namespace G2AspNet.Controllers;
@@ -33,6 +33,31 @@ public class GradesController : Controller
 
         var grades = query.OrderBy(g => g.EnrollmentId).ToList();
         return View(grades);
+    }
+
+    // Detalle de una nota con la matrícula a la que pertenece (alumno y curso).
+    [Authorize]
+    [HttpGet]
+    public IActionResult Details(int id)
+    {
+        var grade = context.Grades
+            .Include(g => g.Enrollment).ThenInclude(e => e!.Student)
+            .Include(g => g.Enrollment).ThenInclude(e => e!.Course)
+            .FirstOrDefault(g => g.Id == id);
+
+        if (grade == null)
+        {
+            return NotFound();
+        }
+
+        // Igual que en Index: el profesorado ve todas las notas y un alumno solo las suyas.
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        if (!isStaff && grade.Enrollment?.StudentId != User.GetRequiredUserId())
+        {
+            return NotFound();
+        }
+
+        return View(grade);
     }
 
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]

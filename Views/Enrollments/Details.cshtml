@@ -1,0 +1,108 @@
+@model Enrollment
+@{
+    ViewData["Title"] = "Detalle de matrícula";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h2 mb-0">Detalle de matrícula</h1>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body p-4">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Alumno</dt>
+            <dd class="col-sm-9">@(Model.Student?.DisplayName ?? Model.Student?.UserName)</dd>
+            <dt class="col-sm-3">Curso</dt>
+            <dd class="col-sm-9">
+                @if (Model.Course is not null)
+                {
+                    <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.Course.Id">@Model.Course.Name</a>
+                }
+            </dd>
+            <dt class="col-sm-3">Fecha de matrícula</dt>
+            <dd class="col-sm-9">@Model.EnrolledAt.ToString("dd/MM/yyyy HH:mm")</dd>
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Status)</dd>
+            <dt class="col-sm-3">Pagada</dt>
+            <dd class="col-sm-9">@(Model.IsPaid ? "Sí" : "No")</dd>
+        </dl>
+    </div>
+    <div class="card-footer bg-transparent">
+        <a class="btn btn-outline-secondary" asp-action="Index">Volver a matrículas</a>
+    </div>
+</div>
+
+<h2 class="h4">Notas</h2>
+@if (Model.Grades.Count == 0)
+{
+    <div class="alert alert-info">Esta matrícula todavía no tiene notas.</div>
+}
+else
+{
+    <div class="table-responsive border rounded mb-4">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Nota</th>
+                    <th>Calificación</th>
+                    <th>Fecha</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var grade in Model.Grades.OrderBy(g => g.GradedAt))
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(m => grade.GradeType)</td>
+                        <td>@grade.Value</td>
+                        <td>@Html.DisplayFor(m => grade.GradeEnum)</td>
+                        <td>@grade.GradedAt?.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Grades" asp-action="Details" asp-route-id="@grade.Id">Ver</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<h2 class="h4">Asistencias</h2>
+@if (Model.Attendances.Count == 0)
+{
+    <div class="alert alert-info">Esta matrícula todavía no tiene asistencias apuntadas.</div>
+}
+else
+{
+    <div class="table-responsive border rounded">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Lección</th>
+                    <th>Fecha</th>
+                    <th>Asistencia</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attendance in Model.Attendances.OrderBy(a => a.Lesson!.StartDate))
+                {
+                    <tr>
+                        <td>
+                            @if (attendance.Lesson is not null)
+                            {
+                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@attendance.Lesson.Id">@attendance.Lesson.Name</a>
+                            }
+                        </td>
+                        <td>@attendance.Lesson?.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@Html.DisplayFor(m => attendance.Status)</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Attendances" asp-action="Details" asp-route-id="@attendance.Id">Ver</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

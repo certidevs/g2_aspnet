@@ -1,0 +1,64 @@
+@model Lesson
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Nueva lección" : "Editar lección";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-warning">TODO (issue #26): descomenta el formulario y ajústalo</div>
+
+@* DESCOMENTA DESDE AQUÍ
+<form asp-action="Save" method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Name">Nombre de la lección</label>
+        <input class="form-control" asp-for="Name" />
+        <span class="text-danger" asp-validation-for="Name"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Description">Descripción</label>
+        <textarea class="form-control" asp-for="Description" rows="3"></textarea>
+        <span class="text-danger" asp-validation-for="Description"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label" asp-for="StartDate">Inicio</label>
+            <input class="form-control" asp-for="StartDate" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+            <span class="text-danger" asp-validation-for="StartDate"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label" asp-for="EndDate">Fin</label>
+            <input class="form-control" asp-for="EndDate" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+            <span class="text-danger" asp-validation-for="EndDate"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label" asp-for="CourseId">Curso</label>
+            <select class="form-select" asp-for="CourseId" asp-items="ViewBag.Courses">
+                <option value="0">Selecciona un curso</option>
+            </select>
+            <span class="text-danger" asp-validation-for="CourseId"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label" asp-for="ClassroomId">Aula (opcional)</label>
+            <select class="form-select" asp-for="ClassroomId" asp-items="ViewBag.Classrooms">
+                <option value="">Sin aula asignada</option>
+            </select>
+            <span class="text-danger" asp-validation-for="ClassroomId"></span>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+FIN DESCOMENTA *@

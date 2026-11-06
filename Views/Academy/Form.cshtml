@@ -1,0 +1,60 @@
+@* EJEMPLO COMPLETO (issue #18): un único formulario para crear y para editar un centro.
+   - @model le dice a la vista qué clase recibe del controlador (Academy).
+   - Si Model.Id es 0 es un centro nuevo; si no, se está editando uno que ya existe. *@
+@model Academy
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Nuevo centro" : "Editar centro";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@* asp-action="Save" envía el formulario por POST a AcademyController.Save.
+   El tag helper del form añade solo el token antifalsificación que Save comprueba. *@
+<form asp-action="Save" method="post" class="col-lg-8">
+    @* Muestra los errores que no pertenecen a un campo concreto. *@
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    @* El Id va oculto: con él Save sabe si debe crear (0) o actualizar (distinto de 0). *@
+    <input type="hidden" asp-for="Id" />
+
+    @* asp-for enlaza cada campo con una propiedad del modelo (nombre, valor y validación),
+       y asp-validation-for pinta debajo el mensaje de error de esa propiedad. *@
+    <div class="mb-3">
+        <label class="form-label" asp-for="Name">Nombre del centro</label>
+        <input class="form-control" asp-for="Name" />
+        <span class="text-danger" asp-validation-for="Name"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Description">Descripción</label>
+        <textarea class="form-control" asp-for="Description" rows="3"></textarea>
+        <span class="text-danger" asp-validation-for="Description"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label class="form-label" asp-for="Address">Dirección</label>
+            <input class="form-control" asp-for="Address" />
+            <span class="text-danger" asp-validation-for="Address"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label" asp-for="City">Ciudad</label>
+            <input class="form-control" asp-for="City" />
+            <span class="text-danger" asp-validation-for="City"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Phone">Teléfono</label>
+        <input class="form-control" asp-for="Phone" type="tel" />
+        <span class="text-danger" asp-validation-for="Phone"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@* Estos scripts hacen que los errores salgan al instante en el navegador, antes de enviar el formulario. *@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

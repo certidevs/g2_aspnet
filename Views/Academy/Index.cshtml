@@ -1,0 +1,81 @@
+@model List<Academy>
+@{
+    ViewData["Title"] = "Centros";
+    var search = ViewBag.Search as string;
+    var city = ViewBag.City as string;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <h1 class="h2 mb-0">Centros de formación</h1>
+    <a class="btn btn-primary" asp-action="Create">Nuevo centro</a>
+</div>
+
+<form method="get" class="card card-body mb-4">
+    @if (!string.IsNullOrEmpty(city))
+    {
+        <input type="hidden" name="city" value="@city" />
+    }
+    <div class="row g-2 align-items-end">
+        <div class="col-md">
+            <label for="Search" class="form-label">Buscar</label>
+            <input id="Search" name="search" value="@search" class="form-control"
+                   placeholder="Nombre del centro" />
+        </div>
+        <div class="col-md-auto"><button class="btn btn-primary" type="submit">Buscar</button></div>
+    </div>
+</form>
+
+@if (!string.IsNullOrEmpty(city))
+{
+    <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span>Mostrando solo los centros de <strong>@city</strong>.</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-search="@search">Quitar filtro</a>
+    </div>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">No hay centros que coincidan con la búsqueda.</div>
+}
+else
+{
+    <p class="text-secondary">Total: @Model.Count</p>
+
+    <div class="table-responsive border rounded">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Centro</th>
+                    <th>Ciudad</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var academy in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">
+                            <a asp-action="Details" asp-route-id="@academy.Id">@academy.Name</a>
+                        </td>
+                        <td>
+                            <a asp-action="Index" asp-route-city="@academy.City" asp-route-search="@search">@academy.City</a>
+                        </td>
+                        <td>@academy.Address</td>
+                        <td>@academy.Phone</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@academy.Id">Ver</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@academy.Id">Editar</a>
+                            @* Borrar es un POST (nunca un enlace): el navegador pide confirmación antes de enviarlo. *@
+                            <form asp-action="Delete" asp-route-id="@academy.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar este centro?');">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

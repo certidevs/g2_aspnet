@@ -1,0 +1,47 @@
+@model Attendance
+@{
+    // Un solo formulario para crear (Id = 0) y para editar (Id > 0).
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Nueva asistencia" : "Editar asistencia";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h2 mb-0">@ViewData["Title"]</h1>
+    <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+</div>
+
+@* Una asistencia nueva se envía a Create y una existente a Save. *@
+<form asp-action="@(isNew ? "Create" : "Save")" method="post" class="card">
+    <div class="card-body p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="Id" />
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="LessonId" class="form-label">Lección</label>
+                <select asp-for="LessonId" asp-items="(SelectList)ViewBag.Lessons" class="form-select">
+                    <option value="">-- Selecciona una lección --</option>
+                </select>
+                <span asp-validation-for="LessonId" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="EnrollmentId" class="form-label">Alumno y curso</label>
+                <select asp-for="EnrollmentId" asp-items="(SelectList)ViewBag.Enrollments" class="form-select">
+                    <option value="">-- Selecciona una matrícula --</option>
+                </select>
+                <span asp-validation-for="EnrollmentId" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Status" class="form-label">Asistencia</label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<AttendanceStatus>()" class="form-select"></select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer bg-transparent text-end">
+        <button class="btn btn-primary" type="submit">Guardar</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
