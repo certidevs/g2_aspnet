@@ -13,7 +13,7 @@ public class Grade
     [StringLength(3000, ErrorMessage = "Los comentarios no puede contener más de 3000 caracteres")]
     public string? Comments { get; set; }
 
-    public DateTime? GradedAt { get; set; }
+    public DateTime? GradedAt { get; set; } = DateTime.UtcNow;
 
     public GradeType? GradeType { get; set; }
 
