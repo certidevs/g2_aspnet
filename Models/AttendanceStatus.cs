@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace G2AspNet.Models;
-
+// prueba commit
 public enum AttendanceStatus
 {
     [Display(Name = "Presente")]
