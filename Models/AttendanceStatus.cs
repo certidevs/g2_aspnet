@@ -2,6 +2,7 @@
 
 namespace G2AspNet.Models;
 // prueba commit
+// prueba commit 2
 public enum AttendanceStatus
 {
     [Display(Name = "Presente")]
