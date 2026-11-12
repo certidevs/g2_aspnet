@@ -8,7 +8,6 @@ namespace G2AspNet.Controllers;
 
 public class ClassroomController(ApplicationDbContext context) : Controller
 {
-
     public async Task<IActionResult> Index()
     {
         var classroom = await context.Classrooms
@@ -33,17 +32,13 @@ public class ClassroomController(ApplicationDbContext context) : Controller
         return View(classroom);
     }
 
-    // TODO (issue #19): Create, Edit, Save y Delete con su vista Form (issue #20).
-    // Tienes un ejemplo completo y funcionando en AcademyController (Create, Edit, Save y Delete).
-
-    // TODO (issue #19): Create, Edit, Save y Delete
-    // Pasos: 1) borra la línea «/* DESCOMENTA DESDE AQUÍ» y la línea «FIN DESCOMENTA */», 2) ajusta los campos de tu entidad, 3) descomenta Views/Classroom/Form.cshtml, 4) descomenta los botones de Index y Details.
-    /* DESCOMENTA DESDE AQUÍ
-
     // Rellena el desplegable de centros del formulario: cada aula pertenece a un centro.
     private async Task LoadAcademies()
     {
-        var academies = await context.Academies.OrderBy(a => a.Name).ToListAsync();
+        var academies = await context.Academies
+        .OrderBy(a => a.Name)
+        .ToListAsync();
+
         ViewBag.Academies = new SelectList(academies, "Id", "Name");
     }
 
@@ -139,6 +134,4 @@ public class ClassroomController(ApplicationDbContext context) : Controller
             : $"Aula «{classroom.Name}» eliminada. Lecciones que se han quedado sin aula asignada: {lessonCount}.";
         return RedirectToAction(nameof(Index));
     }
-
-    FIN DESCOMENTA */
 }

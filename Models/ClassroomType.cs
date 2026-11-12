@@ -4,7 +4,7 @@ namespace G2AspNet.Models;
 
 public enum ClassroomType
 {
-    [Display(Name = "Física")]
+    [Display(Name = "Presencial")]
     Physic,
 
     [Display(Name = "Telemática")]
