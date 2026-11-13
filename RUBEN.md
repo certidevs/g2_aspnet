@@ -17,3 +17,25 @@ en Lessons/Details, un formulario con todos los matriculados del curso y un esta
     guarda todas las Attendance de una vez. Solo el profesor de ese curso.
 5. Poner notas (profesor): solo en sus cursos.
 6. Darse de baja (alumno): su matrícula pasa a Dropped.
+
+
+
+13/11/2026 - 20/11/2026
+
+    - Primero el CRUD completo (Index, Details, Create, Save, Edit, Delete)
+
+20/11/2026 - 02/12/2026
+
+    - personalizar controladores y vistas en base al rol del usuario autenticado.
+
+02/12/2026 - 16/12/2026
+
+    - Mejorar aspecto visual de las pantallas, personalizarlo para que cada proyecto se vea único
+    - Opcional: quien vaya muy avanzado puede probar a agregar alguna nueva entidad
+    - Ensayar presentación:
+        15 min
+        temática, objetivos,
+        equipo
+        tecnologías
+        demo: mostrar rol usuario, mostrar rol admin
+        aprendizajes, futuros desarrollos, conclusiones
