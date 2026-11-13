@@ -66,6 +66,36 @@ public class AttendancesController : Controller
         return View(attendance);
     }
 
+    // Método Edit
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var attendance = context.Attendances.Find(id);
+        if (attendance == null)
+        {
+            return NotFound();
+        }
+        LoadDropdowns(attendance);
+        return View("Form", attendance);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Delete(int id)
+    {
+        var attendance = context.Attendances.Find(id);
+        if (attendance == null)
+        {
+            return NotFound();
+        }
+        var lessonId = attendance.LessonId;
+        context.Attendances.Remove(attendance);
+        context.SaveChanges();
+
+        TempData["Message"] = "Asistencia eliminada correctamente.";
+        return RedirectToAction("Index", "Attendances", new { id = attendance.Id });
+    }
+
     [HttpGet]
     public IActionResult Create(int lessonId, int enrollmentId)
     {
@@ -77,6 +107,7 @@ public class AttendancesController : Controller
         };
 
         LoadDropdowns(attendance);
+        TempData["Message"] = "Creando nueva asistencia para la lección y matrícula seleccionadas.";
         return View("Form", attendance);
     }
 
@@ -90,6 +121,7 @@ public class AttendancesController : Controller
         {
             context.Attendances.Add(attendance);
             context.SaveChanges();
+            TempData["Message"] = "Asistencia creada correctamente.";
             return RedirectToAction("Details", "Lessons", new { id = attendance.LessonId });
         }
 
@@ -111,6 +143,7 @@ public class AttendancesController : Controller
         }
 
         LoadDropdowns(attendance);
+        TempData["Message"] = "Asistencia actualizada correctamente.";
         return View("Form", attendance);
     }
 
