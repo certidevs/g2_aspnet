@@ -19,7 +19,6 @@ public class Academy
     public string City { get; set; } = string.Empty;
     [Phone(ErrorMessage = "Por favor ingrese un número de teléfono válido.")]
     public string? Phone { get; set; }
-    //public string? Location { get; set; }
 
     public List<Classroom> Classrooms { get; set; } = [];
     public List<Course> Courses { get; set; } = [];
