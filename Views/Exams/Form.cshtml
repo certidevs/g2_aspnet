@@ -1,0 +1,49 @@
+@model Exam
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Nuevo examen" : "Editar examen";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@* Formulario para crear o editar un examen. Envía a la acción Save del controlador Exams. *@
+<form asp-action="Save" method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    @* Campos: Título y Curso (desplegable) *@
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label class="form-label" asp-for="Title">Título</label>
+            <input class="form-control" asp-for="Title" />
+            <span class="text-danger" asp-validation-for="Title"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label" asp-for="CourseId">Curso</label>
+            <select class="form-select" asp-for="CourseId" asp-items="ViewBag.Courses">
+                <option value="">Selecciona un curso</option>
+            </select>
+            <span class="text-danger" asp-validation-for="CourseId"></span>
+        </div>
+    </div>
+
+    @* Campo: Descripción *@
+    <div class="mb-3">
+        <label class="form-label" asp-for="Description">Descripción</label>
+        <textarea class="form-control" asp-for="Description" rows="3"></textarea>
+        <span class="text-danger" asp-validation-for="Description"></span>
+    </div>
+
+    @* Campo: Activo (switch) *@
+    <div class="form-check form-switch mb-3">
+        <input class="form-check-input" asp-for="IsActive" />
+        <label class="form-check-label" asp-for="IsActive">Activo</label>
+    </div>
+
+    @* Botones: Guardar y Cancelar *@
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
