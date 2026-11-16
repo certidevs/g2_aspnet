@@ -1,0 +1,75 @@
+@model Exam
+@{
+    ViewData["Title"] = Model.Title;
+    var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+}
+
+<h1>@Model.Title</h1>
+
+@* Descripción del examen *@
+<p>@Html.DisplayFor(m => Model.Description)</p>
+
+@* Información del examen: curso, profesor, fecha y estado activo *@
+<div class="mb-3">
+    <strong>Curso:</strong> @Model.Course?.Name<br />
+    <strong>Profesor:</strong> @(Model.Teacher?.DisplayName ?? Model.Teacher?.UserName ?? "Anónimo")<br />
+    <strong>Fecha:</strong> @Model.CreatedAt.ToShortDateString()<br />
+    <strong>Activo:</strong> @(Model.IsActive ? "Sí" : "No")
+</div>
+
+@* Botones de staff: Editar examen y Añadir pregunta *@
+@if (isStaff)
+{
+    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id">Editar examen</a>
+    <a class="btn btn-sm btn-success" asp-action="Create" asp-controller="Questions" asp-route-examId="@Model.Id">Añadir pregunta</a>
+}
+
+@* Listado de preguntas del examen *@
+<h3>Preguntas (@Model.Questions.Count)</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Pregunta</th>
+            <th>Opción 1</th>
+            <th>Opción 2</th>
+            <th>Opción 3</th>
+            <th>Opción 4</th>
+            @if (isStaff)
+            {
+                <th>Correcta</th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var question in Model.Questions.OrderBy(q => q.Id))
+        {
+            <tr>
+                <td>@question.Text</td>
+                <td>@question.Option1</td>
+                <td>@question.Option2</td>
+                <td>@question.Option3 ?? "—"</td>
+                <td>@question.Option4 ?? "—"</td>
+                @if (isStaff)
+                {
+                    <td>@question.CorrectOption</td>
+                }
+                <td>
+                    @* Acciones por pregunta: Editar y Borrar (solo staff) *@
+                    @if (isStaff)
+                    {
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-controller="Questions" asp-route-id="@question.Id">Editar</a>
+                        <form asp-action="Delete" asp-controller="Questions" asp-route-id="@question.Id" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Borrar esta pregunta?');">
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Borrar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@* Botón para volver al listado de exámenes *@
+<a class="btn btn-outline-secondary" asp-action="Index">Volver al listado</a>
