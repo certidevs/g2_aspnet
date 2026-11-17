@@ -139,7 +139,17 @@
 
         @if (preguntas.Count > 0)
         {
-            <button type="submit" name="accion" value="saveExam" class="btn btn-primary">Guardar examen</button>
+            @if (ViewBag.HayPreguntaSinGuardar == true)
+            {
+                <button type="submit" name="accion" value="saveExam" class="btn btn-primary"
+                        onclick="return confirm('Tienes una pregunta sin guardar que no se añadirá al examen. ¿Desea continuar de todos modos?');">
+                    Guardar examen
+                </button>
+            }
+            else
+            {
+                <button type="submit" name="accion" value="saveExam" class="btn btn-primary">Guardar examen</button>
+            }
         }
         else
         {
