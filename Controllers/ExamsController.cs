@@ -262,16 +262,32 @@ public class ExamsController : Controller
             existing.CourseId = exam.CourseId;
             existing.IsActive = exam.IsActive;
 
-            // Borrar preguntas existentes y volver a crearlas
-            context.Questions.RemoveRange(existing.Questions);
             exam = existing;
         }
 
-        // Guardar preguntas del borrador
+        // Guardar preguntas del borrador: Add si es nueva (Id==0), Update si ya existe (Id>0)
+        var idsBorrador = preguntasBorrador.Where(p => p.Id > 0).Select(p => p.Id).ToList();
+
         foreach (var p in preguntasBorrador)
         {
             p.ExamId = exam.Id;
-            context.Questions.Add(p);
+            if (p.Id == 0)
+            {
+                context.Questions.Add(p);
+            }
+            else
+            {
+                context.Questions.Update(p);
+            }
+        }
+
+        // Borrar preguntas de la base de datos que ya no están en el borrador
+        if (exam.Id > 0)
+        {
+            var preguntasAborrar = context.Questions
+                .Where(q => q.ExamId == exam.Id && !idsBorrador.Contains(q.Id))
+                .ToList();
+            context.Questions.RemoveRange(preguntasAborrar);
         }
 
         context.SaveChanges();
