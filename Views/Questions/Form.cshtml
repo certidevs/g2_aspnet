@@ -1,0 +1,68 @@
+@model Question
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Nueva pregunta" : "Editar pregunta";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@* Formulario para crear o editar una pregunta. Envía a la acción Save del controlador Questions. *@
+<form asp-action="Save" method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ExamId" />
+
+    @* Campo: Texto de la pregunta *@
+    <div class="mb-3">
+        <label class="form-label" asp-for="Text">Pregunta</label>
+        <textarea class="form-control" asp-for="Text" rows="3"></textarea>
+        <span class="text-danger" asp-validation-for="Text"></span>
+    </div>
+
+    @* Campos: Opción 1 y Opción 2 *@
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Opción 1</label>
+            <input class="form-control" asp-for="Option1" />
+            <span class="text-danger" asp-validation-for="Option1"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Opción 2</label>
+            <input class="form-control" asp-for="Option2" />
+            <span class="text-danger" asp-validation-for="Option2"></span>
+        </div>
+    </div>
+
+    @* Campos: Opción 3 y Opción 4 *@
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Opción 3</label>
+            <input class="form-control" asp-for="Option3" />
+            <span class="text-danger" asp-validation-for="Option3"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Opción 4</label>
+            <input class="form-control" asp-for="Option4" />
+            <span class="text-danger" asp-validation-for="Option4"></span>
+        </div>
+    </div>
+
+    @* Campo: Opción correcta (desplegable 1-4) *@
+    <div class="mb-3">
+        <label class="form-label">Opción correcta</label>
+        <select class="form-select" asp-for="CorrectOption">
+            <option value="1">Opción 1</option>
+            <option value="2">Opción 2</option>
+            <option value="3">Opción 3</option>
+            <option value="4">Opción 4</option>
+        </select>
+        <span class="text-danger" asp-validation-for="CorrectOption"></span>
+    </div>
+
+    @* Botones: Guardar y Cancelar *@
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-outline-secondary" asp-action="Details" asp-controller="Exams" asp-route-id="@Model.ExamId">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
