@@ -1,0 +1,21 @@
+## G2 ASP.NET
+
+- [Inicio](https://github.com/certidevs/g2_aspnet/wiki/Home)
+- [Presentación del proyecto](https://github.com/certidevs/g2_aspnet/wiki/Presentacion-del-proyecto)
+- [Guía funcional](https://github.com/certidevs/g2_aspnet/wiki/Guia-funcional)
+- [Modelo de datos](https://github.com/certidevs/g2_aspnet/wiki/Modelo-de-datos)
+- [Primeros pasos](https://github.com/certidevs/g2_aspnet/wiki/Primeros-pasos)
+- [Arquitectura](https://github.com/certidevs/g2_aspnet/wiki/Arquitectura)
+- [Base de datos y migraciones](https://github.com/certidevs/g2_aspnet/wiki/Base-de-datos-y-migraciones)
+- [Autenticación y roles](https://github.com/certidevs/g2_aspnet/wiki/Autenticacion-y-roles)
+- [Controladores y vistas](https://github.com/certidevs/g2_aspnet/wiki/Controladores-y-vistas)
+- [Configuración](https://github.com/certidevs/g2_aspnet/wiki/Configuracion)
+- [Testing y CI](https://github.com/certidevs/g2_aspnet/wiki/Testing-y-CI)
+- [Despliegue](https://github.com/certidevs/g2_aspnet/wiki/Despliegue)
+- [Demostración](https://github.com/certidevs/g2_aspnet/wiki/Demostracion)
+- [Problemas frecuentes](https://github.com/certidevs/g2_aspnet/wiki/Problemas-frecuentes)
+- [Guía de contribución](https://github.com/certidevs/g2_aspnet/wiki/Guia-de-contribucion)
+- [Guía de IDE](https://github.com/certidevs/g2_aspnet/wiki/Guia-de-IDE)
+- [Dependencias](https://github.com/certidevs/g2_aspnet/wiki/Dependencias)
+
+[Repositorio](https://github.com/certidevs/g2_aspnet) · [Issues](https://github.com/certidevs/g2_aspnet/issues)
