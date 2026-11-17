@@ -24,6 +24,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Classroom> Classrooms => Set<Classroom>();
     public DbSet<Grade> Grades => Set<Grade>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
+    public DbSet<Exam> Exams => Set<Exam>();
+    public DbSet<Question> Questions => Set<Question>();
 
 
     /// <summary>
@@ -114,6 +116,29 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(e => e.Attendances)
             .HasForeignKey(a => a.EnrollmentId)
             .OnDelete(DeleteBehavior.Restrict);
+
+
+        // Restrict: un examen pertenece a un curso; no se borra un curso con exámenes.
+        modelBuilder.Entity<Exam>()
+            .HasOne(e => e.Course)
+            .WithMany()
+            .HasForeignKey(e => e.CourseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Restrict: toda relación con ApplicationUser es Restrict; no se borra un profesor con exámenes.
+        modelBuilder.Entity<Exam>()
+            .HasOne(e => e.Teacher)
+            .WithMany()
+            .HasForeignKey(e => e.TeacherId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Cascade: una pregunta es parte de un examen y no tiene sentido sin él.
+        modelBuilder.Entity<Question>()
+            .HasOne(q => q.Exam)
+            .WithMany(e => e.Questions)
+            .HasForeignKey(q => q.ExamId)
+            .OnDelete(DeleteBehavior.Cascade);
+
     }
 
 }
