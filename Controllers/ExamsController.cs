@@ -18,6 +18,19 @@ public class ExamsController : Controller
         this.context = context;
     }
 
+    // Detecta si el formulario de pregunta tiene algún campo relleno pero no guardado.
+    private bool HayPreguntaSinGuardar(Question pregunta)
+    {
+        if (pregunta == null) return false;
+        return !string.IsNullOrWhiteSpace(pregunta.Text)
+            || !string.IsNullOrWhiteSpace(pregunta.Option1)
+            || !string.IsNullOrWhiteSpace(pregunta.Option2)
+            || !string.IsNullOrWhiteSpace(pregunta.Option3)
+            || !string.IsNullOrWhiteSpace(pregunta.Option4);
+    }
+
+
+
     // Listado de exámenes.
     // Un admin o profesor ve todos; un alumno solo ve los exámenes activos.
     [Authorize]
@@ -89,6 +102,7 @@ public class ExamsController : Controller
         ViewBag.EsPrimeraPregunta = preguntas.Count == 0;
 
         ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
+        ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar((Question)ViewBag.PreguntaActual!);
         return View("Form", exam);
     }
 
@@ -122,6 +136,7 @@ public class ExamsController : Controller
         ViewBag.Preguntas = exam.Questions ?? new List<Question>();
         ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
         ViewBag.EsPrimeraPregunta = (exam.Questions ?? new List<Question>()).Count == 0;
+        ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar((Question)ViewBag.PreguntaActual!);
 
         return View("Form", exam);
     }
@@ -184,6 +199,7 @@ public class ExamsController : Controller
             ViewBag.Preguntas = preguntas;
             ViewBag.PreguntaActual = pregunta ?? new Question { ExamId = exam.Id };
             ViewBag.EsPrimeraPregunta = preguntas.Count == 0;
+            ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar(pregunta!);
             ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
             return View("Form", exam);
         }
@@ -200,6 +216,7 @@ public class ExamsController : Controller
             ViewBag.Preguntas = preguntasBorrador;
             ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
             ViewBag.EsPrimeraPregunta = true;
+            ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar(new Question { ExamId = exam.Id });
             ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
             return View("Form", exam);
         }
