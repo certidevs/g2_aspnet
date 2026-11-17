@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using G2AspNet.Data;
 using G2AspNet.Models;
 using G2AspNet.Utilities;
@@ -52,7 +53,6 @@ public class ExamsController : Controller
             return NotFound();
         }
 
-        // Solo el profesor dueño, un admin o un alumno pueden verlo.
         var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
         if (!isStaff && exam.TeacherId != User.GetRequiredUserId())
         {
@@ -62,13 +62,43 @@ public class ExamsController : Controller
         return View(exam);
     }
 
-    // Formulario para crear un nuevo examen.
+    // Formulario para crear un nuevo examen (con borrador de preguntas acumuladas).
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
     public IActionResult Create()
     {
+        var examJson = TempData.Peek("ExamBorrador") as string;
+        var preguntasJson = TempData.Peek("PreguntasBorrador") as string;
+
+        Exam exam;
+        List<Question> preguntas;
+
+        if (!string.IsNullOrEmpty(examJson) && !string.IsNullOrEmpty(preguntasJson))
+        {
+            exam = JsonSerializer.Deserialize<Exam>(examJson) ?? new Exam();
+            preguntas = JsonSerializer.Deserialize<List<Question>>(preguntasJson) ?? new List<Question>();
+        }
+        else
+        {
+            exam = new Exam();
+            preguntas = new List<Question>();
+        }
+
+        ViewBag.Preguntas = preguntas;
+        ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
+        ViewBag.EsPrimeraPregunta = preguntas.Count == 0;
+
         ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
-        return View("Form", new Exam());
+        return View("Form", exam);
+    }
+
+    // Cancela la creación del examen y limpia el borrador de TempData.
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    public IActionResult Cancelar()
+    {
+        TempData.Remove("ExamBorrador");
+        TempData.Remove("PreguntasBorrador");
+        return RedirectToAction("Index");
     }
 
     // Formulario para editar un examen existente.
@@ -76,7 +106,7 @@ public class ExamsController : Controller
     [HttpGet]
     public IActionResult Edit(int id)
     {
-        var exam = context.Exams.Find(id);
+        var exam = context.Exams.Include(e => e.Questions).FirstOrDefault(e => e.Id == id);
         if (exam == null)
         {
             return NotFound();
@@ -89,18 +119,87 @@ public class ExamsController : Controller
         }
 
         ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
+        ViewBag.Preguntas = exam.Questions ?? new List<Question>();
+        ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
+        ViewBag.EsPrimeraPregunta = (exam.Questions ?? new List<Question>()).Count == 0;
+
         return View("Form", exam);
     }
 
-    // Guarda un examen (crea o actualiza según Id).
+    // Guarda una pregunta en el borrador, cancela una pregunta, o guarda el examen completo.
+    // accion="saveQuestion": acumula la pregunta actual en el borrador.
+    // accion="cancelQuestion": descarta la pregunta actual (no se guarda).
+    // accion="addQuestion": reinicia el formulario de pregunta (descarta la actual si no se guardó).
+    // accion="saveExam": valida y guarda el examen con todas sus preguntas en la base de datos.
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpPost]
-    public IActionResult Save(Exam exam)
+    public IActionResult Save(Exam exam, Question pregunta, string accion)
     {
+        if (accion == "saveQuestion")
+        {
+            // Guardar datos del examen tal como están
+            TempData["ExamBorrador"] = JsonSerializer.Serialize(exam);
+
+            // Leer preguntas existentes del borrador (sin marcar para borrar)
+            var preguntasJson = TempData.Peek("PreguntasBorrador") as string;
+            var preguntas = string.IsNullOrEmpty(preguntasJson)
+                ? new List<Question>()
+                : JsonSerializer.Deserialize<List<Question>>(preguntasJson) ?? new List<Question>();
+
+            // Agregar la pregunta actual si tiene texto
+            if (pregunta != null && !string.IsNullOrWhiteSpace(pregunta.Text))
+            {
+                preguntas.Add(pregunta);
+            }
+
+            TempData["PreguntasBorrador"] = JsonSerializer.Serialize(preguntas);
+
+            return RedirectToAction("Create");
+        }
+
+        if (accion == "cancelQuestion" || accion == "addQuestion")
+        {
+            // Mantener los datos del examen, descartar pregunta actual
+            TempData["ExamBorrador"] = JsonSerializer.Serialize(exam);
+            return RedirectToAction("Create");
+        }
+
+        // accion == "saveExam"
         ModelState.Remove(nameof(Exam.TeacherId));
+
+        // Limpiar errores del modelo de pregunta para que no bloqueen el guardado del examen
+        var keysToRemove = ModelState.Keys.Where(k => k.StartsWith("pregunta.")).ToList();
+        foreach (var key in keysToRemove)
+        {
+            ModelState.Remove(key);
+        }
 
         if (!ModelState.IsValid)
         {
+            var preguntasJson = TempData.Peek("PreguntasBorrador") as string;
+            var preguntas = string.IsNullOrEmpty(preguntasJson)
+                ? new List<Question>()
+                : JsonSerializer.Deserialize<List<Question>>(preguntasJson) ?? new List<Question>();
+
+            ViewBag.Preguntas = preguntas;
+            ViewBag.PreguntaActual = pregunta ?? new Question { ExamId = exam.Id };
+            ViewBag.EsPrimeraPregunta = preguntas.Count == 0;
+            ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
+            return View("Form", exam);
+        }
+
+        // Verificar que hay al menos una pregunta guardada
+        var preguntasBorradorJson = TempData.Peek("PreguntasBorrador") as string;
+        var preguntasBorrador = string.IsNullOrEmpty(preguntasBorradorJson)
+            ? new List<Question>()
+            : JsonSerializer.Deserialize<List<Question>>(preguntasBorradorJson) ?? new List<Question>();
+
+        if (preguntasBorrador.Count == 0)
+        {
+            ModelState.AddModelError("", "El examen debe tener al menos una pregunta guardada.");
+            ViewBag.Preguntas = preguntasBorrador;
+            ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
+            ViewBag.EsPrimeraPregunta = true;
             ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
             return View("Form", exam);
         }
@@ -110,10 +209,11 @@ public class ExamsController : Controller
             exam.TeacherId = User.GetRequiredUserId();
             exam.CreatedAt = DateTime.UtcNow;
             context.Exams.Add(exam);
+            context.SaveChanges(); // Para obtener el Id generado
         }
         else
         {
-            var existing = context.Exams.Find(exam.Id);
+            var existing = context.Exams.Include(e => e.Questions).FirstOrDefault(e => e.Id == exam.Id);
             if (existing == null)
             {
                 return NotFound();
@@ -129,9 +229,24 @@ public class ExamsController : Controller
             existing.Description = exam.Description;
             existing.CourseId = exam.CourseId;
             existing.IsActive = exam.IsActive;
+
+            // Borrar preguntas existentes y volver a crearlas
+            context.Questions.RemoveRange(existing.Questions);
+            exam = existing;
+        }
+
+        // Guardar preguntas del borrador
+        foreach (var p in preguntasBorrador)
+        {
+            p.ExamId = exam.Id;
+            context.Questions.Add(p);
         }
 
         context.SaveChanges();
+
+        // Limpiar borrador de TempData
+        TempData.Remove("ExamBorrador");
+        TempData.Remove("PreguntasBorrador");
 
         TempData["Message"] = "Examen guardado correctamente.";
         return RedirectToAction("Index");
