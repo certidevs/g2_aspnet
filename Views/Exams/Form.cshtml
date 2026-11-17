@@ -40,6 +40,13 @@
 
     <h3>Preguntas guardadas (@preguntas.Count)</h3>
 
+    @if (ViewBag.HayPreguntaSinGuardar == true)
+    {
+        <div class="alert alert-warning">
+            Tienes una pregunta sin guardar. Pulsa <strong>"Guardar pregunta"</strong> para añadirla al examen, de lo contrario se descartará.
+        </div>
+    }
+
     @foreach (var p in preguntas)
     {
         <div class="card mb-3">
