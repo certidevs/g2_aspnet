@@ -17,11 +17,10 @@
     <strong>Activo:</strong> @(Model.IsActive ? "Sí" : "No")
 </div>
 
-@* Botones de staff: Editar examen y Añadir pregunta *@
+@* Botones de staff: Editar examen *@
 @if (isStaff)
 {
     <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id">Editar examen</a>
-    <a class="btn btn-sm btn-success" asp-action="Create" asp-controller="Questions" asp-route-examId="@Model.Id">Añadir pregunta</a>
 }
 
 @* Listado de preguntas del examen *@
