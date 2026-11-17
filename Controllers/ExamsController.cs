@@ -210,6 +210,21 @@ public class ExamsController : Controller
             ? new List<Question>()
             : JsonSerializer.Deserialize<List<Question>>(preguntasBorradorJson) ?? new List<Question>();
 
+        // Si estamos editando un examen existente y el borrador está vacío,
+        // cargar las preguntas desde la base de datos para que se reconozcan como guardadas.
+        if (preguntasBorrador.Count == 0 && exam.Id > 0)
+        {
+            var preguntasDb = context.Questions
+                .Where(q => q.ExamId == exam.Id)
+                .OrderBy(q => q.Id)
+                .ToList();
+            if (preguntasDb.Count > 0)
+            {
+                preguntasBorrador = preguntasDb;
+                TempData["PreguntasBorrador"] = JsonSerializer.Serialize(preguntasBorrador);
+            }
+        }
+
         if (preguntasBorrador.Count == 0)
         {
             ModelState.AddModelError("", "El examen debe tener al menos una pregunta guardada.");
