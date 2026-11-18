@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using System.Text.Json.Serialization;           // Serializar es transformar de objeto a texto (JSON)
 using G2AspNet.Data;
 using G2AspNet.Models;
 using G2AspNet.Utilities;
@@ -18,8 +19,33 @@ public class ExamsController : Controller
         this.context = context;
     }
 
+    // DTO Data Transfer Object, son datos planos.
+    // DTOs planos para serializar en TempData sin ciclos de navegación (Exam <-> Question). Exam y Question tienen referencias mutuas y la serializacion entra en bucle por ello.
+    private sealed class ExamBorradorDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public int CourseId { get; set; }
+        public string TeacherId { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    private sealed class QuestionBorradorDto
+    {
+        public int Id { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public string Option1 { get; set; } = string.Empty;
+        public string Option2 { get; set; } = string.Empty;
+        public string? Option3 { get; set; }
+        public string? Option4 { get; set; }
+        public int CorrectOption { get; set; }
+        public int ExamId { get; set; }
+    }
+
     // Detecta si el formulario de pregunta tiene algún campo relleno pero no guardado.
-    private bool HayPreguntaSinGuardar(Question pregunta)
+    private bool AreQuestionNotSaved(Question pregunta)
     {
         if (pregunta == null) return false;
         return !string.IsNullOrWhiteSpace(pregunta.Text)
@@ -29,7 +55,38 @@ public class ExamsController : Controller
             || !string.IsNullOrWhiteSpace(pregunta.Option4);
     }
 
+    // Mapea un ExamBorradorDto a una entidad Exam.
+    private Exam MapExamDtoToEntity(ExamBorradorDto dto)
+    {
+        return new Exam
+        {
+            Id = dto.Id,
+            Title = dto.Title,
+            Description = dto.Description,
+            CourseId = dto.CourseId,
+            TeacherId = dto.TeacherId,
+            IsActive = dto.IsActive,
+            CreatedAt = dto.CreatedAt,
+            Questions = new List<Question>()
+        };
+    }
 
+    // Mapea un QuestionBorradorDto a una entidad Question.
+    private Question MapQuestionDtoToEntity(QuestionBorradorDto dto)
+    {
+        return new Question
+        {
+            Id = dto.Id,
+            Text = dto.Text,
+            Option1 = dto.Option1,
+            Option2 = dto.Option2,
+            Option3 = dto.Option3,
+            Option4 = dto.Option4,
+            CorrectOption = dto.CorrectOption,
+            ExamId = dto.ExamId,
+            Exam = null
+        };
+    }
 
     // Listado de exámenes.
     // Un admin o profesor ve todos; un alumno solo ve los exámenes activos.
@@ -88,8 +145,11 @@ public class ExamsController : Controller
 
         if (!string.IsNullOrEmpty(examJson) && !string.IsNullOrEmpty(preguntasJson))
         {
-            exam = JsonSerializer.Deserialize<Exam>(examJson) ?? new Exam();
-            preguntas = JsonSerializer.Deserialize<List<Question>>(preguntasJson) ?? new List<Question>();
+            var examenDto = JsonSerializer.Deserialize<ExamBorradorDto>(examJson);
+            var preguntasDtos = JsonSerializer.Deserialize<List<QuestionBorradorDto>>(preguntasJson) ?? new List<QuestionBorradorDto>();
+
+            exam = MapExamDtoToEntity(examenDto ?? new ExamBorradorDto());
+            preguntas = preguntasDtos.Select(MapQuestionDtoToEntity).ToList();
         }
         else
         {
@@ -102,7 +162,7 @@ public class ExamsController : Controller
         ViewBag.EsPrimeraPregunta = preguntas.Count == 0;
 
         ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
-        ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar((Question)ViewBag.PreguntaActual!);
+        ViewBag.AreQuestionNotSaved = AreQuestionNotSaved((Question)ViewBag.PreguntaActual!);
         return View("Form", exam);
     }
 
@@ -136,7 +196,33 @@ public class ExamsController : Controller
         ViewBag.Preguntas = exam.Questions ?? new List<Question>();
         ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
         ViewBag.EsPrimeraPregunta = (exam.Questions ?? new List<Question>()).Count == 0;
-        ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar((Question)ViewBag.PreguntaActual!);
+        ViewBag.AreQuestionNotSaved = AreQuestionNotSaved((Question)ViewBag.PreguntaActual!);
+
+        // Guardar los datos planos del examen y las preguntas en TempData (sin ciclos de navegación).
+        var examenDto = new ExamBorradorDto
+        {
+            Id = exam.Id,
+            Title = exam.Title,
+            Description = exam.Description,
+            CourseId = exam.CourseId,
+            TeacherId = exam.TeacherId,
+            IsActive = exam.IsActive,
+            CreatedAt = exam.CreatedAt
+        };
+        TempData["ExamBorrador"] = JsonSerializer.Serialize(examenDto);
+
+        var preguntasDtos = (exam.Questions ?? new List<Question>()).Select(q => new QuestionBorradorDto
+        {
+            Id = q.Id,
+            Text = q.Text,
+            Option1 = q.Option1,
+            Option2 = q.Option2,
+            Option3 = q.Option3,
+            Option4 = q.Option4,
+            CorrectOption = q.CorrectOption,
+            ExamId = q.ExamId
+        }).ToList();
+        TempData["PreguntasBorrador"] = JsonSerializer.Serialize(preguntasDtos);
 
         return View("Form", exam);
     }
@@ -152,22 +238,42 @@ public class ExamsController : Controller
     {
         if (accion == "saveQuestion")
         {
-            // Guardar datos del examen tal como están
-            TempData["ExamBorrador"] = JsonSerializer.Serialize(exam);
+            // Guardar datos del examen tal como están (planos, sin ciclos)
+            var examenDto = new ExamBorradorDto
+            {
+                Id = exam.Id,
+                Title = exam.Title,
+                Description = exam.Description,
+                CourseId = exam.CourseId,
+                TeacherId = exam.TeacherId,
+                IsActive = exam.IsActive,
+                CreatedAt = exam.CreatedAt
+            };
+            TempData["ExamBorrador"] = JsonSerializer.Serialize(examenDto);
 
             // Leer preguntas existentes del borrador (sin marcar para borrar)
             var preguntasJson = TempData.Peek("PreguntasBorrador") as string;
-            var preguntas = string.IsNullOrEmpty(preguntasJson)
-                ? new List<Question>()
-                : JsonSerializer.Deserialize<List<Question>>(preguntasJson) ?? new List<Question>();
+            var preguntasDtos = string.IsNullOrEmpty(preguntasJson)
+                ? new List<QuestionBorradorDto>()
+                : JsonSerializer.Deserialize<List<QuestionBorradorDto>>(preguntasJson) ?? new List<QuestionBorradorDto>();
 
             // Agregar la pregunta actual si tiene texto
             if (pregunta != null && !string.IsNullOrWhiteSpace(pregunta.Text))
             {
-                preguntas.Add(pregunta);
+                preguntasDtos.Add(new QuestionBorradorDto
+                {
+                    Id = 0,
+                    Text = pregunta.Text,
+                    Option1 = pregunta.Option1,
+                    Option2 = pregunta.Option2,
+                    Option3 = pregunta.Option3,
+                    Option4 = pregunta.Option4,
+                    CorrectOption = pregunta.CorrectOption,
+                    ExamId = pregunta.ExamId
+                });
             }
 
-            TempData["PreguntasBorrador"] = JsonSerializer.Serialize(preguntas);
+            TempData["PreguntasBorrador"] = JsonSerializer.Serialize(preguntasDtos);
 
             return RedirectToAction("Create");
         }
@@ -175,7 +281,17 @@ public class ExamsController : Controller
         if (accion == "cancelQuestion" || accion == "addQuestion")
         {
             // Mantener los datos del examen, descartar pregunta actual
-            TempData["ExamBorrador"] = JsonSerializer.Serialize(exam);
+            var examenDto = new ExamBorradorDto
+            {
+                Id = exam.Id,
+                Title = exam.Title,
+                Description = exam.Description,
+                CourseId = exam.CourseId,
+                TeacherId = exam.TeacherId,
+                IsActive = exam.IsActive,
+                CreatedAt = exam.CreatedAt
+            };
+            TempData["ExamBorrador"] = JsonSerializer.Serialize(examenDto);
             return RedirectToAction("Create");
         }
 
@@ -192,27 +308,29 @@ public class ExamsController : Controller
         if (!ModelState.IsValid)
         {
             var preguntasJson = TempData.Peek("PreguntasBorrador") as string;
-            var preguntas = string.IsNullOrEmpty(preguntasJson)
-                ? new List<Question>()
-                : JsonSerializer.Deserialize<List<Question>>(preguntasJson) ?? new List<Question>();
+            var preguntasDtos = string.IsNullOrEmpty(preguntasJson)
+                ? new List<QuestionBorradorDto>()
+                : JsonSerializer.Deserialize<List<QuestionBorradorDto>>(preguntasJson) ?? new List<QuestionBorradorDto>();
+
+            var preguntas = preguntasDtos.Select(MapQuestionDtoToEntity).ToList();
 
             ViewBag.Preguntas = preguntas;
             ViewBag.PreguntaActual = pregunta ?? new Question { ExamId = exam.Id };
             ViewBag.EsPrimeraPregunta = preguntas.Count == 0;
-            ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar(pregunta!);
+            ViewBag.AreQuestionNotSaved = AreQuestionNotSaved(pregunta!);
             ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
             return View("Form", exam);
         }
 
         // Verificar que hay al menos una pregunta guardada
         var preguntasBorradorJson = TempData.Peek("PreguntasBorrador") as string;
-        var preguntasBorrador = string.IsNullOrEmpty(preguntasBorradorJson)
-            ? new List<Question>()
-            : JsonSerializer.Deserialize<List<Question>>(preguntasBorradorJson) ?? new List<Question>();
+        var preguntasDtosFinales = string.IsNullOrEmpty(preguntasBorradorJson)
+            ? new List<QuestionBorradorDto>()
+            : JsonSerializer.Deserialize<List<QuestionBorradorDto>>(preguntasBorradorJson) ?? new List<QuestionBorradorDto>();
 
         // Si estamos editando un examen existente y el borrador está vacío,
         // cargar las preguntas desde la base de datos para que se reconozcan como guardadas.
-        if (preguntasBorrador.Count == 0 && exam.Id > 0)
+        if (preguntasDtosFinales.Count == 0 && exam.Id > 0)
         {
             var preguntasDb = context.Questions
                 .Where(q => q.ExamId == exam.Id)
@@ -220,18 +338,28 @@ public class ExamsController : Controller
                 .ToList();
             if (preguntasDb.Count > 0)
             {
-                preguntasBorrador = preguntasDb;
-                TempData["PreguntasBorrador"] = JsonSerializer.Serialize(preguntasBorrador);
+                preguntasDtosFinales = preguntasDb.Select(q => new QuestionBorradorDto
+                {
+                    Id = q.Id,
+                    Text = q.Text,
+                    Option1 = q.Option1,
+                    Option2 = q.Option2,
+                    Option3 = q.Option3,
+                    Option4 = q.Option4,
+                    CorrectOption = q.CorrectOption,
+                    ExamId = q.ExamId
+                }).ToList();
+                TempData["PreguntasBorrador"] = JsonSerializer.Serialize(preguntasDtosFinales);
             }
         }
 
-        if (preguntasBorrador.Count == 0)
+        if (preguntasDtosFinales.Count == 0)
         {
             ModelState.AddModelError("", "El examen debe tener al menos una pregunta guardada.");
-            ViewBag.Preguntas = preguntasBorrador;
+            ViewBag.Preguntas = new List<Question>();
             ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
             ViewBag.EsPrimeraPregunta = true;
-            ViewBag.HayPreguntaSinGuardar = HayPreguntaSinGuardar(new Question { ExamId = exam.Id });
+            ViewBag.AreQuestionNotSaved = AreQuestionNotSaved(new Question { ExamId = exam.Id });
             ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
             return View("Form", exam);
         }
@@ -245,7 +373,7 @@ public class ExamsController : Controller
         }
         else
         {
-            var existing = context.Exams.Include(e => e.Questions).FirstOrDefault(e => e.Id == exam.Id);
+            var existing = context.Exams.FirstOrDefault(e => e.Id == exam.Id);
             if (existing == null)
             {
                 return NotFound();
@@ -266,18 +394,19 @@ public class ExamsController : Controller
         }
 
         // Guardar preguntas del borrador: Add si es nueva (Id==0), Update si ya existe (Id>0)
-        var idsBorrador = preguntasBorrador.Where(p => p.Id > 0).Select(p => p.Id).ToList();
+        var idsBorrador = preguntasDtosFinales.Where(p => p.Id > 0).Select(p => p.Id).ToList();
 
-        foreach (var p in preguntasBorrador)
+        foreach (var dto in preguntasDtosFinales)
         {
-            p.ExamId = exam.Id;
-            if (p.Id == 0)
+            var entidad = MapQuestionDtoToEntity(dto);
+            entidad.ExamId = exam.Id;
+            if (entidad.Id == 0)
             {
-                context.Questions.Add(p);
+                context.Questions.Add(entidad);
             }
             else
             {
-                context.Questions.Update(p);
+                context.Questions.Update(entidad);
             }
         }
 
@@ -285,6 +414,7 @@ public class ExamsController : Controller
         if (exam.Id > 0)
         {
             var preguntasAborrar = context.Questions
+                .AsNoTracking()
                 .Where(q => q.ExamId == exam.Id && !idsBorrador.Contains(q.Id))
                 .ToList();
             context.Questions.RemoveRange(preguntasAborrar);
