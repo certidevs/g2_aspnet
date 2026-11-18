@@ -40,7 +40,7 @@
 
     <h3>Preguntas guardadas (@preguntas.Count)</h3>
 
-    @if (ViewBag.HayPreguntaSinGuardar == true)
+    @if (ViewBag.AreQuestionNotSaved == true)
     {
         <div class="alert alert-warning">
             Tienes una pregunta sin guardar. Pulsa <strong>"Guardar pregunta"</strong> para añadirla al examen, de lo contrario se descartará.
@@ -139,17 +139,9 @@
 
         @if (preguntas.Count > 0)
         {
-            @if (ViewBag.HayPreguntaSinGuardar == true)
-            {
-                <button type="submit" name="accion" value="saveExam" class="btn btn-primary"
-                        onclick="return confirm('Tienes una pregunta sin guardar que no se añadirá al examen. ¿Desea continuar de todos modos?');">
-                    Guardar examen
-                </button>
-            }
-            else
-            {
-                <button type="submit" name="accion" value="saveExam" class="btn btn-primary">Guardar examen</button>
-            }
+            <button type="submit" name="accion" value="saveExam" class="btn btn-primary" id="btnGuardarExamen">
+                Guardar examen
+            </button>
         }
         else
         {
@@ -162,4 +154,19 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('btnGuardarExamen')?.addEventListener('click', function (e) {
+            const texto = document.querySelector('input[name="pregunta.Text"]').value.trim();
+            const op1 = document.querySelector('input[name="pregunta.Option1"]').value.trim();
+            const op2 = document.querySelector('input[name="pregunta.Option2"]').value.trim();
+            const op3 = document.querySelector('input[name="pregunta.Option3"]').value.trim();
+            const op4 = document.querySelector('input[name="pregunta.Option4"]').value.trim();
+
+            if (texto || op1 || op2 || op3 || op4) {
+                if (!confirm('Tienes una pregunta sin guardar que no se añadirá al examen. ¿Desea continuar de todos modos?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
 }
