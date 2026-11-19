@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- Fondo -->
+  <rect width="400" height="300" fill="#e7f1f8"/>
+  <!-- Suelo -->
+  <rect y="250" width="400" height="50" fill="#cfe3ef"/>
+  <!-- Edificio principal -->
+  <rect x="80" y="140" width="240" height="110" fill="#5b8fb9"/>
+  <!-- Frontón triangular -->
+  <polygon points="200,80 290,140 110,140" fill="#3f6f99"/>
+  <!-- Banda decorativa bajo el frontón -->
+  <rect x="110" y="140" width="180" height="12" fill="#d9e8f3"/>
+  <!-- Columnas -->
+  <rect x="130" y="152" width="14" height="98" fill="#d9e8f3"/>
+  <rect x="165" y="152" width="14" height="98" fill="#d9e8f3"/>
+  <rect x="200" y="152" width="14" height="98" fill="#d9e8f3"/>
+  <rect x="235" y="152" width="14" height="98" fill="#d9e8f3"/>
+  <rect x="270" y="152" width="14" height="98" fill="#d9e8f3"/>
+  <!-- Puerta central -->
+  <rect x="193" y="200" width="28" height="50" fill="#2f5578"/>
+  <!-- Escalones -->
+  <rect x="70" y="250" width="260" height="10" fill="#a8c8dd"/>
+  <rect x="60" y="260" width="280" height="10" fill="#8fb3cb"/>
+  <!-- Bandera -->
+  <rect x="199" y="40" width="3" height="40" fill="#2f5578"/>
+  <polygon points="202,42 232,50 202,58" fill="#e2a33d"/>
+</svg>
