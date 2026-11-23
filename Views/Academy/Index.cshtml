@@ -66,12 +66,15 @@ else
                         <td>@academy.Phone</td>
                         <td>
                             <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@academy.Id">Ver</a>
-                            <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@academy.Id">Editar</a>
-                            @* Borrar es un POST (nunca un enlace): el navegador pide confirmación antes de enviarlo. *@
-                            <form asp-action="Delete" asp-route-id="@academy.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('¿Eliminar este centro?');">
-                                <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
-                            </form>
+                            @if (User.IsInRole(RoleNames.Admin))
+                            {
+                                <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@academy.Id">Editar</a>
+                                @* Borrar es un POST (nunca un enlace): el navegador pide confirmación antes de enviarlo. *@
+                                <form asp-action="Delete" asp-route-id="@academy.Id" method="post" class="d-inline"
+                                    onsubmit="return confirm('¿Eliminar este centro?');">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+                                </form>
+                            }
                         </td>
                     </tr>
                 }

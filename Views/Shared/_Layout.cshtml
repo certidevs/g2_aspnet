@@ -58,7 +58,7 @@
                                                                     asp-action="Index">Notas</a></li>
                                             <li class="nav-item dropdown">
                                                 <a class='@(inMoreMenu ? "nav-link dropdown-toggle active" : "nav-link dropdown-toggle")'
-                                                   href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
+                                                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item" asp-controller="Classroom" asp-action="Index">Aulas</a>
                                                     </li>
@@ -67,7 +67,7 @@
                                                     @if (isStaff)
                                                     {
                                                         <li><a class="dropdown-item" asp-controller="Attendances"
-                                                                   asp-action="Index">Asistencias</a></li>
+                                                            asp-action="Index">Asistencias</a></li>
                                                         }
                                                     </ul>
                                                 </li>
@@ -89,7 +89,7 @@
                                                     {
                                                         <li class="nav-item dropdown">
                                                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
-                                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
                                                                 @if (ImageStorage.GetUrl(currentUser.AvatarFileName) is string avatarUrl)
                                                                 {
                                                                     <img class="avatar" src="@avatarUrl" alt="Avatar de @currentName" />
@@ -116,7 +116,7 @@
                                                                 </ul>
                                                             </li>
                                                         }
-                        else
+                                                        else
                                                         {
                                                             <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Iniciar
                                                                 sesión</a></li>

@@ -55,8 +55,11 @@ else
                         </td>
                         <td>
                             <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@classroom.Id">Ver</a>
-                            @* DESCOMENTA: <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@classroom.Id">Editar</a> *@
-                            @* DESCOMENTA: <form asp-action="Delete" asp-route-id="@classroom.Id" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta aula?');"><button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button></form> *@
+                            @if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher))
+                            {
+                                <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@classroom.Id">Editar</a>
+                                <form asp-action="Delete" asp-route-id="@classroom.Id" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta aula?');"><button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button></form>
+                            }
                         </td>
                     </tr>
                 }
