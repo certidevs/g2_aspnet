@@ -4,6 +4,9 @@
     var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
 }
 
+@* Vista: Listado de exámenes. Muestra todos los exámenes en una tabla básica de Bootstrap.
+   Solo los usuarios con rol Admin o Teacher ven la columna de Profesor y el botón "Nuevo examen". *@
+
 @* Encabezado: título de la página y botón "Nuevo examen" (solo staff) *@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">Exámenes</h1>

@@ -4,6 +4,10 @@
     var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
 }
 
+@* Vista: Detalle de un examen con sus preguntas.
+   Muestra título, descripción, curso, profesor, fecha y estado activo.
+   Solo el personal (Admin/Teacher) ve el botón de Editar examen/Añadir preguntas y la columna "Correcta". *@
+
 <h1>@Model.Title</h1>
 
 @* Descripción del examen *@
