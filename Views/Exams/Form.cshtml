@@ -163,7 +163,7 @@
             <button type="submit" name="accion" value="saveExam" class="btn btn-primary" disabled>Guardar examen (necesita al menos una pregunta)</button>
         }
 
-        <a class="btn btn-outline-secondary" asp-action="Cancelar">Cancelar</a>
+        <a class="btn btn-outline-secondary" asp-action="Cancelar" asp-route-id="@Model.Id">Cancelar</a>
     </div>
 </form>
 
