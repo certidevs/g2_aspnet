@@ -417,6 +417,101 @@ public static class DbInitializer
             context.SaveChanges();
         }
 
+
+
+        // Exámenes demo para el profesor "teacher"
+        if (!context.Exams.Any())
+        {
+            var exam1 = new Exam
+            {
+                Title = "Examen de Prueba 1",
+                Description = "Examen tipo test sobre conceptos básicos.",
+                CourseId = peopleCourse.Id,
+                TeacherId = teacher2.Id,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            var exam2 = new Exam
+            {
+                Title = "Examen de Prueba 2",
+                Description = "Segundo examen tipo test con preguntas variadas.",
+                CourseId = historyCourse.Id,
+                TeacherId = teacher2.Id,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            context.Exams.AddRange(exam1, exam2);
+            context.SaveChanges();
+
+            context.Questions.AddRange(
+                // Preguntas del examen 1
+                new Question
+                {
+                    Text = "¿Cuál es la capital de Francia?",
+                    Option1 = "Londres",
+                    Option2 = "París",
+                    Option3 = "Berlín",
+                    Option4 = "Roma",
+                    CorrectOption = 2,
+                    ExamId = exam1.Id
+                },
+                new Question
+                {
+                    Text = "¿Cuánto es 2 + 2?",
+                    Option1 = "3",
+                    Option2 = "4",
+                    Option3 = "5",
+                    Option4 = "6",
+                    CorrectOption = 2,
+                    ExamId = exam1.Id
+                },
+                new Question
+                {
+                    Text = "¿Quién escribió 'Cien años de soledad'?",
+                    Option1 = "Gabriel García Márquez",
+                    Option2 = "Mario Vargas Llosa",
+                    Option3 = "Julio Cortázar",
+                    Option4 = "Jorge Luis Borges",
+                    CorrectOption = 1,
+                    ExamId = exam1.Id
+                },
+                // Preguntas del examen 2
+                new Question
+                {
+                    Text = "¿Qué planeta es conocido como el planeta rojo?",
+                    Option1 = "Tierra",
+                    Option2 = "Marte",
+                    Option3 = "Júpiter",
+                    Option4 = "Venus",
+                    CorrectOption = 2,
+                    ExamId = exam2.Id
+                },
+                new Question
+                {
+                    Text = "¿En qué año llegó el hombre a la Luna?",
+                    Option1 = "1965",
+                    Option2 = "1969",
+                    Option3 = "1972",
+                    Option4 = "1959",
+                    CorrectOption = 2,
+                    ExamId = exam2.Id
+                },
+                new Question
+                {
+                    Text = "¿Cuál es el océano más grande del mundo?",
+                    Option1 = "Atlántico",
+                    Option2 = "Índico",
+                    Option3 = "Pacífico",
+                    Option4 = "Ártico",
+                    CorrectOption = 3,
+                    ExamId = exam2.Id
+                }
+            );
+
+            context.SaveChanges();
+        }
+
         if (!context.Attendances.Any())
         {
             // Asistencia solo a lecciones ya impartidas (hasta el 5 de noviembre) y de matrículas
