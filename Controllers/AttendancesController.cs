@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using G2AspNet.Data;
@@ -19,6 +20,7 @@ public class AttendancesController : Controller
 
     // Lista las asistencias con su lección, el alumno y el curso.
     // La búsqueda filtra por nombre de lección, de curso o de alumno.
+    [Authorize]
     public IActionResult Index(string? search)
     {
         // Include carga las relaciones: sin él, Lesson y Enrollment llegarían vacíos a la vista.
@@ -50,6 +52,7 @@ public class AttendancesController : Controller
     }
 
     // Detalle de una asistencia: a qué lección, de qué alumno y de qué curso.
+    [Authorize]
     public IActionResult Details(int id)
     {
         var attendance = context.Attendances
@@ -66,7 +69,40 @@ public class AttendancesController : Controller
         return View(attendance);
     }
 
+    // Método Edit
     [HttpGet]
+    [Authorize]
+    public IActionResult Edit(int id)
+    {
+        var attendance = context.Attendances.Find(id);
+        if (attendance == null)
+        {
+            return NotFound();
+        }
+        LoadDropdowns(attendance);
+        return View("Form", attendance);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public IActionResult Delete(int id)
+    {
+        var attendance = context.Attendances.Find(id);
+        if (attendance == null)
+        {
+            return NotFound();
+        }
+        var lessonId = attendance.LessonId;
+        context.Attendances.Remove(attendance);
+        context.SaveChanges();
+
+        TempData["Message"] = "Asistencia eliminada correctamente.";
+        return RedirectToAction("Index", "Attendances", new { id = attendance.Id });
+    }
+
+    [HttpGet]
+    [Authorize]
     public IActionResult Create(int lessonId, int enrollmentId)
     {
         var attendance = new Attendance
@@ -77,10 +113,12 @@ public class AttendancesController : Controller
         };
 
         LoadDropdowns(attendance);
+        TempData["Message"] = "Creando nueva asistencia para la lección y matrícula seleccionadas.";
         return View("Form", attendance);
     }
 
     [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public IActionResult Create(Attendance attendance)
     {
@@ -90,6 +128,7 @@ public class AttendancesController : Controller
         {
             context.Attendances.Add(attendance);
             context.SaveChanges();
+            TempData["Message"] = "Asistencia creada correctamente.";
             return RedirectToAction("Details", "Lessons", new { id = attendance.LessonId });
         }
 
@@ -98,6 +137,7 @@ public class AttendancesController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public IActionResult Save(Attendance attendance)
     {
@@ -111,6 +151,7 @@ public class AttendancesController : Controller
         }
 
         LoadDropdowns(attendance);
+        TempData["Message"] = "Asistencia actualizada correctamente.";
         return View("Form", attendance);
     }
 

@@ -2,14 +2,6 @@
 
 Repositorio del **Grupo 2** del curso de .NET: aplicación web con **C#, ASP.NET Core MVC, Razor y Entity Framework Core**, desarrollada en equipo con Git y GitHub.
 
-## Temática: a elegir por el equipo
-
-Elegid **una** de estas temáticas durante el fin de semana. Todas parten del mismo esqueleto (usuarios con roles `User` y `Admin`); el dominio lo construís vosotros.
-
-6. **Gestión de academias y centros de formación:** administración de alumnos, profesores, cursos, matrículas y calificaciones.
-
-Cuando el equipo lo haya decidido, sustituid esta sección por la descripción de la temática elegida y de sus funcionalidades principales (por ejemplo, con una Pull Request).
-
 ## Qué incluye el esqueleto
 
 Punto de partida común de todos los grupos: **solo la entidad `ApplicationUser` (usuario)** y la infraestructura para que todo arranque a la primera. Las entidades del dominio, sus relaciones, servicios, controladores y vistas las construye el equipo.
