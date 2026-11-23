@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering; // SelectList (desplegables del formulario)
 using G2AspNet.Data;
@@ -54,6 +55,7 @@ public class CoursesController : Controller
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult Create()
     {
         var course = new Course();
@@ -62,6 +64,7 @@ public class CoursesController : Controller
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult Edit(int id)
     {
         var course = context.Courses.Find(id);
@@ -75,6 +78,7 @@ public class CoursesController : Controller
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult Details(int id)
     {
         var course = context.Courses.Include(c => c.Academy).Include(c => c.Teacher).FirstOrDefault(c => c.Id == id);
@@ -87,6 +91,7 @@ public class CoursesController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public IActionResult Save(Course course)
     {
@@ -118,6 +123,7 @@ public class CoursesController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public IActionResult Delete(int id)
     {
