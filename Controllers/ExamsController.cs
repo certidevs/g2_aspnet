@@ -168,10 +168,15 @@ public class ExamsController : Controller
 
     // Cancela la creación del examen y limpia el borrador de TempData.
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
-    public IActionResult Cancelar()
+    public IActionResult Cancelar(int? id)
     {
         TempData.Remove("ExamBorrador");
         TempData.Remove("PreguntasBorrador");
+        if (id.HasValue && id.Value > 0)
+        {
+            return RedirectToAction("Details", new { id = id.Value });
+        }
+        
         return RedirectToAction("Index");
     }
 
@@ -229,8 +234,6 @@ public class ExamsController : Controller
 
     // Guarda una pregunta en el borrador, cancela una pregunta, o guarda el examen completo.
     // accion="saveQuestion": acumula la pregunta actual en el borrador.
-    // accion="cancelQuestion": descarta la pregunta actual (no se guarda).
-    // accion="addQuestion": reinicia el formulario de pregunta (descarta la actual si no se guardó).
     // accion="saveExam": valida y guarda el examen con todas sus preguntas en la base de datos.
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpPost]
@@ -278,7 +281,7 @@ public class ExamsController : Controller
             return RedirectToAction("Create");
         }
 
-        if (accion == "cancelQuestion" || accion == "addQuestion")
+       /*  if (accion == "addQuestion")
         {
             // Mantener los datos del examen, descartar pregunta actual
             var examenDto = new ExamBorradorDto
@@ -293,7 +296,7 @@ public class ExamsController : Controller
             };
             TempData["ExamBorrador"] = JsonSerializer.Serialize(examenDto);
             return RedirectToAction("Create");
-        }
+        } */
 
         // accion == "saveExam"
         ModelState.Remove(nameof(Exam.TeacherId));
@@ -427,7 +430,7 @@ public class ExamsController : Controller
         TempData.Remove("PreguntasBorrador");
 
         TempData["Message"] = "Examen guardado correctamente.";
-        return RedirectToAction("Index");
+        return RedirectToAction("Details", new { id = exam.Id });
     }
 
     // Elimina un examen y sus preguntas asociadas.
@@ -451,6 +454,6 @@ public class ExamsController : Controller
         context.SaveChanges();
 
         TempData["Message"] = "Examen eliminado correctamente.";
-        return RedirectToAction("Index");
+        return RedirectToAction("Details");
     }
 }
