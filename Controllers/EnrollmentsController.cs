@@ -12,17 +12,116 @@ public class EnrollmentsController : Controller
 {
     private readonly ApplicationDbContext context;
 
+
     public EnrollmentsController(ApplicationDbContext context)
     {
         this.context = context;
     }
+
+
+    [Authorize(Roles = RoleNames.Student)]
+    [HttpPost]
+    public IActionResult Enroll(int courseId)
+    {
+        var course = context.Courses.Find(courseId);
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        if (course.Status != CourseStatus.Open)
+        {
+            TempData["Error"] = "Las matrículas de este curso están cerradas.";
+            return RedirectToAction("Details", "Courses", new { id = course.Id });
+        }
+
+        var userId = User.GetRequiredUserId();
+        var alreadyEnrolled = context.Enrollments.Any(e => e.CourseId == courseId
+            && e.StudentId == userId
+            && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+        if (alreadyEnrolled)
+        {
+            TempData["Error"] = "Ya estás matriculado en este curso.";
+            return RedirectToAction("Details", "Courses", new { id = course.Id });
+        }
+
+        var occupied = context.Enrollments
+            .Count(e => e.CourseId == courseId && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+        if (occupied >= course.MaxStudents)
+        {
+            TempData["Error"] = "Curso completo: no quedan plazas.";
+            return RedirectToAction("Details", "Courses", new { id = course.Id });
+        }
+
+        var enrollment = new Enrollment
+        {
+            StudentId = userId,
+            CourseId = course.Id,
+            EnrolledAt = DateTime.UtcNow,
+            IsPaid = false,
+            Status = EnrollmentStatus.Pending
+        };
+        context.Enrollments.Add(enrollment);
+        context.SaveChanges();
+
+        TempData["Message"] = "Matrícula realizada. Queda pendiente de pago.";
+        return RedirectToAction("Details", new { id = enrollment.Id });
+    }
+
+    [Authorize]
+    [HttpPost]
+    public IActionResult Pay(int id)
+    {
+        var enrollment = VisibleEnrollments().FirstOrDefault(e => e.Id == id);
+        if (enrollment == null)
+        {
+            return NotFound();
+        }
+
+        if (enrollment.Status != EnrollmentStatus.Pending)
+        {
+            TempData["Error"] = "Solo se puede pagar una matrícula pendiente.";
+            return RedirectToAction("Details", new { id });
+        }
+
+        enrollment.IsPaid = true;
+        enrollment.Status = EnrollmentStatus.Active;
+        context.SaveChanges();
+
+        TempData["Message"] = "Pago registrado. Tu matrícula está activa.";
+        return RedirectToAction("Details", new { id });
+    }
+
+    [Authorize]
+    [HttpPost]
+    public IActionResult Drop(int id)
+    {
+        var enrollment = VisibleEnrollments().FirstOrDefault(e => e.Id == id);
+        if (enrollment == null)
+        {
+            return NotFound();
+        }
+
+        if (!EnrollmentRules.TakesPlace(enrollment))
+        {
+            TempData["Error"] = "Solo se puede abandonar una matrícula pendiente o activa.";
+            return RedirectToAction("Details", new { id });
+        }
+
+        enrollment.Status = EnrollmentStatus.Dropped;
+        context.SaveChanges();
+
+        TempData["Message"] = "Has abandonado el curso. Tu plaza queda libre.";
+        return RedirectToAction("Details", new { id });
+    }
+
 
     private void LoadCourses()
     {
         ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
     }
 
-    [Authorize]
+    /* [Authorize]
     public IActionResult Index()
     {
         var query = context.Enrollments
@@ -37,6 +136,31 @@ public class EnrollmentsController : Controller
         }
 
         var enrollments = query.OrderByDescending(e => e.EnrolledAt).ToList();
+        return View(enrollments);
+    } */
+
+    private IQueryable<Enrollment> VisibleEnrollments()
+    {
+        var query = context.Enrollments.AsQueryable();
+
+        if (!User.IsInRole(RoleNames.Admin))
+        {
+            var userId = User.GetRequiredUserId();
+            query = query.Where(e => e.StudentId == userId);
+        }
+
+        return query;
+    }
+
+    [Authorize]
+    public IActionResult Index()
+    {
+        var enrollments = VisibleEnrollments()
+            .Include(e => e.Course)
+            .Include(e => e.Student)
+            .OrderByDescending(e => e.EnrolledAt)
+            .ToList();
+
         return View(enrollments);
     }
 
