@@ -1,0 +1,76 @@
+@model Exam
+@{
+    ViewData["Title"] = "Examen: " + Model.Title;
+    var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+}
+
+@* Vista: Examen para el alumno.
+   Muestra las preguntas en acordeón con opciones seleccionables por radio.
+   No se muestra la respuesta correcta. *@
+
+<h1>@Model.Title</h1>
+
+<p>@Html.DisplayFor(m => Model.Description)</p>
+
+<div class="mb-3">
+    <strong>Curso:</strong> @Model.Course?.Name<br />
+    <strong>Profesor:</strong> @(Model.Teacher?.DisplayName ?? Model.Teacher?.UserName ?? "Anónimo")<br />
+    <strong>Fecha:</strong> @Model.CreatedAt.ToShortDateString()<br />
+    <strong>Activo:</strong> @(Model.IsActive ? "Sí" : "No")
+</div>
+
+@if (Model.Questions == null || !Model.Questions.Any())
+{
+    <div class="alert alert-warning">Este examen aún no tiene preguntas.</div>
+}
+else
+{
+    <form asp-action="SaveAttempt" asp-controller="Exams" method="post">
+        <input type="hidden" name="ExamId" value="@Model.Id" />
+
+        <div class="accordion" id="accordionExamen">
+            @foreach (var question in Model.Questions.OrderBy(q => q.Id))
+            {
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-@question.Id">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@question.Id">
+                            @question.Text
+                        </button>
+                    </h2>
+                    <div id="collapse-@question.Id" class="accordion-collapse collapse" data-bs-parent="#accordionExamen">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                <label class="form-label">Selecciona una respuesta:</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="respuesta-@question.Id" value="1" id="op1-@question.Id" />
+                                    <label class="form-check-label" for="op1-@question.Id">@question.Option1</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="respuesta-@question.Id" value="2" id="op2-@question.Id" />
+                                    <label class="form-check-label" for="op2-@question.Id">@question.Option2</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="respuesta-@question.Id" value="3" id="op3-@question.Id" />
+                                    <label class="form-check-label" for="op3-@question.Id">@question.Option3</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="respuesta-@question.Id" value="4" id="op4-@question.Id" />
+                                    <label class="form-check-label" for="op4-@question.Id">@question.Option4</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Guardar intento y calificar</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Volver al listado</a>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
