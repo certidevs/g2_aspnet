@@ -132,6 +132,43 @@ public class ExamsController : Controller
         return View(exam);
     }
 
+
+
+    // Vista del examen para el alumno: responder preguntas.
+    // Solo puede acceder si es staff o si tiene una matrícula válida (Pending/Active) en el curso del examen.
+    [Authorize]
+    [HttpGet]
+    public IActionResult Take(int id)
+    {
+        var exam = context.Exams
+            .Include(e => e.Course)
+            .Include(e => e.Teacher)
+            .Include(e => e.Questions)
+            .FirstOrDefault(e => e.Id == id);
+
+        if (exam == null)
+        {
+            return NotFound();
+        }
+
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        if (!isStaff)
+        {
+            var userId = User.GetRequiredUserId();
+            var tieneMatriculaValida = context.Enrollments
+                .Any(e => e.CourseId == exam.CourseId
+                    && e.StudentId == userId
+                    && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+
+            if (!tieneMatriculaValida)
+            {
+                return Forbid();
+            }
+        }
+
+        return View("StudentTake", exam);
+    }
+
     // Formulario para crear un nuevo examen (con borrador de preguntas acumuladas).
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
