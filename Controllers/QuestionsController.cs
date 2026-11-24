@@ -105,6 +105,48 @@ public class QuestionsController : Controller
         return RedirectToAction("Details", "Exams", new { id = question.ExamId });
     }
 
+    // Guarda una pregunta editada desde el formulario inline en la vista Details del examen.
+    // Actualiza la pregunta en la base de datos y redirige de vuelta al detalle del examen.
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpPost]
+    public IActionResult SaveQuestion(Question question)
+    {
+        var exam = context.Exams.Find(question.ExamId);
+        if (exam == null)
+        {
+            ModelState.AddModelError(nameof(Question.ExamId), "El examen no existe.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return RedirectToAction("Details", "Exams", new { id = question.ExamId });
+        }
+
+        var existing = context.Questions.Find(question.Id);
+        if (existing == null)
+        {
+            return NotFound();
+        }
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin && existing.Exam?.TeacherId != User.GetRequiredUserId())
+        {
+            return Forbid();
+        }
+
+        existing.Text = question.Text;
+        existing.Option1 = question.Option1;
+        existing.Option2 = question.Option2;
+        existing.Option3 = question.Option3;
+        existing.Option4 = question.Option4;
+        existing.CorrectOption = question.CorrectOption;
+
+        context.SaveChanges();
+
+        TempData["Message"] = "Pregunta actualizada correctamente.";
+        return RedirectToAction("Details", "Exams", new { id = question.ExamId });
+    }
+
     // Elimina una pregunta de un examen.
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpPost]
