@@ -58,7 +58,9 @@
                     return;
                 }
                 var id = this.getAttribute('data-exam-id');
-                window.location.href = '/Exams/Details?id=' + id;
+        var esStaff = @Json.Serialize(User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher));
+        var url = esStaff ? '/Exams/Details?id=' + id : '/Exams/Take?id=' + id;
+        window.location.href = url;
             });
         });
     </script>
