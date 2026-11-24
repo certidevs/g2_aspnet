@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using G2AspNet.Data;
 using G2AspNet.Models;
@@ -26,6 +27,7 @@ public class AcademyController(ApplicationDbContext context) : Controller
         var academies = await query.OrderBy(a => a.Name).ToListAsync();
         return View(academies);
     }
+
     public async Task<IActionResult> Details(int id)
     {
         var academy = await context.Academies
@@ -51,12 +53,15 @@ public class AcademyController(ApplicationDbContext context) : Controller
 
     // GET /Academy/Create: muestra el formulario vacío.
     // Crear y editar usan la MISMA vista (Form): lo único que cambia es el modelo que le pasamos.
+    
+    [Authorize(Roles = RoleNames.Admin)]
     public IActionResult Create()
     {
         return View("Form", new Academy());
     }
 
     // GET /Academy/Edit/5: muestra el mismo formulario, pero relleno con los datos del centro.
+    [Authorize(Roles = RoleNames.Admin)]
     public async Task<IActionResult> Edit(int id)
     {
         var academy = await context.Academies.FindAsync(id);
@@ -72,6 +77,7 @@ public class AcademyController(ApplicationDbContext context) : Controller
 
     // POST /Academy/Save: recibe el formulario. Sirve para crear (Id == 0) y para editar (Id != 0).
     // [ValidateAntiForgeryToken] comprueba el token oculto que el formulario añade solo (evita envíos falsificados).
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Save(Academy academy)
@@ -113,6 +119,7 @@ public class AcademyController(ApplicationDbContext context) : Controller
     }
 
     // POST /Academy/Delete/5: borra el centro, salvo que tenga aulas o cursos.
+    [Authorize(Roles = RoleNames.Admin)]    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
