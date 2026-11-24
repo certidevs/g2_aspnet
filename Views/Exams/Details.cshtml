@@ -62,7 +62,7 @@
                     @* Acciones por pregunta: Editar y Borrar (solo staff) *@
                     @if (isStaff)
                     {
-                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-controller="Questions" asp-route-id="@question.Id">Editar</a>
+                        <button type="button" class="btn btn-sm btn-outline-primary btn-edit-question" data-question-id="@question.Id">Editar</button>
                         <form asp-action="Delete" asp-controller="Questions" asp-route-id="@question.Id" method="post" class="d-inline"
                               onsubmit="return confirm('¿Borrar esta pregunta?');">
                             <button class="btn btn-sm btn-outline-danger" type="submit">Borrar</button>
@@ -70,9 +70,123 @@
                     }
                 </td>
             </tr>
+
+            @* Formulario oculto de edición de pregunta (se muestra al pulsar Editar) *@
+            @if (isStaff)
+            {
+                <tr>
+                    <td colspan="7">
+                        <div class="card mb-2 edit-question-form d-none" id="edit-form-@question.Id">
+                            <div class="card-body">
+                                <form asp-action="SaveQuestion" asp-controller="Questions" method="post">
+                                    <input type="hidden" name="Id" value="@question.Id" />
+                                    <input type="hidden" name="ExamId" value="@question.ExamId" />
+
+                                    <div class="row mb-2">
+                                        <div class="col-md-9">
+                                            <label class="form-label">Pregunta</label>
+                                            <input class="form-control" name="Text" value="@question.Text" />
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-end gap-2">
+                                            <button type="submit" class="btn btn-primary btn-save-question">Guardar</button>
+                                            <button type="button" class="btn btn-outline-secondary btn-cancel-question">Cancelar</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <input class="form-control" name="Option1" value="@question.Option1" placeholder="Opción 1" />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input class="form-control" name="Option2" value="@question.Option2" placeholder="Opción 2" />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input class="form-control" name="Option3" value="@question.Option3" placeholder="Opción 3" />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input class="form-control" name="Option4" value="@question.Option4" placeholder="Opción 4" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Opción correcta</label>
+                                            <select class="form-select" name="CorrectOption">
+                                                @if (question.CorrectOption == 1)
+                                                {
+                                                    <option value="1" selected>Opción 1</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="1">Opción 1</option>
+                                                }
+                                                @if (question.CorrectOption == 2)
+                                                {
+                                                    <option value="2" selected>Opción 2</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="2">Opción 2</option>
+                                                }
+                                                @if (question.CorrectOption == 3)
+                                                {
+                                                    <option value="3" selected>Opción 3</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="3">Opción 3</option>
+                                                }
+                                                @if (question.CorrectOption == 4)
+                                                {
+                                                    <option value="4" selected>Opción 4</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="4">Opción 4</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
         }
     </tbody>
 </table>
 
 @* Botón para volver al listado de exámenes *@
 <a class="btn btn-outline-secondary" asp-action="Index">Volver al listado</a>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelectorAll('.btn-edit-question').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var qid = this.getAttribute('data-question-id');
+
+                // Ocultar todos los formularios de edición
+                document.querySelectorAll('.edit-question-form').forEach(function (f) {
+                    f.classList.add('d-none');
+                });
+
+                // Mostrar el formulario de esta pregunta
+                var form = document.getElementById('edit-form-' + qid);
+                if (form) {
+                    form.classList.remove('d-none');
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-cancel-question').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var form = btn.closest('.edit-question-form');
+                if (form) {
+                    form.classList.add('d-none');
+                }
+            });
+        });
+    </script>
+}
