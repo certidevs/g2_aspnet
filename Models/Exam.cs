@@ -26,4 +26,6 @@ public class Exam
 
     // Lists (entities that have Exam as FK)
     public List<Question> Questions { get; set; } = new();
+    public List<ExamAttempt> ExamAttempts { get; set; } = new();
+
 }
