@@ -26,6 +26,9 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<Exam> Exams => Set<Exam>();
     public DbSet<Question> Questions => Set<Question>();
+    public DbSet<ExamAttempt> ExamAttempts => Set<ExamAttempt>();
+    public DbSet<ExamAnswer> ExamAnswers => Set<ExamAnswer>();
+
 
 
     /// <summary>
@@ -138,6 +141,35 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(e => e.Questions)
             .HasForeignKey(q => q.ExamId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Restrict: un intento de examen pertenece a un examen y a un alumno; no se borra un examen con intentos.
+        modelBuilder.Entity<ExamAttempt>()
+            .HasOne(ea => ea.Exam)
+            .WithMany(e => e.ExamAttempts)
+            .HasForeignKey(ea => ea.ExamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Restrict: no se borra un alumno que tiene intentos de examen.
+        modelBuilder.Entity<ExamAttempt>()
+            .HasOne(ea => ea.Student)
+            .WithMany()
+            .HasForeignKey(ea => ea.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Cascade: una respuesta es parte de un intento y no tiene sentido sin él.
+        modelBuilder.Entity<ExamAnswer>()
+            .HasOne(a => a.ExamAttempt)
+            .WithMany(ea => ea.Answers)
+            .HasForeignKey(a => a.ExamAttemptId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Restrict: una respuesta pertenece a una pregunta; no se borra una pregunta con respuestas de intentos.
+        modelBuilder.Entity<ExamAnswer>()
+            .HasOne(a => a.Question)
+            .WithMany()
+            .HasForeignKey(a => a.QuestionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
 
     }
 
