@@ -1,0 +1,88 @@
+@model ExamAttempt
+@{
+    ViewData["Title"] = "Resultado del examen";
+    var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+    var totalQuestions = Model.Exam?.Questions?.Count ?? 0;
+    var aciertos = Model.Answers?.Count(a => a.IsCorrect) ?? 0;
+    var nota = Model.Score ?? 0;
+}
+
+@* Vista: Resultado de un intento de examen.
+   Muestra la nota final sobre 10 y el desglose de aciertos y fallos. *@
+
+<h1>Resultado del examen</h1>
+
+@if (Model.Exam == null)
+{
+    <div class="alert alert-danger">No se encontró el examen.</div>
+}
+else
+{
+    <div class="mb-3">
+        <strong>Examen:</strong> @Model.Exam.Title<br />
+        <strong>Curso:</strong> @Model.Exam.Course?.Name<br />
+        <strong>Alumno:</strong> @Model.Student?.UserName ?? "Anónimo"<br />
+        <strong>Fecha:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—"
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Nota final: @nota.ToString("F2") / 10</h3>
+            <p class="card-text">
+                Aciertos: <strong>@aciertos</strong> de <strong>@totalQuestions</strong> preguntas.
+            </p>
+        </div>
+    </div>
+
+    <h4>Desglose de respuestas</h4>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Pregunta</th>
+                <th>Tu respuesta</th>
+                <th>Resultado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var question in Model.Exam.Questions.OrderBy(q => q.Id))
+            {
+                var answer = Model.Answers?.FirstOrDefault(a => a.QuestionId == question.Id);
+                var opcionSeleccionada = answer?.SelectedOption switch
+                {
+                    1 => question.Option1,
+                    2 => question.Option2,
+                    3 => question.Option3,
+                    4 => question.Option4,
+                    _ => "Sin responder"
+                };
+
+                <tr>
+                    <td>@question.Text</td>
+                    <td>@opcionSeleccionada</td>
+                    <td>
+                        @if (answer == null)
+                        {
+                            <span class="text-warning">Sin responder</span>
+                        }
+                        else if (answer.IsCorrect)
+                        {
+                            <span class="text-success">✓ Correcta</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">✗ Incorrecta</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary" asp-action="Take" asp-route-id="@Model.ExamId">Volver a intentar</a>
+    <a class="btn btn-outline-secondary" asp-action="Index">Volver al listado</a>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
