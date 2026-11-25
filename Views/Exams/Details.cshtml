@@ -21,10 +21,15 @@
     <strong>Activo:</strong> @(Model.IsActive ? "Sí" : "No")
 </div>
 
-@* Botones de staff: Editar examen *@
+@* Botones de staff: Editar examen y Revisión examen *@
 @if (isStaff)
 {
     <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id">Editar examen/Añadir preguntas</a>
+    
+    @if (Model.FechaCierre.HasValue && DateTime.UtcNow > Model.FechaCierre.Value)
+    {
+        <a class="btn btn-sm btn-success" asp-action="Validate" asp-route-id="@Model.Id">Revisión examen</a>
+    }
 }
 
 @* Listado de preguntas del examen *@
