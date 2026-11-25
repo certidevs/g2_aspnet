@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Examen: " + Model.Title;
     var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+    var intentosRestantes = ViewBag.IntentosRestantes ?? 0;
+    var maxIntentos = ViewBag.MaxIntentos ?? 1;
 }
 
 @* Vista: Examen para el alumno.
@@ -18,6 +20,13 @@
     <strong>Fecha:</strong> @Model.CreatedAt.ToShortDateString()<br />
     <strong>Activo:</strong> @(Model.IsActive ? "Sí" : "No")
 </div>
+
+@if (!isStaff)
+{
+    <div class="alert alert-info">
+        <strong>Intentos restantes:</strong> @intentosRestantes de @maxIntentos
+    </div>
+}
 
 @if (Model.Questions == null || !Model.Questions.Any())
 {
@@ -57,6 +66,10 @@ else
                                     <input class="form-check-input" type="radio" name="respuesta-@question.Id" value="4" id="op4-@question.Id" />
                                     <label class="form-check-label" for="op4-@question.Id">@question.Option4</label>
                                 </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Comentario (opcional):</label>
+                                <textarea class="form-control" name="comentario-@question.Id" rows="2" placeholder="Escribe un comentario sobre esta respuesta..."></textarea>
                             </div>
                         </div>
                     </div>
