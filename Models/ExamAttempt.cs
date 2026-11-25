@@ -15,6 +15,17 @@ public class ExamAttempt
 
     public bool IsCompleted { get; set; } = false;
 
+    // Nota y comentario del profesor (al validar)
+    [Range(0, 10, ErrorMessage = "La nota debe estar entre 0 y 10")]
+    public double? ProfesorNota { get; set; }
+
+    [StringLength(1000, ErrorMessage = "El comentario no puede superar los 1000 caracteres")]
+    public string? ComentarioProfesor { get; set; }
+
+    public bool Validado { get; set; } = false;
+
+    public DateTime? FechaValidacion { get; set; }
+
     // Fks
     public string StudentId { get; set; } = string.Empty;
     public ApplicationUser? Student { get; set; }
