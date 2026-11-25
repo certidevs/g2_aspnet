@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="Ilustración de una pizarra, libros y un birrete de graduación">
+  <title>Aula</title>
+  <defs>
+    <linearGradient id="g2bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EEEBFF"/>
+      <stop offset="1" stop-color="#D5CEFA"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="360" rx="28" fill="url(#g2bg)"/>
+  <circle cx="420" cy="50" r="40" fill="#F5B700" opacity=".55"/>
+  <circle cx="40" cy="320" r="56" fill="#4338A8" opacity=".15"/>
+  <!-- pizarra -->
+  <rect x="60" y="40" width="360" height="190" rx="12" fill="#2E2680"/>
+  <rect x="74" y="54" width="332" height="162" rx="6" fill="#33298F"/>
+  <g stroke="#F7F5FF" stroke-width="5" stroke-linecap="round" fill="none" opacity=".9">
+    <path d="M100 96 h90"/>
+    <path d="M100 124 h140"/>
+    <path d="M100 152 h70"/>
+    <path d="M270 96 q22 -26 44 0 t44 0"/>
+  </g>
+  <g fill="none" stroke="#F5B700" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M276 160 l20 24 l44 -52"/>
+  </g>
+  <rect x="60" y="226" width="360" height="12" rx="6" fill="#1D1759"/>
+  <rect x="190" y="231" width="46" height="8" rx="3" fill="#F7F5FF"/>
+  <rect x="246" y="231" width="24" height="8" rx="3" fill="#F5B700"/>
+  <!-- mesa -->
+  <rect x="40" y="290" width="400" height="14" rx="7" fill="#4338A8"/>
+  <rect x="70" y="304" width="12" height="44" fill="#2E2680"/>
+  <rect x="398" y="304" width="12" height="44" fill="#2E2680"/>
+  <!-- libros -->
+  <g>
+    <rect x="76" y="258" width="120" height="32" rx="4" fill="#F5B700"/>
+    <rect x="76" y="258" width="120" height="8" rx="3" fill="#FFD966"/>
+    <rect x="88" y="228" width="104" height="30" rx="4" fill="#4338A8"/>
+    <rect x="88" y="228" width="104" height="8" rx="3" fill="#6B5FD6"/>
+    <rect x="100" y="200" width="88" height="28" rx="4" fill="#E5484D"/>
+    <rect x="100" y="200" width="88" height="8" rx="3" fill="#F27E82"/>
+  </g>
+  <!-- birrete -->
+  <g transform="translate(300 214)">
+    <!-- banda: se dibuja primero y arranca por dentro de la tapa para que no quede hueco -->
+    <path d="M-26 4 v30 q26 16 52 0 v-30 Z" fill="#33298F"/>
+    <!-- tapa del birrete -->
+    <path d="M-44 3 L0 -19 L44 3 L0 25 Z" fill="#1D1759"/>
+    <path d="M44 3 v28" stroke="#F5B700" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="44" cy="34" r="5" fill="#F5B700"/>
+  </g>
+  <!-- lápiz -->
+  <g transform="translate(372 276) rotate(-18)">
+    <rect x="0" y="0" width="70" height="10" rx="2" fill="#F5B700"/>
+    <path d="M70 0 l14 5 l-14 5 Z" fill="#F4D9B0"/>
+    <path d="M80 3 l4 2 l-4 2 Z" fill="#1D1759"/>
+    <rect x="-8" y="0" width="8" height="10" rx="2" fill="#E5484D"/>
+  </g>
+</svg>

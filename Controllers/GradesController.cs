@@ -144,4 +144,95 @@ public class GradesController : Controller
         TempData["Message"] = "Nota borrada.";
         return RedirectToAction("Index");
     }
+
+    // Crea una nota en Grades a partir de un intento de examen validado.
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpGet]
+    public IActionResult CreateFromExamAttempt(int attemptId)
+    {
+        var attempt = context.ExamAttempts
+            .Include(ea => ea.Exam)
+            .Include(ea => ea.Student)
+            .FirstOrDefault(ea => ea.Id == attemptId);
+
+        if (attempt == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.ExamAttempt = attempt;
+        ViewBag.ExamAttemptId = attemptId;
+        return View();
+    }
+
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpPost]
+    public IActionResult CreateFromExamAttempt(int attemptId, double Value, string Comments)
+    {
+        var attempt = context.ExamAttempts
+            .Include(ea => ea.Exam)
+            .Include(ea => ea.Student)
+            .FirstOrDefault(ea => ea.Id == attemptId);
+
+        if (attempt == null)
+        {
+            return NotFound();
+        }
+
+        if (!attempt.Validado)
+        {
+            TempData["Error"] = "Este intento aún no ha sido validado por el profesor.";
+            return RedirectToAction("TryDetail", "Exams", new { attemptId });
+        }
+
+        // Buscar la matrícula del alumno en el curso del examen (estado activo o pendiente)
+        var enrollment = context.Enrollments
+            .FirstOrDefault(e => e.StudentId == attempt.StudentId
+                && e.CourseId == attempt.ExamId
+                && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+
+        if (enrollment == null)
+        {
+            TempData["Error"] = "No se encontró una matrícula activa para este alumno en este curso.";
+            return RedirectToAction("TryDetail", "Exams", new { attemptId });
+        }
+
+        // Nota final: usar la del profesor si la puso, si no la automática
+        double finalGrade = attempt.ProfesorNota ?? attempt.Score ?? 0;
+
+        // Verificar si ya existe una nota para este intento
+        var existingGrade = context.Grades.FirstOrDefault(g => g.ExamAttemptId == attemptId);
+
+        if (existingGrade != null)
+        {
+            existingGrade.Value = Value;
+            existingGrade.Comments = Comments;
+            existingGrade.GradeType = GradeType.Exam;
+            existingGrade.GradedAt = DateTime.UtcNow;
+            context.Grades.Update(existingGrade);
+        }
+        else
+        {
+            var grade = new Grade
+            {
+                EnrollmentId = enrollment.Id,
+                ExamAttemptId = attemptId,
+                Value = Value,
+                Comments = Comments,
+                GradeType = GradeType.Exam,
+                GradedAt = DateTime.UtcNow
+            };
+            context.Grades.Add(grade);
+        }
+
+        context.SaveChanges();
+
+        var gradeId = existingGrade?.Id ?? context.Grades
+            .Where(g => g.ExamAttemptId == attemptId)
+            .Select(g => g.Id)
+            .FirstOrDefault();
+
+        TempData["Message"] = "Nota guardada correctamente en las calificaciones.";
+        return RedirectToAction("Details", new { id = gradeId });
+    }
 }

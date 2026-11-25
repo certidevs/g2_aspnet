@@ -98,7 +98,7 @@ public sealed class AccountController : Controller
             return View(model);
         }
 
-        var roleResult = await userManager.AddToRoleAsync(user, RoleNames.Teacher);
+        var roleResult = await userManager.AddToRoleAsync(user, RoleNames.Student);
         if (!roleResult.Succeeded)
         {
             await userManager.DeleteAsync(user);

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace G2AspNet.Models;
 
@@ -29,9 +29,10 @@ public class Grade
         }
     }
 
-
     // FKs
     public int EnrollmentId { get; set; }
     public Enrollment? Enrollment { get; set; }
 
+    public int? ExamAttemptId { get; set; }
+    public ExamAttempt? ExamAttempt { get; set; }
 }
