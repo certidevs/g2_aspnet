@@ -135,7 +135,8 @@ public class ExamsController : Controller
 
 
     // Vista del examen para el alumno: responder preguntas.
-    // Solo puede acceder si es staff o si tiene una matrícula válida (Pending/Active) en el curso del examen.
+    // Solo puede acceder si es staff o si tiene una matrícula válida (Pending/Active) en el curso del examen,
+    // el examen está dentro de sus fechas de apertura/cierre y aún le quedan intentos.
     [Authorize]
     [HttpGet]
     public IActionResult Take(int id)
@@ -152,18 +153,51 @@ public class ExamsController : Controller
         }
 
         var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        var userId = User.GetRequiredUserId();
+
         if (!isStaff)
         {
-            var userId = User.GetRequiredUserId();
-            var tieneMatriculaValida = context.Enrollments
+            // Verificar matrícula válida
+            var tieneMatricula = context.Enrollments
                 .Any(e => e.CourseId == exam.CourseId
                     && e.StudentId == userId
                     && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
 
-            if (!tieneMatriculaValida)
+            if (!tieneMatricula)
             {
                 return Forbid();
             }
+
+            // Verificar fechas de apertura y cierre
+            var ahora = DateTime.UtcNow;
+            if (exam.FechaApertura.HasValue && ahora < exam.FechaApertura.Value)
+            {
+                TempData["Error"] = $"Este examen aún no está disponible. Se abre el {exam.FechaApertura.Value:dd/MM/yyyy HH:mm}.";
+                return RedirectToAction("Index");
+            }
+            if (exam.FechaCierre.HasValue && ahora > exam.FechaCierre.Value)
+            {
+                TempData["Error"] = $"Este examen ya se cerró el {exam.FechaCierre.Value:dd/MM/yyyy HH:mm}.";
+                return RedirectToAction("Index");
+            }
+
+            // Verificar intentos restantes
+            var intentosRealizados = context.ExamAttempts
+                .Count(e => e.ExamId == id && e.StudentId == userId && e.IsCompleted);
+
+            if (intentosRealizados >= exam.MaxIntentos)
+            {
+                TempData["Error"] = $"Has agotado los {exam.MaxIntentos} intentos permitidos para este examen.";
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.IntentosRestantes = exam.MaxIntentos - intentosRealizados;
+            ViewBag.MaxIntentos = exam.MaxIntentos;
+        }
+        else
+        {
+            ViewBag.IntentosRestantes = null;
+            ViewBag.MaxIntentos = null;
         }
 
         return View("StudentTake", exam);
@@ -492,6 +526,7 @@ public class ExamsController : Controller
 
         if (!isStaff)
         {
+            // Verificar matrícula válida
             var tieneMatricula = context.Enrollments
                 .Any(e => e.CourseId == exam.CourseId
                     && e.StudentId == userId
@@ -500,6 +535,29 @@ public class ExamsController : Controller
             if (!tieneMatricula)
             {
                 return Forbid();
+            }
+
+            // Verificar fechas
+            var ahora = DateTime.UtcNow;
+            if (exam.FechaApertura.HasValue && ahora < exam.FechaApertura.Value)
+            {
+                TempData["Error"] = $"Este examen aún no está disponible.";
+                return RedirectToAction("Index");
+            }
+            if (exam.FechaCierre.HasValue && ahora > exam.FechaCierre.Value)
+            {
+                TempData["Error"] = $"Este examen ya se cerró.";
+                return RedirectToAction("Index");
+            }
+
+            // Verificar intentos restantes
+            var intentosRealizados = context.ExamAttempts
+                .Count(e => e.ExamId == examId && e.StudentId == userId && e.IsCompleted);
+
+            if (intentosRealizados >= exam.MaxIntentos)
+            {
+                TempData["Error"] = $"Has agotado los {exam.MaxIntentos} intentos permitidos.";
+                return RedirectToAction("Index");
             }
         }
 
@@ -523,6 +581,8 @@ public class ExamsController : Controller
         {
             var selectedKey = $"respuesta-{question.Id}";
             var selectedValue = Request.Form[selectedKey].FirstOrDefault();
+            var comentarioKey = $"comentario-{question.Id}";
+            var comentarioValue = Request.Form[comentarioKey].FirstOrDefault();
 
             int selectedOption = 0;
             if (!string.IsNullOrWhiteSpace(selectedValue) && int.TryParse(selectedValue, out int parsed))
@@ -538,7 +598,8 @@ public class ExamsController : Controller
                 ExamAttemptId = attempt.Id,
                 QuestionId = question.Id,
                 SelectedOption = selectedOption,
-                IsCorrect = isCorrect
+                IsCorrect = isCorrect,
+                ComentarioAlumno = string.IsNullOrWhiteSpace(comentarioValue) ? null : comentarioValue.Trim()
             };
 
             context.ExamAnswers.Add(answer);
@@ -575,6 +636,70 @@ public class ExamsController : Controller
         var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
 
         if (!isStaff && attempt.StudentId != userId)
+        {
+            return Forbid();
+        }
+
+        return View(attempt);
+    }
+
+    // Vista para el profesor: ver todos los intentos de un examen, último intento por alumno.
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpGet]
+    public IActionResult Validar(int id)
+    {
+        var exam = context.Exams
+            .Include(e => e.Course)
+            .FirstOrDefault(e => e.Id == id);
+
+        if (exam == null)
+        {
+            return NotFound();
+        }
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin && exam.TeacherId != User.GetRequiredUserId())
+        {
+            return Forbid();
+        }
+
+        // Obtener el último intento de cada alumno para este examen
+        var intentos = context.ExamAttempts
+            .Include(ea => ea.Student)
+            .Include(ea => ea.Answers).ThenInclude(a => a.Question)
+            .Where(ea => ea.ExamId == id && ea.IsCompleted)
+            .OrderByDescending(ea => ea.CompletedAt)
+            .ToList();
+
+        // Agrupar por alumno y quedarnos con el más reciente de cada uno
+        var ultimosIntentos = intentos
+            .GroupBy(ea => ea.StudentId)
+            .Select(g => g.First())
+            .OrderByDescending(ea => ea.CompletedAt)
+            .ToList();
+
+        ViewBag.Exam = exam;
+        return View(ultimosIntentos);
+    }
+
+    // Vista detallada de un intento específico para el profesor (revisar respuestas y comentarios).
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpGet]
+    public IActionResult DetalleIntento(int attemptId)
+    {
+        var attempt = context.ExamAttempts
+            .Include(ea => ea.Student)
+            .Include(ea => ea.Exam).ThenInclude(e => e!.Questions)
+            .Include(ea => ea.Answers).ThenInclude(a => a!.Question)
+            .FirstOrDefault(ea => ea.Id == attemptId);
+
+        if (attempt == null)
+        {
+            return NotFound();
+        }
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin && attempt.Exam?.TeacherId != User.GetRequiredUserId())
         {
             return Forbid();
         }
