@@ -11,6 +11,9 @@ public class ExamAnswer
 
     public bool IsCorrect { get; set; }
 
+    [StringLength(1000, ErrorMessage = "El comentario no puede superar los 1000 caracteres")]
+    public string? ComentarioAlumno { get; set; }
+
     // Fks
     public int ExamAttemptId { get; set; }
     public ExamAttempt? ExamAttempt { get; set; }
