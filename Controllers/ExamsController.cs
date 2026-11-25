@@ -643,10 +643,10 @@ public class ExamsController : Controller
         return View(attempt);
     }
 
-    // Vista para el profesor: ver todos los intentos de un examen, último intento por alumno.
+    // Vista para el profesor: ver los últimos intentos de cada alumno para un examen.
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
-    public IActionResult Validar(int id)
+    public IActionResult Validate(int id)
     {
         var exam = context.Exams
             .Include(e => e.Course)
@@ -685,7 +685,7 @@ public class ExamsController : Controller
     // Vista detallada de un intento específico para el profesor (revisar respuestas y comentarios).
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
-    public IActionResult DetalleIntento(int attemptId)
+    public IActionResult TryDetail(int attemptId)
     {
         var attempt = context.ExamAttempts
             .Include(ea => ea.Student)
@@ -705,6 +705,72 @@ public class ExamsController : Controller
         }
 
         return View(attempt);
+    }
+
+    // Guarda la nota y comentario del profesor para un intento de examen.
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpPost]
+    public IActionResult TryDetail(int attemptId, double profesorNota, string comentarioProfesor)
+    {
+        var attempt = context.ExamAttempts
+            .Include(ea => ea.Exam)
+            .FirstOrDefault(ea => ea.Id == attemptId);
+
+        if (attempt == null)
+        {
+            return NotFound();
+        }
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin && attempt.Exam?.TeacherId != User.GetRequiredUserId())
+        {
+            return Forbid();
+        }
+
+        attempt.ProfesorNota = profesorNota;
+        attempt.ComentarioProfesor = string.IsNullOrWhiteSpace(comentarioProfesor) ? null : comentarioProfesor.Trim();
+        attempt.Validado = true;
+        attempt.FechaValidacion = DateTime.UtcNow;
+
+        context.SaveChanges();
+
+        TempData["Message"] = "Intento validado correctamente.";
+        return RedirectToAction("Validate", new { id = attempt.ExamId });
+    }
+
+    // Marca todos los intentos de un examen como validados.
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpPost]
+    public IActionResult ValidateAll(int id)
+    {
+        var exam = context.Exams
+            .FirstOrDefault(e => e.Id == id);
+
+        if (exam == null)
+        {
+            return NotFound();
+        }
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin && exam.TeacherId != User.GetRequiredUserId())
+        {
+            return Forbid();
+        }
+
+        var intentos = context.ExamAttempts
+            .Where(ea => ea.ExamId == id && ea.IsCompleted && !ea.Validado)
+            .ToList();
+
+        foreach (var attempt in intentos)
+        {
+            attempt.Validado = true;
+            attempt.FechaValidacion = DateTime.UtcNow;
+        }
+
+        context.SaveChanges();
+
+        TempData["Message"] = $"Se han validado {intentos.Count} intentos.";
+        return RedirectToAction("Validate", new { id = exam.Id });
     }
 
     // Elimina un examen y sus preguntas asociadas.
