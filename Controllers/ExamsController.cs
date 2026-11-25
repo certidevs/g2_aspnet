@@ -470,6 +470,118 @@ public class ExamsController : Controller
         return RedirectToAction("Details", new { id = exam.Id });
     }
 
+
+
+    // Guarda el intento de examen de un alumno y calcula la nota sobre 10.
+    // Recibe las respuestas marcadas en el formulario del alumno.
+    [Authorize]
+    [HttpPost]
+    public IActionResult SaveAttempt(int examId)
+    {
+        var exam = context.Exams
+            .Include(e => e.Questions)
+            .FirstOrDefault(e => e.Id == examId);
+
+        if (exam == null)
+        {
+            return NotFound();
+        }
+
+        var userId = User.GetRequiredUserId();
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+
+        if (!isStaff)
+        {
+            var tieneMatricula = context.Enrollments
+                .Any(e => e.CourseId == exam.CourseId
+                    && e.StudentId == userId
+                    && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+
+            if (!tieneMatricula)
+            {
+                return Forbid();
+            }
+        }
+
+        var questions = exam.Questions.OrderBy(q => q.Id).ToList();
+        var totalQuestions = questions.Count;
+        var aciertos = 0;
+
+        var attempt = new ExamAttempt
+        {
+            StudentId = userId,
+            ExamId = examId,
+            StartedAt = DateTime.UtcNow,
+            CompletedAt = DateTime.UtcNow,
+            IsCompleted = true
+        };
+
+        context.ExamAttempts.Add(attempt);
+        context.SaveChanges(); // Para obtener el Id del intento
+
+        foreach (var question in questions)
+        {
+            var selectedKey = $"respuesta-{question.Id}";
+            var selectedValue = Request.Form[selectedKey].FirstOrDefault();
+
+            int selectedOption = 0;
+            if (!string.IsNullOrWhiteSpace(selectedValue) && int.TryParse(selectedValue, out int parsed))
+            {
+                selectedOption = parsed;
+            }
+
+            bool isCorrect = selectedOption == question.CorrectOption;
+            if (isCorrect) aciertos++;
+
+            var answer = new ExamAnswer
+            {
+                ExamAttemptId = attempt.Id,
+                QuestionId = question.Id,
+                SelectedOption = selectedOption,
+                IsCorrect = isCorrect
+            };
+
+            context.ExamAnswers.Add(answer);
+        }
+
+        // Calcular nota sobre 10
+        double score = totalQuestions > 0
+            ? Math.Round((double)aciertos / totalQuestions * 10, 2)
+            : 0;
+
+        attempt.Score = score;
+        context.SaveChanges();
+
+        TempData["Message"] = $"Examen completado. Nota: {score} / 10";
+        return RedirectToAction("Result", new { attemptId = attempt.Id });
+    }
+
+    // Muestra el resultado de un intento de examen.
+    [Authorize]
+    [HttpGet]
+    public IActionResult Result(int attemptId)
+    {
+        var attempt = context.ExamAttempts
+            .Include(e => e.Exam).ThenInclude(e => e!.Questions)
+            .Include(e => e.Answers).ThenInclude(a => a!.Question)
+            .FirstOrDefault(e => e.Id == attemptId);
+
+        if (attempt == null)
+        {
+            return NotFound();
+        }
+
+        var userId = User.GetRequiredUserId();
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+
+        if (!isStaff && attempt.StudentId != userId)
+        {
+            return Forbid();
+        }
+
+        return View(attempt);
+    }
+
     // Elimina un examen y sus preguntas asociadas.
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpPost]
