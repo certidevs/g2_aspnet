@@ -1,37 +1,194 @@
+@using G2AspNet.Models
 @{
     ViewData["Title"] = "Inicio";
+    var academies = (int)ViewData["Academies"]!;
+    var courseCount = (int)ViewData["Courses"]!;
+    var enrollments = (int)ViewData["Enrollments"]!;
+    var lessons = (int)ViewData["Lessons"]!;
+    var upcoming = (List<Course>)ViewData["UpcomingCourses"]!;
+
+    string LevelLabel(CourseLevel level) => level switch
+    {
+        CourseLevel.Beginner => "Principiante",
+        CourseLevel.Intermediate => "Intermedio",
+        _ => "Avanzado"
+    };
 }
 
-<section class="py-4 py-lg-5">
-    <div class="row align-items-center g-4">
-        <div class="col-lg-8">
-            <p class="text-primary text-uppercase fw-semibold small mb-2">Grupo 2</p>
-            <h1 class="display-5 fw-bold">G2 ASP.NET</h1>
-            <p class="lead text-secondary">La infraestructura transversal ya está preparada. El equipo añadirá las entidades, asociaciones, servicios, controladores y vistas del dominio del proyecto.</p>
-            <div class="d-flex flex-wrap gap-2">
+<div class="aula-home">
+
+    <!-- Hero centrado -->
+    <section class="aula-hero rounded-4 text-center text-white px-3 px-lg-5 py-5 mb-0">
+        <i class="fa-solid fa-book-open aula-float aula-float-1" aria-hidden="true"></i>
+        <i class="fa-solid fa-pencil aula-float aula-float-2" aria-hidden="true"></i>
+        <i class="fa-solid fa-lightbulb aula-float aula-float-3" aria-hidden="true"></i>
+        <i class="fa-solid fa-graduation-cap aula-float aula-float-4" aria-hidden="true"></i>
+        <div class="position-relative py-lg-4">
+            <span class="aula-pill mb-3 d-inline-block"><i class="fa-solid fa-star me-1"></i> Formación para todos los niveles</span>
+            <h1 class="display-3 fw-bold mb-3">Aprende algo nuevo<br class="d-none d-md-inline" /> <span class="aula-gold">cada semana</span></h1>
+            <p class="lead mx-auto mb-4 aula-lead">
+                Descubre centros de formación, cursos y profesores en un solo lugar.
+                Matricúlate en minutos y sigue tus notas y asistencias desde cualquier dispositivo.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a class="btn btn-warning btn-lg px-4" asp-controller="Courses" asp-action="Index">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Explorar cursos
+                </a>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <a class="btn btn-primary" asp-controller="Profile" asp-action="Index">Ver mi perfil</a>
+                    <a class="btn btn-outline-light btn-lg px-4" asp-controller="Enrollments" asp-action="Index">
+                        <i class="fa-solid fa-id-card me-2"></i>Mis matrículas
+                    </a>
                 }
                 else
                 {
-                    <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Crear cuenta</a>
-                    <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                    <a class="btn btn-outline-light btn-lg px-4" asp-controller="Account" asp-action="Register">
+                        <i class="fa-solid fa-user-plus me-2"></i>Crear cuenta
+                    </a>
                 }
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card">
+    </section>
+
+    <!-- Cifras que solapan el hero -->
+    <section class="aula-stats row g-3 mx-0 px-lg-4 mb-5" aria-label="Cifras de la plataforma">
+        <div class="col-6 col-lg-3">
+            <div class="aula-stat card h-100 text-center">
                 <div class="card-body">
-                    <h2 class="h5">Incluido desde el primer día</h2>
-                    <ul class="mb-0 ps-3">
-                        <li>Identity, roles y login por cookie</li>
-                        <li>SQLite y Entity Framework Core</li>
-                        <li>Perfil, avatar y cambio de contraseña</li>
-                        <li>Administración de usuarios</li>
-                    </ul>
+                    <i class="fa-solid fa-building-columns aula-stat-icon"></i>
+                    <div class="aula-stat-number">@academies</div>
+                    <div class="text-secondary small">Centros</div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+        <div class="col-6 col-lg-3">
+            <div class="aula-stat card h-100 text-center">
+                <div class="card-body">
+                    <i class="fa-solid fa-book-open-reader aula-stat-icon"></i>
+                    <div class="aula-stat-number">@courseCount</div>
+                    <div class="text-secondary small">Cursos activos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="aula-stat card h-100 text-center">
+                <div class="card-body">
+                    <i class="fa-solid fa-user-graduate aula-stat-icon"></i>
+                    <div class="aula-stat-number">@enrollments</div>
+                    <div class="text-secondary small">Matrículas</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="aula-stat card h-100 text-center">
+                <div class="card-body">
+                    <i class="fa-solid fa-chalkboard-user aula-stat-icon"></i>
+                    <div class="aula-stat-number">@lessons</div>
+                    <div class="text-secondary small">Lecciones</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Próximos cursos -->
+    @if (upcoming.Count > 0)
+    {
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-end mb-3">
+                <div>
+                    <p class="aula-eyebrow mb-1">Matrícula abierta</p>
+                    <h2 class="fw-bold mb-0">Próximos cursos</h2>
+                </div>
+                <a asp-controller="Courses" asp-action="Index" class="fw-semibold">Ver todos <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="row g-4">
+                @foreach (var course in upcoming)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <article class="card aula-course h-100">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge aula-level">@LevelLabel(course.Level)</span>
+                                    <span class="fw-bold aula-price">@course.Price.ToString("0.##") €</span>
+                                </div>
+                                <h3 class="h5">@course.Name</h3>
+                                <p class="text-secondary small flex-grow-1">@course.Description</p>
+                                <ul class="list-unstyled small text-secondary mb-3">
+                                    @if (course.Academy is not null)
+                                    {
+                                        <li><i class="fa-solid fa-building-columns fa-fw me-1"></i>@course.Academy.Name · @course.Academy.City</li>
+                                    }
+                                    <li><i class="fa-regular fa-calendar fa-fw me-1"></i>Empieza el @course.StartDate.ToString("dd/MM/yyyy")</li>
+                                    <li><i class="fa-solid fa-users fa-fw me-1"></i>@course.MaxStudents plazas</li>
+                                </ul>
+                                <a class="btn btn-outline-primary mt-auto" asp-controller="Courses" asp-action="Details" asp-route-id="@course.Id">Ver curso</a>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Ilustración + ventajas -->
+    <section class="aula-feature rounded-4 p-4 p-lg-5 mb-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-5">
+                <img class="img-fluid rounded-4 shadow-sm" src="~/images/aula.svg" alt="Pizarra con apuntes, libros y un birrete de graduación" />
+            </div>
+            <div class="col-lg-7">
+                <p class="aula-eyebrow mb-1">Todo en un mismo sitio</p>
+                <h2 class="fw-bold mb-4">Una academia pensada para alumnos y profesores</h2>
+                <div class="row g-3">
+                    <div class="col-sm-6 d-flex gap-3">
+                        <span class="aula-icon"><i class="fa-solid fa-id-card"></i></span>
+                        <div><h3 class="h6 mb-1">Matrículas al instante</h3><p class="small text-secondary mb-0">Apúntate a un curso y consulta el estado de tu inscripción.</p></div>
+                    </div>
+                    <div class="col-sm-6 d-flex gap-3">
+                        <span class="aula-icon"><i class="fa-solid fa-ranking-star"></i></span>
+                        <div><h3 class="h6 mb-1">Notas al día</h3><p class="small text-secondary mb-0">El profesorado publica las calificaciones y tú las ves al momento.</p></div>
+                    </div>
+                    <div class="col-sm-6 d-flex gap-3">
+                        <span class="aula-icon"><i class="fa-solid fa-clipboard-user"></i></span>
+                        <div><h3 class="h6 mb-1">Control de asistencia</h3><p class="small text-secondary mb-0">Cada lección registra quién ha venido, sin papeles.</p></div>
+                    </div>
+                    <div class="col-sm-6 d-flex gap-3">
+                        <span class="aula-icon"><i class="fa-solid fa-door-open"></i></span>
+                        <div><h3 class="h6 mb-1">Aulas organizadas</h3><p class="small text-secondary mb-0">Cada centro gestiona sus aulas y lecciones sin solapes.</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Niveles -->
+    <section class="mb-4">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Elige tu nivel</h2>
+            <p class="text-secondary mb-0">Hay un punto de partida para cada persona.</p>
+        </div>
+        <div class="row g-3 text-center">
+            <div class="col-md-4">
+                <div class="aula-level-card h-100">
+                    <i class="fa-solid fa-seedling"></i>
+                    <h3 class="h5 mt-2">Principiante</h3>
+                    <p class="small text-secondary mb-0">Empieza desde cero con ritmo tranquilo y bases sólidas.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="aula-level-card h-100">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <h3 class="h5 mt-2">Intermedio</h3>
+                    <p class="small text-secondary mb-0">Consolida lo aprendido con casos prácticos y proyectos.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="aula-level-card h-100">
+                    <i class="fa-solid fa-trophy"></i>
+                    <h3 class="h5 mt-2">Avanzado</h3>
+                    <p class="small text-secondary mb-0">Especialízate y lleva tus conocimientos al siguiente nivel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
