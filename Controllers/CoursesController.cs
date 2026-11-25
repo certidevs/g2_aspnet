@@ -5,6 +5,7 @@ using G2AspNet.Data;
 using G2AspNet.Models;
 using G2AspNet.ViewModels.Courses;
 using Microsoft.EntityFrameworkCore;
+using G2AspNet.Utilities;
 
 namespace G2AspNet.Controllers;
 
@@ -15,6 +16,19 @@ public class CoursesController : Controller
     public CoursesController(ApplicationDbContext context)
     {
         this.context = context;
+    }
+
+    private IQueryable<Course> ManageableCourses()
+    {
+        var query = context.Courses.AsQueryable();
+
+        if (User.IsInRole(RoleNames.Admin))
+        {
+            return query;
+        }
+
+        var userId = User.GetRequiredUserId();
+        return query.Where(c => c.TeacherId == userId);
     }
 
     public IActionResult Index(string? search)
@@ -87,7 +101,106 @@ public class CoursesController : Controller
             return NotFound();
         }
 
+        ViewBag.OccupiedPlaces = context.Enrollments
+            .Count(e => e.CourseId == id && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userId = User.GetRequiredUserId();
+            ViewBag.MyEnrollment = context.Enrollments.FirstOrDefault(e => e.CourseId == id
+                && e.StudentId == userId
+                && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+        }
+
+        var canManage = (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher))
+            && ManageableCourses().Any(c => c.Id == id);
+        ViewBag.CanManage = canManage;
+        if (canManage)
+        {
+            ViewBag.CourseEnrollments = context.Enrollments
+                .Include(e => e.Student)
+                .Where(e => e.CourseId == id)
+                .OrderBy(e => e.EnrolledAt)
+                .ToList();
+        }
+
         return View("Details", course);
+    }
+
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpPost]
+    public IActionResult Start(int id)
+    {
+        var course = ManageableCourses()
+            .Include(c => c.Enrollments)
+            .FirstOrDefault(c => c.Id == id);
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        if (course.Status != CourseStatus.Open)
+        {
+            TempData["Error"] = "Solo se puede iniciar un curso abierto.";
+            return RedirectToAction("Details", new { id });
+        }
+
+        if (!course.Enrollments.Any(e => e.Status == EnrollmentStatus.Active))
+        {
+            TempData["Error"] = "No se puede iniciar un curso sin ningún alumno con la matrícula activa.";
+            return RedirectToAction("Details", new { id });
+        }
+
+        var unpaid = course.Enrollments.Where(e => e.Status == EnrollmentStatus.Pending).ToList();
+        foreach (var enrollment in unpaid)
+        {
+            enrollment.Status = EnrollmentStatus.Dropped;
+        }
+
+        course.Status = CourseStatus.InProgress;
+        context.SaveChanges();
+
+        if (unpaid.Count == 0)
+        {
+            TempData["Message"] = "Curso iniciado.";
+        }
+        else
+        {
+            TempData["Message"] = $"Curso iniciado. Matrículas sin pagar dadas de baja: {unpaid.Count}.";
+        }
+
+        return RedirectToAction("Details", new { id });
+    }
+
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [HttpPost]
+    public IActionResult Finish(int id)
+    {
+        var course = ManageableCourses()
+            .Include(c => c.Enrollments)
+            .FirstOrDefault(c => c.Id == id);
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        if (course.Status != CourseStatus.InProgress)
+        {
+            TempData["Error"] = "Solo se puede finalizar un curso en progreso.";
+            return RedirectToAction("Details", new { id });
+        }
+
+        var active = course.Enrollments.Where(e => e.Status == EnrollmentStatus.Active).ToList();
+        foreach (var enrollment in active)
+        {
+            enrollment.Status = EnrollmentStatus.Completed;
+        }
+
+        course.Status = CourseStatus.Finished;
+        context.SaveChanges();
+
+        TempData["Message"] = $"Curso finalizado. Matrículas completadas: {active.Count}.";
+        return RedirectToAction("Details", new { id });
     }
 
     [HttpPost]

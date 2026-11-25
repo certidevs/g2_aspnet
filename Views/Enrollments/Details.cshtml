@@ -27,7 +27,22 @@
             <dd class="col-sm-9">@(Model.IsPaid ? "Sí" : "No")</dd>
         </dl>
     </div>
-    <div class="card-footer bg-transparent">
+    <div class="card-footer bg-transparent d-flex flex-wrap gap-2">
+        @if (Model.Status == EnrollmentStatus.Pending)
+        {
+            <form asp-action="Pay" asp-route-id="@Model.Id" method="post">
+                <button class="btn btn-success" type="submit">Pagar matrícula</button>
+            </form>
+        }
+
+        @if (Model.Status == EnrollmentStatus.Pending || Model.Status == EnrollmentStatus.Active)
+        {
+            <form asp-action="Drop" asp-route-id="@Model.Id" method="post"
+                  onsubmit="return confirm('¿Seguro que quieres abandonar este curso?');">
+                <button class="btn btn-outline-danger" type="submit">Abandonar curso</button>
+            </form>
+        }
+
         <a class="btn btn-outline-secondary" asp-action="Index">Volver a matrículas</a>
     </div>
 </div>
@@ -59,7 +74,8 @@ else
                         <td>@Html.DisplayFor(m => grade.GradeEnum)</td>
                         <td>@grade.GradedAt?.ToString("dd/MM/yyyy")</td>
                         <td>
-                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Grades" asp-action="Details" asp-route-id="@grade.Id">Ver</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Grades" asp-action="Details"
+                               asp-route-id="@grade.Id">Ver</a>
                         </td>
                     </tr>
                 }
@@ -92,13 +108,15 @@ else
                         <td>
                             @if (attendance.Lesson is not null)
                             {
-                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@attendance.Lesson.Id">@attendance.Lesson.Name</a>
+                                <a asp-controller="Lessons" asp-action="Details"
+                                   asp-route-id="@attendance.Lesson.Id">@attendance.Lesson.Name</a>
                             }
                         </td>
                         <td>@attendance.Lesson?.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@Html.DisplayFor(m => attendance.Status)</td>
                         <td>
-                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Attendances" asp-action="Details" asp-route-id="@attendance.Id">Ver</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Attendances" asp-action="Details"
+                               asp-route-id="@attendance.Id">Ver</a>
                         </td>
                     </tr>
                 }
