@@ -644,6 +644,7 @@ public class ExamsController : Controller
     }
 
     // Vista para el profesor: ver los últimos intentos de cada alumno para un examen.
+    // Solo accesible cuando el examen ha cerrado (FechaCierre ha pasado).
     [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [HttpGet]
     public IActionResult Validate(int id)
@@ -661,6 +662,14 @@ public class ExamsController : Controller
         if (!isAdmin && exam.TeacherId != User.GetRequiredUserId())
         {
             return Forbid();
+        }
+
+        // Solo accesible cuando el examen ha cerrado
+        var ahora = DateTime.UtcNow;
+        if (exam.FechaCierre.HasValue && ahora < exam.FechaCierre.Value)
+        {
+            TempData["Error"] = $"Este examen aún está abierto. Se cierra el {exam.FechaCierre.Value:dd/MM/yyyy HH:mm}.";
+            return RedirectToAction("Details", new { id = exam.Id });
         }
 
         // Obtener el último intento de cada alumno para este examen
