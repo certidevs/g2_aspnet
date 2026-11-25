@@ -20,8 +20,8 @@ else
     <div class="mb-3">
         <strong>Exam:</strong> @exam.Title<br />
         <strong>Course:</strong> @exam.Course?.Name<br />
-        <strong>Student:</strong> @Model.Student?.UserName ?? "Anonymous"<br />
-        <strong>Date:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—"
+        <strong>Student:</strong> @Model.Student?.UserName<br />
+        <strong>Date:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm")
     </div>
 
     <div class="card mb-4">

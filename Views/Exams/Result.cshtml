@@ -21,8 +21,8 @@ else
     <div class="mb-3">
         <strong>Examen:</strong> @Model.Exam.Title<br />
         <strong>Curso:</strong> @Model.Exam.Course?.Name<br />
-        <strong>Alumno:</strong> @Model.Student?.UserName ?? "Anónimo"<br />
-        <strong>Fecha:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—"
+        <strong>Alumno:</strong> @Model.Student?.UserName<br />
+        <strong>Fecha:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm")
     </div>
 
     <div class="card mb-4">
@@ -42,7 +42,6 @@ else
                 <th>Pregunta</th>
                 <th>Tu respuesta</th>
                 <th>Comentario</th>
-                <th>Resultado</th>
             </tr>
         </thead>
         <tbody>
@@ -69,20 +68,6 @@ else
                         else
                         {
                             <span class="text-muted">—</span>
-                        }
-                    </td>
-                    <td>
-                        @if (answer == null)
-                        {
-                            <span class="text-warning">Sin responder</span>
-                        }
-                        else if (answer.IsCorrect)
-                        {
-                            <span class="text-success">✓ Correcta</span>
-                        }
-                        else
-                        {
-                            <span class="text-danger">✗ Incorrecta</span>
                         }
                     </td>
                 </tr>
