@@ -1,0 +1,48 @@
+@model G2AspNet.Models.Grade
+@{
+    ViewData["Title"] = "Nota del Examen";
+    var attempt = ViewBag.ExamAttempt as G2AspNet.Models.ExamAttempt;
+}
+
+<h2>Nota del Examen</h2>
+
+@if (attempt == null)
+{
+    <div class="alert alert-danger">No se encontró el intento de examen.</div>
+}
+else
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">@attempt.Exam?.Title</h5>
+            <p class="card-text">
+                <strong>Alumno:</strong> @attempt.Student?.UserName<br />
+                <strong>Examen:</strong> @attempt.Exam?.Title<br />
+                <strong>Nota automática:</strong> @attempt.Score?.ToString("F2") / 10<br />
+                <strong>Nota del profesor:</strong> @attempt.ProfesorNota?.ToString("F2") / 10<br />
+                <strong>Comentario del profesor:</strong> @attempt.ComentarioProfesor<br />
+            </p>
+        </div>
+    </div>
+
+    <form asp-action="CreateFromExamAttempt" method="post">
+        <input type="hidden" name="attemptId" value="@ViewBag.ExamAttemptId" />
+
+        <div class="mb-3">
+            <label class="form-label">Nota (0-10)</label>
+            <input class="form-control" name="Value" type="number" step="0.01" min="0" max="10" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Comentarios</label>
+            <textarea class="form-control" name="Comments" rows="3"></textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Guardar nota</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Volver a las notas</a>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
