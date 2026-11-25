@@ -1,0 +1,115 @@
+@model ExamAttempt
+@{
+    ViewData["Title"] = "Attempt detail";
+    var exam = Model.Exam;
+    var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+}
+
+@* View: Detail of an exam attempt.
+   The teacher sees the student's answers, comments and the automatic score,
+   and can modify the grade and leave their own comment. *@
+
+<h1>Attempt detail</h1>
+
+@if (exam == null)
+{
+    <div class="alert alert-danger">Exam not found.</div>
+}
+else
+{
+    <div class="mb-3">
+        <strong>Exam:</strong> @exam.Title<br />
+        <strong>Course:</strong> @exam.Course?.Name<br />
+        <strong>Student:</strong> @Model.Student?.UserName ?? "Anonymous"<br />
+        <strong>Date:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—"
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Automatic score: @Model.Score?.ToString("F2") / 10</h3>
+        </div>
+    </div>
+
+    <h4>Student answers</h4>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Student answer</th>
+                <th>Student comment</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var question in exam.Questions.OrderBy(q => q.Id))
+            {
+                var answer = Model.Answers?.FirstOrDefault(a => a.QuestionId == question.Id);
+                var selectedOption = answer?.SelectedOption switch
+                {
+                    1 => question.Option1,
+                    2 => question.Option2,
+                    3 => question.Option3,
+                    4 => question.Option4,
+                    _ => "Not answered"
+                };
+
+                <tr>
+                    <td>@question.Text</td>
+                    <td>@selectedOption</td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(answer?.ComentarioAlumno))
+                        {
+                            <span class="text-info">"@answer.ComentarioAlumno"</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                    <td>
+                        @if (answer == null)
+                        {
+                            <span class="text-warning">Not answered</span>
+                        }
+                        else if (answer.IsCorrect)
+                        {
+                            <span class="text-success">✓ Correct</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">✗ Incorrect</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <form asp-action="TryDetail" asp-controller="Exams" method="post">
+        <input type="hidden" name="attemptId" value="@Model.Id" />
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4>Teacher review</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Teacher grade (0-10)</label>
+                    <input class="form-control" name="profesorNota" type="number" step="0.01" min="0" max="10" value="@(Model.ProfesorNota.HasValue ? Model.ProfesorNota.Value.ToString("F2") : "")" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Teacher comment</label>
+                    <textarea class="form-control" name="comentarioProfesor" rows="3">@Model.ComentarioProfesor</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save review</button>
+                <a class="btn btn-outline-secondary" asp-action="Validate" asp-route-id="@exam.Id">Back to validation</a>
+            </div>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

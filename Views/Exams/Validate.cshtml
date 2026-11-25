@@ -1,0 +1,72 @@
+@model List<ExamAttempt>
+@{
+    ViewData["Title"] = "Validate Exams";
+    var exam = ViewBag.Exam as Exam;
+}
+
+@* View: Validate exam attempts.
+   The teacher sees the last attempt of each student for this exam
+   and can review answers and comments before validating the grade. *@
+
+<h1>Validate exams: @(exam?.Title ?? "Exam")</h1>
+
+@if (exam == null)
+{
+    <div class="alert alert-danger">Exam not found.</div>
+}
+else
+{
+    <div class="mb-3">
+        <strong>Course:</strong> @exam.Course?.Name<br />
+        <strong>Teacher:</strong> @(exam.Teacher?.DisplayName ?? exam.Teacher?.UserName ?? "Anonymous")<br />
+        <strong>Max attempts:</strong> @exam.MaxIntentos
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">No exam attempts to validate.</div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Score</th>
+                    <th>Attempt date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attempt in Model)
+                {
+                    <tr>
+                        <td>@attempt.Student?.UserName ?? "Anonymous"</td>
+                        <td>
+                            @if (attempt.Score.HasValue)
+                            {
+                                <strong>@attempt.Score.Value.ToString("F2") / 10</strong>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not graded</span>
+                            }
+                        </td>
+                        <td>@attempt.CompletedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" asp-action="TryDetail" asp-route-id="@attempt.Id">
+                                View detail
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
