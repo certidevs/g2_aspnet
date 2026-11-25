@@ -41,6 +41,7 @@ else
             <tr>
                 <th>Pregunta</th>
                 <th>Tu respuesta</th>
+                <th>Comentario</th>
                 <th>Resultado</th>
             </tr>
         </thead>
@@ -60,6 +61,16 @@ else
                 <tr>
                     <td>@question.Text</td>
                     <td>@opcionSeleccionada</td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(answer?.ComentarioAlumno))
+                        {
+                            <span class="text-info">"@answer.ComentarioAlumno"</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
                     <td>
                         @if (answer == null)
                         {
