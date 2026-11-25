@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Authorization.Infrastructure
 @inject UserManager<ApplicationUser> UserManager
 @inject ImageStorage ImageStorage
 @{
@@ -60,16 +61,19 @@
                                                                     asp-action="Index">Notas</a></li>
                                             <li class="nav-item dropdown">
                                                 <a class='@(inMoreMenu ? "nav-link dropdown-toggle active" : "nav-link dropdown-toggle")'
-                                                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
+                                                   href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
                                                 <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" asp-controller="Classroom" asp-action="Index">Aulas</a>
-                                                    </li>
-                                                    <li><a class="dropdown-item" asp-controller="Lessons" asp-action="Index">Lecciones</a>
-                                                    </li>
+                                                    @if (User.Identity?.IsAuthenticated == true)
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="Classroom" asp-action="Index">Aulas</a>
+                                                        </li>
+                                                        <li><a class="dropdown-item" asp-controller="Lessons" asp-action="Index">Lecciones</a>
+                                                        </li>
+                                                    }
                                                     @if (isStaff)
                                                     {
                                                         <li><a class="dropdown-item" asp-controller="Attendances"
-                                                            asp-action="Index">Asistencias</a></li>
+                                                                   asp-action="Index">Asistencias</a></li>
                                                         }
                                                     </ul>
                                                 </li>
@@ -91,7 +95,7 @@
                                                     {
                                                         <li class="nav-item dropdown">
                                                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                               data-bs-toggle="dropdown" aria-expanded="false">
                                                                 @if (ImageStorage.GetUrl(currentUser.AvatarFileName) is string avatarUrl)
                                                                 {
                                                                     <img class="avatar" src="@avatarUrl" alt="Avatar de @currentName" />
