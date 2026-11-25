@@ -17,6 +17,17 @@ public class Exam
 
     public bool IsActive { get; set; } = true;
 
+    [Display(Name = "Fecha de apertura")]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
+    public DateTime? FechaApertura { get; set; }
+
+    [Display(Name = "Fecha de cierre")]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
+    public DateTime? FechaCierre { get; set; }
+
+    [Range(1, 100, ErrorMessage = "El número de intentos debe estar entre 1 y 100")]
+    public int MaxIntentos { get; set; } = 1;
+
     // Fks
     public int CourseId { get; set; }
     public Course? Course { get; set; }
@@ -27,5 +38,4 @@ public class Exam
     // Lists (entities that have Exam as FK)
     public List<Question> Questions { get; set; } = new();
     public List<ExamAttempt> ExamAttempts { get; set; } = new();
-
 }
