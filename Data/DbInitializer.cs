@@ -369,7 +369,7 @@ public static class DbInitializer
 
                 new Enrollment { StudentId = student1.Id, CourseId = aspnetCourse.Id, EnrolledAt = new DateTime(2026, 9, 28, 10, 20, 0), IsPaid = true, Status = EnrollmentStatus.Active },
                 new Enrollment { StudentId = student2.Id, CourseId = aspnetCourse.Id, EnrolledAt = new DateTime(2026, 9, 30, 18, 5, 0), IsPaid = true, Status = EnrollmentStatus.Active },
-                new Enrollment { StudentId = student3.Id, CourseId = aspnetCourse.Id, EnrolledAt = new DateTime(2026, 10, 5, 9, 40, 0), IsPaid = false, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student3.Id, CourseId = aspnetCourse.Id, EnrolledAt = new DateTime(2026, 10, 5, 9, 40, 0), IsPaid = true, Status = EnrollmentStatus.Active },
 
                 new Enrollment { StudentId = student2.Id, CourseId = englishCourse.Id, EnrolledAt = new DateTime(2026, 10, 5, 13, 0, 0), IsPaid = true, Status = EnrollmentStatus.Active },
                 new Enrollment { StudentId = student3.Id, CourseId = englishCourse.Id, EnrolledAt = new DateTime(2026, 10, 8, 17, 30, 0), IsPaid = true, Status = EnrollmentStatus.Active },
@@ -519,7 +519,7 @@ public static class DbInitializer
             {
                 Title = "Examen Final de Matemáticas",
                 Description = "Examen final del primer trimestre de matemáticas.",
-                CourseId = excelCourse.Id,
+                CourseId = aspnetCourse.Id,
                 TeacherId = teacher2.Id,
                 IsActive = false,
                 CreatedAt = new DateTime(2026, 9, 1, 8, 0, 0),
