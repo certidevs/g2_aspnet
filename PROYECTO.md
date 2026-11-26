@@ -76,6 +76,21 @@ Lo que funciona ahora mismo.
 - Subscripciones y planes de pago?
 
 
+### Propuestas
+- Alfonso:
+    - 
+
+- Ruben:
+    - 
+
+- Juanma:
+    - 
+
+- Pol:
+    - 
+    
+
+
 ## 7. Si sobra tiempo
 
 - Ideas tras terminar el MVP
