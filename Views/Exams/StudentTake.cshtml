@@ -16,7 +16,7 @@
 
 <div class="mb-3">
     <strong>Curso:</strong> @Model.Course?.Name<br />
-    <strong>Profesor:</strong> @(Model.Teacher?.DisplayName ?? Model.Teacher?.UserName ?? "Anónimo")<br />
+    <strong>Profesor:</strong> @(Model.Teacher?.DisplayName ?? Model.Teacher?.UserName)<br />
     <strong>Fecha:</strong> @Model.CreatedAt.ToShortDateString()<br />
     <strong>Activo:</strong> @(Model.IsActive ? "Sí" : "No")
 </div>

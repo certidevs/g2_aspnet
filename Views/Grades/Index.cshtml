@@ -34,7 +34,7 @@
                     @if (isStaff)
                     {
                         <p class="card-text text-secondary mb-1">
-                            Alumno: @(grade.Enrollment?.Student?.DisplayName ?? grade.Enrollment?.Student?.UserName ?? "Anónimo")
+                            Alumno: @(grade.Enrollment?.Student?.DisplayName ?? grade.Enrollment?.Student?.UserName)
                         </p>
                     }
                     <p class="card-text">Nota: @grade.Value</p>
@@ -78,7 +78,7 @@
                 <tr>
                     @if (isStaff)
                     {
-                        <td>@(grade.Enrollment?.Student?.DisplayName ?? grade.Enrollment?.Student?.UserName ?? "Anónimo")</td>
+                        <td>@(grade.Enrollment?.Student?.DisplayName ?? grade.Enrollment?.Student?.UserName)</td>
                     }
                     <td>@grade.Enrollment?.Course?.Name</td>
                     <td>@grade.Value</td>

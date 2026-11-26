@@ -18,7 +18,7 @@ else
 {
     <div class="mb-3">
         <strong>Curso:</strong> @exam.Course?.Name<br />
-        <strong>Profesor:</strong> @(exam.Teacher?.DisplayName ?? exam.Teacher?.UserName ?? "Anonymous")<br />
+        <strong>Profesor:</strong> @(exam.Teacher?.DisplayName ?? exam.Teacher?.UserName)<br />
         <strong>Intentos máximos:</strong> @exam.MaxIntentos
     </div>
 
@@ -41,7 +41,7 @@ else
                 @foreach (var attempt in Model)
                 {
                     <tr>
-                        <td>@attempt.Student?.UserName ?? "Anónimo"</td>
+                        <td>@attempt.Student?.UserName</td>
                         <td>
                             @if (attempt.Score.HasValue)
                             {

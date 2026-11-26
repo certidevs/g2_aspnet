@@ -32,7 +32,7 @@
             <tr>
                 @if (User.IsInRole(RoleNames.Admin))
                 {
-                    <td>@(enrollment.Student?.DisplayName ?? enrollment.Student?.UserName ?? "Anónimo")</td>
+                    <td>@(enrollment.Student?.DisplayName ?? enrollment.Student?.UserName)</td>
                 }
                 <td>@enrollment.Course?.Name</td>
                 <td>@enrollment.EnrolledAt</td>
