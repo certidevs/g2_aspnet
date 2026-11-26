@@ -1,5 +1,5 @@
 ​
-# GRUPO 2 - <ACADEMIAS>
+# GRUPO 2 - ACADEMIAS
 ## 1. Resumen
 
 - Es una aplicación para la gestión de academias, con los diferentes centros, los cursos de cada centro, las lecciones de cada curso, matriculaciones de alumnos, asistencias, exámenes, notas y, por supuesto, administración de usuarios.
@@ -35,22 +35,42 @@ Lo que funciona ahora mismo.
 
 ### Errores
 
-- Error al arrancar debido a...
+- Nada
 
 ### Cosas a medias
-- Funcionalidad marcar como atrasado
+- Estilo y diseño
 
 
 ## 4. Qué falta de lógica de negocio para MVP
 
-### Funcionalidad puntuar prenda
+### Funcionalidad Academias
 
-- Qué hace (como <rol> quiero <acción> para <objetivo>)
-- Reglas (qué se permite, qué se impide, qué se calcula)
+- Qué hace: gestiona las academias que es la parte mas alta de gestion
+- Reglas: Cada academia esta gestionada por un gestor asociado a esa academia. Cada academia tiene varios cursos.
 - Modelo: 
 - Controlador y acciones: 
 - Vistas: 
-- Responsable
+- Pol
+
+### Funcionalidad Cursos
+
+- Qué hace: gestiona los cursos que cuelgan de las academias
+- Reglas: Cada curso tiene varias lecciones, un profesor (pendiente de ver si más de uno), tiene varias clases y notas asociadas. Los alumnos se matriculan mediante la funcionalidad "Matriculacion"
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Ruben
+
+### Funcionalidad Matriculacion
+
+- Qué hace: gestiona las matriculaciones de los alumnos (pendiente de ver si apartado de profesores)
+- Reglas: Cada matricula asocia la posibilidad de que un alumno pueda entrar y usar las funcionalidades de un curso y lo que cuelga de él
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Alfonso
+
+Me cansé, que siga otro
 
 
 ## 5. Qué más nos falta
@@ -103,7 +123,7 @@ Lo que funciona ahora mismo.
 
 - Pol:
     - 
-    
+
 
 
 ## 7. Si sobra tiempo
