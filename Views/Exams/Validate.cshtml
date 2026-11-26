@@ -26,6 +26,10 @@ else
     {
         <div class="alert alert-info">No hay intentos de examen para revisar.</div>
     }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info">@TempData["Info"]</div>
+    }
     else
     {
         <table class="table table-striped">
@@ -65,6 +69,10 @@ else
     }
 
     <a class="btn btn-outline-secondary" asp-action="Index">Volver al listado</a>
+
+    <form asp-action="ValidateAll" asp-route-id="@exam.Id" method="post" class="d-inline mt-3">
+        <button type="submit" class="btn btn-success">Validar todo y enviar a calificaciones</button>
+    </form>
 }
 
 @section Scripts {
