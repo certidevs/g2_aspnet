@@ -512,6 +512,309 @@ public static class DbInitializer
             context.SaveChanges();
         }
 
+                // Exámenes ya cerrados para demostración de la zona de revisión del profesor
+        if (!context.Exams.Any(e => e.Title.Contains("Examen Final"))) 
+        {
+            var examClosed1 = new Exam
+            {
+                Title = "Examen Final de Matemáticas",
+                Description = "Examen final del primer trimestre de matemáticas.",
+                CourseId = excelCourse.Id,
+                TeacherId = teacher2.Id,
+                IsActive = false,
+                CreatedAt = new DateTime(2026, 9, 1, 8, 0, 0),
+                FechaApertura = new DateTime(2026, 10, 1, 8, 0, 0),
+                FechaCierre = new DateTime(2026, 10, 20, 23, 59, 59),
+                MaxIntentos = 3
+            };
+            var examClosed2 = new Exam
+            {
+                Title = "Examen Final de Historia",
+                Description = "Examen final del primer trimestre de historia.",
+                CourseId = historyCourse.Id,
+                TeacherId = teacher2.Id,
+                IsActive = false,
+                CreatedAt = new DateTime(2026, 9, 1, 8, 0, 0),
+                FechaApertura = new DateTime(2026, 10, 5, 8, 0, 0),
+                FechaCierre = new DateTime(2026, 10, 30, 23, 59, 59),
+                MaxIntentos = 3
+            };
+
+            context.Exams.AddRange(examClosed1, examClosed2);
+            context.SaveChanges();
+
+            // Preguntas del examen 1 (Matemáticas)
+            context.Questions.AddRange(
+                new Question
+                {
+                    Text = "¿Cuánto es 7 × 8?",
+                    Option1 = "54",
+                    Option2 = "56",
+                    Option3 = "64",
+                    Option4 = "72",
+                    CorrectOption = 2,
+                    ExamId = examClosed1.Id
+                },
+                new Question
+                {
+                    Text = "¿Cuál es el valor de π (pi) aproximado?",
+                    Option1 = "3.14",
+                    Option2 = "3.16",
+                    Option3 = "3.18",
+                    Option4 = "3.20",
+                    CorrectOption = 1,
+                    ExamId = examClosed1.Id
+                },
+                new Question
+                {
+                    Text = "¿Cuál es la raíz cuadrada de 144?",
+                    Option1 = "10",
+                    Option2 = "11",
+                    Option3 = "12",
+                    Option4 = "13",
+                    CorrectOption = 3,
+                    ExamId = examClosed1.Id
+                });
+
+            // Preguntas del examen 2 (Historia)
+            context.Questions.AddRange(
+                new Question
+                {
+                    Text = "¿En qué año cayó el Imperio Romano de Occidente?",
+                    Option1 = "410 d.C.",
+                    Option2 = "476 d.C.",
+                    Option3 = "500 d.C.",
+                    Option4 = "527 d.C.",
+                    CorrectOption = 2,
+                    ExamId = examClosed2.Id
+                },
+                new Question
+                {
+                    Text = "¿Quién fue el primer emperador de Roma?",
+                    Option1 = "Julio César",
+                    Option2 = "Augusto",
+                    Option3 = "Nerón",
+                    Option4 = "Trajano",
+                    CorrectOption = 2,
+                    ExamId = examClosed2.Id
+                },
+                new Question
+                {
+                    Text = "¿En qué año comenzó la Primera Guerra Mundial?",
+                    Option1 = "1914",
+                    Option2 = "1916",
+                    Option3 = "1918",
+                    Option4 = "1920",
+                    CorrectOption = 1,
+                    ExamId = examClosed2.Id
+                });
+
+            context.SaveChanges();
+
+            // Intentos del examen 1 - Estudiante 1 (dos intentos)
+            var exam1Attempt1 = new ExamAttempt
+            {
+                ExamId = examClosed1.Id,
+                StudentId = student1.Id,
+                StartedAt = new DateTime(2026, 10, 15, 10, 0, 0),
+                CompletedAt = new DateTime(2026, 10, 15, 10, 25, 0),
+                Score = 6.67,
+                Validado = true,
+                IsCompleted = true
+            };
+            context.ExamAttempts.Add(exam1Attempt1);
+            context.SaveChanges();
+
+            context.ExamAnswers.AddRange(
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt1.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuánto es 7 × 8?").Id,
+                    SelectedOption = 2,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt1.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuál es el valor de π (pi) aproximado?").Id,
+                    SelectedOption = 1,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt1.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuál es la raíz cuadrada de 144?").Id,
+                    SelectedOption = 4,
+                    IsCorrect = false,
+                    ComentarioAlumno = "Creí que era 13"
+                }
+            );
+
+            var exam1Attempt2 = new ExamAttempt
+            {
+                ExamId = examClosed1.Id,
+                StudentId = student2.Id,
+                StartedAt = new DateTime(2026, 10, 18, 15, 0, 0),
+                CompletedAt = new DateTime(2026, 10, 21, 10, 30, 0),
+                Score = 3.33,
+                Validado = true,
+                IsCompleted = true
+            };
+            context.ExamAttempts.Add(exam1Attempt2);
+            context.SaveChanges();
+
+            context.ExamAnswers.AddRange(
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt2.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuánto es 7 × 8?").Id,
+                    SelectedOption = 1,
+                    IsCorrect = false,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt2.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuál es el valor de π (pi) aproximado?").Id,
+                    SelectedOption = 2,
+                    IsCorrect = false,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt2.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuál es la raíz cuadrada de 144?").Id,
+                    SelectedOption = 2,
+                    IsCorrect = false,
+                    ComentarioAlumno = null
+                }
+            );
+
+            // Intento del examen 1 - Estudiante 3 (un intento, validado)
+            var exam1Attempt3 = new ExamAttempt
+            {
+                ExamId = examClosed1.Id,
+                StudentId = student3.Id,
+                StartedAt = new DateTime(2026, 10, 19, 14, 0, 0),
+                CompletedAt = new DateTime(2026, 10, 19, 14, 15, 0),
+                Score = 10.0,
+                Validado = true,
+                IsCompleted = true
+            };
+            context.ExamAttempts.Add(exam1Attempt3);
+            context.SaveChanges();
+
+            context.ExamAnswers.AddRange(
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt3.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuánto es 7 × 8?").Id,
+                    SelectedOption = 2,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt3.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuál es el valor de π (pi) aproximado?").Id,
+                    SelectedOption = 1,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam1Attempt3.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed1.Id && q.Text == "¿Cuál es la raíz cuadrada de 144?").Id,
+                    SelectedOption = 3,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                }
+            );
+
+            // Intentos del examen 2 - Estudiante 1 y 3
+            var exam2Attempt1 = new ExamAttempt
+            {
+                ExamId = examClosed2.Id,
+                StudentId = student1.Id,
+                StartedAt = new DateTime(2026, 10, 15, 10, 0, 0),
+                CompletedAt = new DateTime(2026, 10, 15, 10, 25, 0),
+                Score = 3.33,
+                Validado = true,
+                IsCompleted = true
+            };
+            context.ExamAttempts.Add(exam2Attempt1);
+            context.SaveChanges();
+
+            context.ExamAnswers.AddRange(
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam2Attempt1.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed2.Id && q.Text == "¿En qué año cayó el Imperio Romano de Occidente?").Id,
+                    SelectedOption = 3,
+                    IsCorrect = false,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam2Attempt1.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed2.Id && q.Text == "¿Quién fue el primer emperador de Roma?").Id,
+                    SelectedOption = 2,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam2Attempt1.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed2.Id && q.Text == "¿En qué año comenzó la Primera Guerra Mundial?").Id,
+                    SelectedOption = 1,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                }
+            );
+
+            var exam2Attempt2 = new ExamAttempt
+            {
+                ExamId = examClosed2.Id,
+                StudentId = student3.Id,
+                StartedAt = new DateTime(2026, 10, 29, 14, 0, 0),
+                CompletedAt = new DateTime(2026, 10, 29, 14, 35, 0),
+                Score = 10.0,
+                Validado = true,
+                IsCompleted = true
+            };
+            context.ExamAttempts.Add(exam2Attempt2);
+            context.SaveChanges();
+
+            context.ExamAnswers.AddRange(
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam2Attempt2.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed2.Id && q.Text == "¿En qué año cayó el Imperio Romano de Occidente?").Id,
+                    SelectedOption = 2,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam2Attempt2.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed2.Id && q.Text == "¿Quién fue el primer emperador de Roma?").Id,
+                    SelectedOption = 2,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                },
+                new ExamAnswer
+                {
+                    ExamAttemptId = exam2Attempt2.Id,
+                    QuestionId = context.Questions.First(q => q.ExamId == examClosed2.Id && q.Text == "¿En qué año comenzó la Primera Guerra Mundial?").Id,
+                    SelectedOption = 1,
+                    IsCorrect = true,
+                    ComentarioAlumno = null
+                }
+            );
+        }
+
         if (!context.Attendances.Any())
         {
             // Asistencia solo a lecciones ya impartidas (hasta el 5 de noviembre) y de matrículas
