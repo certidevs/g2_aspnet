@@ -52,7 +52,7 @@ public class AttendancesController : Controller
     }
 
     // Detalle de una asistencia: a qué lección, de qué alumno y de qué curso.
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher + "," + RoleNames.Student)]
     public IActionResult Details(int id)
     {
         var attendance = context.Attendances
@@ -71,7 +71,7 @@ public class AttendancesController : Controller
 
     // Método Edit
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     public IActionResult Edit(int id)
     {
         var attendance = context.Attendances.Find(id);
@@ -84,7 +84,7 @@ public class AttendancesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Delete(int id)
     {
@@ -102,7 +102,7 @@ public class AttendancesController : Controller
     }
 
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     public IActionResult Create(int lessonId, int enrollmentId)
     {
         var attendance = new Attendance
@@ -118,7 +118,7 @@ public class AttendancesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Create(Attendance attendance)
     {
@@ -137,7 +137,7 @@ public class AttendancesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Save(Attendance attendance)
     {

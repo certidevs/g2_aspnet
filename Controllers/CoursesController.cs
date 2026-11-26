@@ -92,7 +92,6 @@ public class CoursesController : Controller
     }
 
     [HttpGet]
-    [Authorize]
     public IActionResult Details(int id)
     {
         var course = context.Courses.Include(c => c.Academy).Include(c => c.Teacher).FirstOrDefault(c => c.Id == id);
@@ -204,7 +203,7 @@ public class CoursesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Save(Course course)
     {
@@ -236,7 +235,7 @@ public class CoursesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Delete(int id)
     {
