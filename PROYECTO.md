@@ -38,44 +38,18 @@ Lo que funciona ahora mismo.
 - Nada
 
 ### Cosas a medias
+
 - Estilo y diseño
 
 
 ## 4. Qué falta de lógica de negocio para MVP
 
-### Funcionalidad Academias
-
-- Qué hace: gestiona las academias que es la parte mas alta de gestion
-- Reglas: Cada academia esta gestionada por un gestor asociado a esa academia. Cada academia tiene varios cursos.
-- Modelo: 
-- Controlador y acciones: 
-- Vistas: 
-- Pol
-
-### Funcionalidad Cursos
-
-- Qué hace: gestiona los cursos que cuelgan de las academias
-- Reglas: Cada curso tiene varias lecciones, un profesor (pendiente de ver si más de uno), tiene varias clases y notas asociadas. Los alumnos se matriculan mediante la funcionalidad "Matriculacion"
-- Modelo: 
-- Controlador y acciones: 
-- Vistas: 
-- Ruben
-
-### Funcionalidad Matriculacion
-
-- Qué hace: gestiona las matriculaciones de los alumnos (pendiente de ver si apartado de profesores)
-- Reglas: Cada matricula asocia la posibilidad de que un alumno pueda entrar y usar las funcionalidades de un curso y lo que cuelga de él
-- Modelo: 
-- Controlador y acciones: 
-- Vistas: 
-- Alfonso
-
-Me cansé, que siga otro
+- Nada?
 
 
 ## 5. Qué más nos falta
 
-- Validaciones, permisos, diseño, datos de prueba, README...
+- Permisos y diseño
 
 
 ## 6. Reparto por persona
@@ -136,3 +110,69 @@ Me cansé, que siga otro
 
 - 
 
+
+
+## Extra para no perderlo
+
+### Funcionalidad Academias
+
+- Qué hace: gestiona las academias que es la parte mas alta de gestion
+- Reglas: Cada academia esta gestionada por un gestor asociado a esa academia. Cada academia tiene varios cursos.
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Pol
+
+### Funcionalidad Cursos
+
+- Qué hace: gestiona los cursos que cuelgan de las academias
+- Reglas: Cada curso tiene varias lecciones, un profesor (pendiente de ver si más de uno), tiene varias clases y notas asociadas. Los alumnos se matriculan mediante la funcionalidad "Matriculacion"
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Ruben
+
+### Funcionalidad Matriculacion
+
+- Qué hace: gestiona las matriculaciones de los alumnos (pendiente de ver si apartado de profesores)
+- Reglas: Cada matricula asocia la posibilidad de que un alumno pueda entrar y usar las funcionalidades de un curso y lo que cuelga de él
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Alfonso
+
+### Funcionalidad Aulas
+
+- Qué hace: 
+- Reglas: 
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Pol
+
+### Funcionalidad Lecciones
+
+- Qué hace: 
+- Reglas: 
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Juanma
+
+### Funcionalidad Asistencia
+
+- Qué hace: 
+- Reglas: 
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Ruben
+
+### Funcionalidad Calificaciones
+
+- Qué hace: 
+- Reglas: 
+- Modelo: 
+- Controlador y acciones: 
+- Vistas: 
+- Alfonso
