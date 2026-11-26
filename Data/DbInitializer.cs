@@ -619,7 +619,7 @@ public static class DbInitializer
                 StartedAt = new DateTime(2026, 10, 15, 10, 0, 0),
                 CompletedAt = new DateTime(2026, 10, 15, 10, 25, 0),
                 Score = 6.67,
-                Validado = true,
+                Validado = false,
                 IsCompleted = true
             };
             context.ExamAttempts.Add(exam1Attempt1);
@@ -659,7 +659,7 @@ public static class DbInitializer
                 StartedAt = new DateTime(2026, 10, 18, 15, 0, 0),
                 CompletedAt = new DateTime(2026, 10, 21, 10, 30, 0),
                 Score = 3.33,
-                Validado = true,
+                Validado = false,
                 IsCompleted = true
             };
             context.ExamAttempts.Add(exam1Attempt2);
@@ -700,7 +700,7 @@ public static class DbInitializer
                 StartedAt = new DateTime(2026, 10, 19, 14, 0, 0),
                 CompletedAt = new DateTime(2026, 10, 19, 14, 15, 0),
                 Score = 10.0,
-                Validado = true,
+                Validado = false,
                 IsCompleted = true
             };
             context.ExamAttempts.Add(exam1Attempt3);
@@ -741,7 +741,7 @@ public static class DbInitializer
                 StartedAt = new DateTime(2026, 10, 15, 10, 0, 0),
                 CompletedAt = new DateTime(2026, 10, 15, 10, 25, 0),
                 Score = 3.33,
-                Validado = true,
+                Validado = false,
                 IsCompleted = true
             };
             context.ExamAttempts.Add(exam2Attempt1);
@@ -781,7 +781,7 @@ public static class DbInitializer
                 StartedAt = new DateTime(2026, 10, 29, 14, 0, 0),
                 CompletedAt = new DateTime(2026, 10, 29, 14, 35, 0),
                 Score = 10.0,
-                Validado = true,
+                Validado = false,
                 IsCompleted = true
             };
             context.ExamAttempts.Add(exam2Attempt2);
