@@ -767,8 +767,15 @@ public class ExamsController : Controller
         }
 
         var intentos = context.ExamAttempts
-            .Where(ea => ea.ExamId == id && ea.IsCompleted && !ea.Validado)
+            .Where(ea => ea.ExamId == id && ea.IsCompleted)
+            .OrderByDescending(ea => ea.CompletedAt)
             .ToList();
+
+        if (intentos.Count == 0)
+        {
+            TempData["Info"] = "No hay intentos de examen para validar en este examen.";
+            return RedirectToAction("Validate", new { id = exam.Id });
+        }
 
         foreach (var attempt in intentos)
         {
@@ -778,7 +785,52 @@ public class ExamsController : Controller
 
         context.SaveChanges();
 
-        TempData["Message"] = $"Se han validado {intentos.Count} intentos.";
+        // Crear notas en Grades para cada intento validado
+        foreach (var attempt in intentos)
+        {
+            // Buscar la matrícula del alumno en el curso del examen
+            var enrollment = context.Enrollments
+                .FirstOrDefault(e => e.StudentId == attempt.StudentId
+                    && e.CourseId == exam.CourseId
+                    && EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+
+            if (enrollment == null)
+            {
+                continue; // Saltar si no hay matrícula válida
+            }
+
+            // Nota final: usar la del profesor si la puso, si no la automática
+            double finalGrade = attempt.ProfesorNota ?? attempt.Score ?? 0;
+
+            // Verificar si ya existe una nota para este intento
+            var existingGrade = context.Grades.FirstOrDefault(g => g.ExamAttemptId == attempt.Id);
+
+            if (existingGrade != null)
+            {
+                existingGrade.Value = finalGrade;
+                existingGrade.Comments = attempt.ComentarioProfesor;
+                existingGrade.GradeType = GradeType.Exam;
+                existingGrade.GradedAt = DateTime.UtcNow;
+                context.Grades.Update(existingGrade);
+            }
+            else
+            {
+                var grade = new Grade
+                {
+                    EnrollmentId = enrollment.Id,
+                    ExamAttemptId = attempt.Id,
+                    Value = finalGrade,
+                    Comments = attempt.ComentarioProfesor,
+                    GradeType = GradeType.Exam,
+                    GradedAt = DateTime.UtcNow
+                };
+                context.Grades.Add(grade);
+            }
+        }
+
+        context.SaveChanges();
+
+        TempData["Message"] = $"Se han validado {intentos.Count} intentos y se han creado las notas en calificaciones.";
         return RedirectToAction("Validate", new { id = exam.Id });
     }
 
