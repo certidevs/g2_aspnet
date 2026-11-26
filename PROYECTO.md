@@ -1,19 +1,34 @@
 ​
-# GRUPO 3 - <ACADEMIAS>
+# GRUPO 2 - <ACADEMIAS>
 ## 1. Resumen
 
-- De qué va la aplicación: 
-- Roles de usuario y qué puede hacer cada uno: 
-- Integrantes: 
+- Es una aplicación para la gestión de academias, con los diferentes centros, los cursos de cada centro, las lecciones de cada curso, matriculaciones de alumnos, asistencias, exámenes, notas y, por supuesto, administración de usuarios.
+- Roles de usuario y qué puede hacer cada uno:
+  - Administrador: Tiene acceso a todo el sistema y todas las acciones.
+  - Gestor: Tiene los mismos accesos que el administrador, excepto la gestión de usuarios.
+  - Profesor: Tiene los mismos accesos que el gestor, excepto la gestión de centros y cursos.
+  - Alumno: Tiene acceso a ver los centros, cursos, lecciones, matricularse, pagar, realizar sus exámenes, ver sus notas y abandonar el curso.
+  - Público: Tiene acceso a ver los centros, cursos, lecciones y registrarse.
+  -El registro por defecto es como alumno, el administrador, cuando sea necesario, podrá cambiar el rol al que se requiera.
+- Integrantes del grupo:
+    - Rubén Bitrián.
+    - Alfonso Vázquez.
+    - Pol García.
+    - Juanma Gonzalez.
 
 
 ## 2. Qué tenemos hecho
 
 Lo que funciona ahora mismo.
 
-- CRUD básico de `ClothingItem`...
-- Reservar prenda...
-- Funcionalidad devolver prenda...
+- CRUD básico de `User`
+- CRUD básico de `Academy`
+- CRUD básico de `Attendance`
+- CRUD básico de `Classroom`
+- CRUD básico de `Courses`
+- CRUD básico de `Enrollments`
+- CRUD básico de `Grades`
+- CRUD básico de `Lesson`
 
 
 ## 3. Errores y cosas a medias
