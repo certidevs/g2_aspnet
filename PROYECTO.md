@@ -61,10 +61,34 @@ Lo que funciona ahora mismo.
 ## 6. Reparto por persona
 
 ### Alfonso
-- 
+- [ ] Ocultar botones de Matricula, Examen, Notas para no logeados
+- [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
+
 ### Ruben
+- [ ] Detalles de curso abierto a todos. Ocultar cierta informacion a discrecion de Ruben.
+- [ ] Vista para gestor donde para añadir profesor a curso 
+- [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
+
 ### Pol
+- [ ] Ocultar Boton Aulas para no logeados
+- [ ] Academias abierto a todos
+- [ ] Detalles Academia abierto a todos, pero aulas oculto y solo visible para usuarios con dichas aulas.
+- [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
+
 ### Juanma
+- [ ] Ocultar Boton lecciones para no logeados.
+- [ ] Lecciones visibles segun logging. (Solo te aparecen las lecciones de los cursos donde estas matriculado.)
+- [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
+- [ ] Crear Rol gestor.
+
+
+
+### Pendiente
+- El gestor va asociado a academia?
+- Hay cursos sin academia?
+- Hay cursos que pueden estar en varias academias al mismo tiempo?
+- Hay varios profesores por curso?
+- Subscripciones y planes de pago?
 
 
 ## 7. Si sobra tiempo
