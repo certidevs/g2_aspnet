@@ -100,6 +100,7 @@ Me cansé, que siga otro
 - [ ] Lecciones visibles segun logging. (Solo te aparecen las lecciones de los cursos donde estas matriculado.)
 - [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 - [ ] Crear Rol gestor.
+    - [ ] Modificar la autorizacion por roles o avisar de hacerlo para toda entidad
 
 
 
