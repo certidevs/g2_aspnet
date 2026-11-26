@@ -5,6 +5,7 @@ using G2AspNet.Data;
 using G2AspNet.Models;
 using G2AspNet.ViewModels.Attendances;
 using Microsoft.EntityFrameworkCore;
+using G2AspNet.Utilities;
 
 namespace G2AspNet.Controllers;
 
@@ -18,9 +19,11 @@ public class AttendancesController : Controller
         this.context = context;
     }
 
-    // Lista las asistencias con su lección, el alumno y el curso.
-    // La búsqueda filtra por nombre de lección, de curso o de alumno.
-    [Authorize]
+    /**
+    * Lista las asistencias visibles para el usuario autenticado.
+    * El personal ve todas y el estudiante solo las suyas.
+    */
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher + "," + RoleNames.Student)]
     public IActionResult Index(string? search)
     {
         // Include carga las relaciones: sin él, Lesson y Enrollment llegarían vacíos a la vista.
@@ -29,6 +32,16 @@ public class AttendancesController : Controller
             .Include(attendance => attendance.Enrollment).ThenInclude(enrollment => enrollment!.Student)
             .Include(attendance => attendance.Enrollment).ThenInclude(enrollment => enrollment!.Course)
             .AsQueryable();
+
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+
+        if (!isStaff)
+        {
+            var userId = User.GetRequiredUserId();
+
+            query = query.Where(attendance =>
+                attendance.Enrollment!.StudentId == userId);
+        }
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -62,6 +75,12 @@ public class AttendancesController : Controller
             .FirstOrDefault(a => a.Id == id);
 
         if (attendance == null)
+        {
+            return NotFound();
+        }
+
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        if ((!isStaff) && attendance.Enrollment?.StudentId != User.GetRequiredUserId())
         {
             return NotFound();
         }

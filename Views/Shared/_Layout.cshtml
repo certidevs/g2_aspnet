@@ -15,6 +15,7 @@
     var inMoreMenu = new[] { "Classroom", "Lessons", "Attendances" }
         .Contains(activeController, StringComparer.OrdinalIgnoreCase);
     var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+    var canSeeAttendances = isStaff || User.IsInRole(RoleNames.Student);
 }
 <!DOCTYPE html>
 <html lang="es" data-bs-theme="light">
@@ -38,7 +39,8 @@
           crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Nunito+Sans:wght@400;600;700;800&display=swap" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Nunito+Sans:wght@400;600;700;800&display=swap" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
@@ -74,7 +76,7 @@
                                                         <li><a class="dropdown-item" asp-controller="Lessons" asp-action="Index">Lecciones</a>
                                                         </li>
                                                     }
-                                                    @if (isStaff)
+                                                    @if (canSeeAttendances)
                                                     {
                                                         <li><a class="dropdown-item" asp-controller="Attendances"
                                                                    asp-action="Index">Asistencias</a></li>
