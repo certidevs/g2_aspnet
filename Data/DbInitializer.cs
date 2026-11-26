@@ -360,9 +360,9 @@ public static class DbInitializer
             // 15 matrículas: ningún alumno repite curso. Hay matrículas completadas, activas,
             // pendientes de pago y una abandonada, para ver todos los estados.
             context.Enrollments.AddRange(
-                new Enrollment { StudentId = student1.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 1, 10, 0, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
-                new Enrollment { StudentId = student2.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 3, 12, 30, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
-                new Enrollment { StudentId = student3.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 5, 9, 15, 0), IsPaid = true, Status = EnrollmentStatus.Dropped },
+                new Enrollment { StudentId = student1.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 1, 10, 0, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student2.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 3, 12, 30, 0), IsPaid = true, Status = EnrollmentStatus.Active },
+                new Enrollment { StudentId = student3.Id, CourseId = excelCourse.Id, EnrolledAt = new DateTime(2026, 9, 5, 9, 15, 0), IsPaid = true, Status = EnrollmentStatus.Active },
 
                 new Enrollment { StudentId = student1.Id, CourseId = sqlCourse.Id, EnrolledAt = new DateTime(2026, 9, 8, 11, 0, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
                 new Enrollment { StudentId = student3.Id, CourseId = sqlCourse.Id, EnrolledAt = new DateTime(2026, 9, 10, 16, 45, 0), IsPaid = true, Status = EnrollmentStatus.Completed },
