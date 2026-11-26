@@ -61,28 +61,28 @@
                                                         asp-action="Index">Centros</a></li>
                                 <li class="nav-item"><a class='@NavClass("Courses")' asp-controller="Courses"
                                                             asp-action="Index">Cursos</a></li>
-                                    <li class="nav-item"><a class='@NavClass("Enrollments")' asp-controller="Enrollments"
-                                                                asp-action="Index">Mis matrículas</a></li>
-                                        <li class="nav-item"><a class='@NavClass("Grades")' asp-controller="Grades"
-                                                                    asp-action="Index">Notas</a></li>
-                                            <li class="nav-item dropdown">
-                                                <a class='@(inMoreMenu ? "nav-link dropdown-toggle active" : "nav-link dropdown-toggle")'
-                                                   href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
-                                                <ul class="dropdown-menu">
-                                                    @if (User.Identity?.IsAuthenticated == true)
-                                                    {
+                                    @if (User.Identity?.IsAuthenticated == true)
+                                    {
+                                        <li class="nav-item"><a class='@NavClass("Enrollments")' asp-controller="Enrollments"
+                                                                    asp-action="Index">Mis matrículas</a></li>
+                                            <li class="nav-item"><a class='@NavClass("Grades")' asp-controller="Grades"
+                                                                        asp-action="Index">Notas</a></li>
+                                                <li class="nav-item dropdown">
+                                                    <a class='@(inMoreMenu ? "nav-link dropdown-toggle active" : "nav-link dropdown-toggle")'
+                                                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
+                                                    <ul class="dropdown-menu">
                                                         <li><a class="dropdown-item" asp-controller="Classroom" asp-action="Index">Aulas</a>
                                                         </li>
                                                         <li><a class="dropdown-item" asp-controller="Lessons" asp-action="Index">Lecciones</a>
                                                         </li>
-                                                    }
-                                                    @if (canSeeAttendances)
-                                                    {
-                                                        <li><a class="dropdown-item" asp-controller="Attendances"
-                                                                   asp-action="Index">Asistencias</a></li>
-                                                        }
-                                                    </ul>
-                                                </li>
+                                                        @if (canSeeAttendances)
+                                                        {
+                                                            <li><a class="dropdown-item" asp-controller="Attendances"
+                                                                       asp-action="Index">Asistencias</a></li>
+                                                            }
+                                                        </ul>
+                                                    </li>
+                                                }
                                                 @if (User.IsInRole(RoleNames.Admin))
                                                 {
                                                     <li class="nav-item"><a class='@NavClass("Users")' asp-controller="Users"
