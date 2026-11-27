@@ -30,7 +30,7 @@ else
     {
         <div class="alert alert-info">@TempData["Info"]</div>
     }
-    else
+    else if (Model != null && Model.Any())
     {
         <table class="table table-striped">
             <thead>
