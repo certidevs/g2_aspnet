@@ -59,9 +59,9 @@ Lo que funciona ahora mismo.
 - [x] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 
 ### Ruben
-- [ ] Detalles de curso abierto a todos. Ocultar cierta informacion a discrecion de Ruben.
+- [x] Detalles de curso abierto a todos. Ocultar cierta informacion a discrecion de Ruben.
 - [ ] Vista para gestor donde para añadir profesor a curso 
-- [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
+- [x] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 
 ### Pol
 - [x] Ocultar Boton Aulas para no logeados
@@ -79,11 +79,11 @@ Lo que funciona ahora mismo.
 
 
 ### Pendiente
-- El gestor va asociado a academia?
-- Hay cursos sin academia?
-- Hay cursos que pueden estar en varias academias al mismo tiempo?
-- Hay varios profesores por curso?
-- Subscripciones y planes de pago?
+- El gestor va asociado a academia? Yo pondría un gestor general para todas las academias, si se pone uno por academia, sí va asociado.
+- Hay cursos sin academia? No
+- Hay cursos que pueden estar en varias academias al mismo tiempo? Lo que decidamos
+- Hay varios profesores por curso? Lo que decidamos
+- Subscripciones y planes de pago? Yo aquí haría una simulación de pago automático, de forma que el alumno paga, se confirma automáticamente y listo.
 
 
 ### Propuestas y arreglos
@@ -133,9 +133,9 @@ Lo que funciona ahora mismo.
 
 - Qué hace: gestiona los cursos que cuelgan de las academias
 - Reglas: Cada curso tiene varias lecciones, un profesor (pendiente de ver si más de uno), tiene varias clases y notas asociadas. Los alumnos se matriculan mediante la funcionalidad "Matriculacion"
-- Modelo: 
-- Controlador y acciones: 
-- Vistas: 
+- Modelo: Course.cs
+- Controlador y acciones: CoursesController.cs
+- Vistas: Index.cshtml, Details.cshtml y Form.cshtml
 - Ruben
 
 ### Funcionalidad Matriculacion
@@ -167,11 +167,11 @@ Lo que funciona ahora mismo.
 
 ### Funcionalidad Asistencia
 
-- Qué hace: 
-- Reglas: 
-- Modelo: 
-- Controlador y acciones: 
-- Vistas: 
+- Qué hace: Indica la asisencia o falta de un alumno a una clase.
+- Reglas: El profesor marca si el alumno ha asistido a clase o no.
+- Modelo: Attendance.cs
+- Controlador y acciones: AttendanceController.cs
+- Vistas: Index.cshtml, Details.cshtml y Form.cshtml
 - Ruben
 
 ### Funcionalidad Calificaciones
