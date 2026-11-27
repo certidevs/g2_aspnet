@@ -19,6 +19,23 @@ public class ExamsController : Controller
         this.context = context;
     }
 
+    // Devuelve los exámenes visibles según el rol del usuario.
+    // Admin y Teacher ven todos; un alumno solo ve exámenes de cursos donde tenga matrícula válida (Pending o Active).
+    private IQueryable<Exam> VisibleExams()
+    {
+        var query = context.Exams.Include(e => e.Course).Include(e => e.Teacher).AsQueryable();
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        if (!isStaff)
+        {
+            var userId = User.GetRequiredUserId();
+            query = query.Where(e => context.Enrollments.Any(en =>
+                en.CourseId == e.CourseId &&
+                en.StudentId == userId &&
+                EnrollmentRules.PlaceTakingStatuses.Contains(en.Status)));
+        }
+        return query;
+    }
+
     // DTO Data Transfer Object, son datos planos.
     // DTOs planos para serializar en TempData sin ciclos de navegación (Exam <-> Question). Exam y Question tienen referencias mutuas y la serializacion entra en bucle por ello.
     private sealed class ExamBorradorDto
@@ -93,10 +110,7 @@ public class ExamsController : Controller
     [Authorize]
     public IActionResult Index()
     {
-        var query = context.Exams
-            .Include(e => e.Course)
-            .Include(e => e.Teacher)
-            .AsQueryable();
+        var query = VisibleExams();
 
         if (!User.IsInRole(RoleNames.Admin) && !User.IsInRole(RoleNames.Teacher))
         {
@@ -124,9 +138,17 @@ public class ExamsController : Controller
         }
 
         var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
-        if (!isStaff && exam.TeacherId != User.GetRequiredUserId())
+        if (!isStaff)
         {
-            return Forbid();
+            // Un alumno solo puede ver el detalle de exámenes de cursos donde tenga matrícula válida
+            var tieneMatricula = context.Enrollments.Any(e =>
+                e.CourseId == exam.CourseId &&
+                e.StudentId == User.GetRequiredUserId() &&
+                EnrollmentRules.PlaceTakingStatuses.Contains(e.Status));
+            if (!tieneMatricula)
+            {
+                return Forbid();
+            }
         }
 
         return View(exam);
@@ -232,13 +254,17 @@ public class ExamsController : Controller
         ViewBag.PreguntaActual = new Question { ExamId = exam.Id };
         ViewBag.EsPrimeraPregunta = preguntas.Count == 0;
 
-        ViewBag.Courses = new SelectList(context.Courses.OrderBy(c => c.Name).ToList(), "Id", "Name");
+        ViewBag.Courses = new SelectList(
+            User.IsInRole(RoleNames.Admin)
+                ? context.Courses.OrderBy(c => c.Name).ToList()
+                : context.Courses.Where(c => c.TeacherId == User.GetRequiredUserId()).OrderBy(c => c.Name).ToList(),
+            "Id", "Name");
         ViewBag.AreQuestionNotSaved = AreQuestionNotSaved((Question)ViewBag.PreguntaActual!);
         return View("Form", exam);
     }
 
     // Cancela la creación del examen y limpia el borrador de TempData.
-    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [Authorize(Roles = RoleNames.Admin + ", " + RoleNames.Teacher)]
     public IActionResult Cancelar(int? id)
     {
         TempData.Remove("ExamBorrador");
@@ -440,6 +466,11 @@ public class ExamsController : Controller
 
         if (exam.Id == 0)
         {
+            var isAdmin = User.IsInRole(RoleNames.Admin);
+            if (!isAdmin && !ExamRules.EsDocenteDelCurso(context, exam.CourseId, User.GetRequiredUserId()))
+            {
+                return Forbid();
+            }
             exam.TeacherId = User.GetRequiredUserId();
             exam.CreatedAt = DateTime.UtcNow;
             context.Exams.Add(exam);
