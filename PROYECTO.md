@@ -86,9 +86,10 @@ Lo que funciona ahora mismo.
 - Subscripciones y planes de pago?
 
 
-### Propuestas
+### Propuestas y arreglos
 - Alfonso:
-    - 
+    - Bug exam: al mandar la nota corregida, si el profesor no la cambia, no se guarda por defecto la automatica.
+    - Feature exam: si la nota del profesor difiere de la auto, es obligatorio que escriba un coment
 
 - Ruben:
     - 
