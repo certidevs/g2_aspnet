@@ -143,6 +143,10 @@ public class AttendancesController : Controller
     {
         CheckNotDuplicated(attendance);
 
+        if (!ModelState.IsValid)
+        {
+            return View("Form", attendance);
+        }
         if (ModelState.IsValid)
         {
             context.Attendances.Add(attendance);
@@ -161,7 +165,10 @@ public class AttendancesController : Controller
     public IActionResult Save(Attendance attendance)
     {
         CheckNotDuplicated(attendance);
-
+        if (!ModelState.IsValid)
+        {
+            return View("Form", attendance);
+        }
         if (ModelState.IsValid)
         {
             context.Attendances.Update(attendance);
