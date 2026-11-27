@@ -89,6 +89,7 @@ Lo que funciona ahora mismo.
 ### Propuestas y arreglos
 - Alfonso:
     - Bug exam: al mandar la nota corregida, si el profesor no la cambia, no se guarda por defecto la automatica.
+    - Bug exam: form de preguntas tiene modo oscuro erroneo
     - Feature exam: si la nota del profesor difiere de la auto, es obligatorio que escriba un coment
     - Feature exam: al dar a validar todo y enviar, volver a la vista de examenes y cerrar esa validacion
     - Feature exam: cuando un examen este para revision, indicarlo en la vista. Cuando el examen ya haya sido mandado a calificaciones se quita o se hace una distincion en la vista de terminados y acciones pendientes
