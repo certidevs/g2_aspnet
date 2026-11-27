@@ -39,3 +39,49 @@ en Lessons/Details, un formulario con todos los matriculados del curso y un esta
         tecnologías
         demo: mostrar rol usuario, mostrar rol admin
         aprendizajes, futuros desarrollos, conclusiones
+
+Para los 4 grupos
+
+    Primero haced que el flujo principal funcione de punta a punta. Las funciones nuevas, después.
+
+    Seguridad: usad [Authorize] y comprobad en el controlador quién es el dueño del dato. Ocultar un botón no basta.
+
+    Diseño: listados en tarjetas con imágenes, inicio distinto según el rol y todos los textos en español.
+
+    Cada persona se encarga de una parte, sabe explicarla y sube su primer commit antes del miércoles 2.
+
+    Subid cambios pequeños y a menudo, y fusionad pronto para evitar conflictos.
+
+    Antes del viernes 4, ensayad la demo completa entrando con cada rol.
+
+Grupo 2: AcademyNET
+Lo que ya tenéis: el proyecto compila y arranca, tres roles, una buena portada y el recorrido matrícula, pago, examen y resultado.
+Fallos que hay que corregir
+
+    Notas: si el profesor deja la nota vacía se guarda un 0, y si escribe 7.5 se guarda 75.
+
+    Un alumno puede crear y renombrar centros, y cambiar de curso una matrícula ya pagada.
+
+    Un profesor puede editar o borrar cursos de otro.
+
+    Sin iniciar sesión se ven nombres y asistencia de alumnos (/Lessons/Details/1).
+
+    Error 500 al borrar un examen con intentos, una pregunta respondida o un usuario con matrículas.
+
+Pendiente de terminar
+
+    Fechas y número de intentos en el formulario de examen.
+
+    Alta de aulas y CRUD de lecciones.
+
+Tareas
+
+Alfonso: dejar redondo el flujo de examen y nota (decimales, fechas, intentos y borrados) antes de añadir nada más.
+
+Rubén: permisos: cada profesor solo sus cursos, matrículas protegidas y asistencia oculta a quien no deba verla.
+
+Pol: proteger la gestión de centros, activar "Nueva aula" y quitar el aviso TODO. Tu rama Poulgar tiene conflictos: no la fusiones, copia a mano la vista de centro.
+
+Juanma: CRUD de Lecciones con permisos por rol.
+
+Pol y Rubén: tarjetas con imagen para cursos y centros, textos en español y datos de ejemplo con fechas de diciembre.
