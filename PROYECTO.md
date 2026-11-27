@@ -90,6 +90,8 @@ Lo que funciona ahora mismo.
 - Alfonso:
     - Bug exam: al mandar la nota corregida, si el profesor no la cambia, no se guarda por defecto la automatica.
     - Feature exam: si la nota del profesor difiere de la auto, es obligatorio que escriba un coment
+    - Feature exam: al dar a validar todo y enviar, volver a la vista de examenes y cerrar esa validacion
+    - 
 
 - Ruben:
     - 
