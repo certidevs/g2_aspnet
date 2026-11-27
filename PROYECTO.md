@@ -56,7 +56,7 @@ Lo que funciona ahora mismo.
 
 ### Alfonso
 - [x] Ocultar botones de Matricula, Examen, Notas para no logeados
-- [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
+- [x] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 
 ### Ruben
 - [ ] Detalles de curso abierto a todos. Ocultar cierta informacion a discrecion de Ruben.
