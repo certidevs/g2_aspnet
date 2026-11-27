@@ -9,36 +9,36 @@
    The teacher sees the student's answers, comments and the automatic score,
    and can modify the grade and leave their own comment. *@
 
-<h1>Attempt detail</h1>
+<h1>Detalles del intento</h1>
 
 @if (exam == null)
 {
-    <div class="alert alert-danger">Exam not found.</div>
+    <div class="alert alert-danger">Examen no encontrado.</div>
 }
 else
 {
     <div class="mb-3">
-        <strong>Exam:</strong> @exam.Title<br />
-        <strong>Course:</strong> @exam.Course?.Name<br />
-        <strong>Student:</strong> @Model.Student?.UserName<br />
-        <strong>Date:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm")
+        <strong>Examen:</strong> @exam.Title<br />
+        <strong>Curso:</strong> @exam.Course?.Name<br />
+        <strong>Alumno:</strong> @Model.Student?.UserName<br />
+        <strong>Fecha:</strong> @Model.CompletedAt?.ToString("dd/MM/yyyy HH:mm")
     </div>
 
     <div class="card mb-4">
         <div class="card-body">
-            <h3 class="card-title">Automatic score: @Model.Score?.ToString("F2") / 10</h3>
+            <h3 class="card-title">Nota Automática: @Model.Score?.ToString("F2") / 10</h3>
         </div>
     </div>
 
-    <h4>Student answers</h4>
+    <h4>Respuestas del alumno</h4>
 
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Question</th>
-                <th>Student answer</th>
-                <th>Student comment</th>
-                <th>Result</th>
+                <th>Pregunta</th>
+                <th>Respuesta Alumno</th>
+                <th>Justificación Alumno</th>
+                <th>Resultado</th>
             </tr>
         </thead>
         <tbody>
@@ -70,15 +70,15 @@ else
                     <td>
                         @if (answer == null)
                         {
-                            <span class="text-warning">Not answered</span>
+                            <span class="text-warning">No contestada</span>
                         }
                         else if (answer.IsCorrect)
                         {
-                            <span class="text-success">✓ Correct</span>
+                            <span class="text-success">✓ Correcta</span>
                         }
                         else
                         {
-                            <span class="text-danger">✗ Incorrect</span>
+                            <span class="text-danger">✗ Incorrecta</span>
                         }
                     </td>
                 </tr>
@@ -91,20 +91,20 @@ else
 
         <div class="card mb-4">
             <div class="card-body">
-                <h4>Teacher review</h4>
+                <h4>Revisión Profesor</h4>
 
                 <div class="mb-3">
-                    <label class="form-label">Teacher grade (0-10)</label>
+                    <label class="form-label">Nota del Profesor (0-10)</label>
                     <input class="form-control" name="profesorNota" type="number" step="0.01" min="0" max="10" value="@(Model.ProfesorNota.HasValue ? Model.ProfesorNota.Value.ToString("F2") : "")" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Teacher comment</label>
+                    <label class="form-label">Comentarios del Profesor</label>
                     <textarea class="form-control" name="comentarioProfesor" rows="3">@Model.ComentarioProfesor</textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Save review</button>
-                <a class="btn btn-outline-secondary" asp-action="Validate" asp-route-id="@exam.Id">Back to validation</a>
+                <button type="submit" class="btn btn-primary">Guardar Revisión</button>
+                <a class="btn btn-outline-secondary" asp-action="Validate" asp-route-id="@exam.Id">Volver a Validaciones</a>
             </div>
         </div>
     </form>
