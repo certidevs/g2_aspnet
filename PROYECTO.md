@@ -55,7 +55,7 @@ Lo que funciona ahora mismo.
 ## 6. Reparto por persona
 
 ### Alfonso
-- [ ] Ocultar botones de Matricula, Examen, Notas para no logeados
+- [x] Ocultar botones de Matricula, Examen, Notas para no logeados
 - [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 
 ### Ruben
@@ -64,13 +64,13 @@ Lo que funciona ahora mismo.
 - [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 
 ### Pol
-- [ ] Ocultar Boton Aulas para no logeados
-- [ ] Academias abierto a todos
+- [x] Ocultar Boton Aulas para no logeados
+- [x] Academias abierto a todos
 - [ ] Detalles Academia abierto a todos, pero aulas oculto y solo visible para usuarios con dichas aulas.
 - [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 
 ### Juanma
-- [ ] Ocultar Boton lecciones para no logeados.
+- [x] Ocultar Boton lecciones para no logeados.
 - [ ] Lecciones visibles segun logging. (Solo te aparecen las lecciones de los cursos donde estas matriculado.)
 - [ ] La ocultacion de botones esta reflejada en Controllers? Debe estar en Controllers?
 - [ ] Crear Rol gestor.
