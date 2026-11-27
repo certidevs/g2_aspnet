@@ -5,6 +5,7 @@ using G2AspNet.Data;
 using G2AspNet.Models;
 using G2AspNet.ViewModels.Attendances;
 using Microsoft.EntityFrameworkCore;
+using G2AspNet.Utilities;
 
 namespace G2AspNet.Controllers;
 
@@ -18,9 +19,11 @@ public class AttendancesController : Controller
         this.context = context;
     }
 
-    // Lista las asistencias con su lección, el alumno y el curso.
-    // La búsqueda filtra por nombre de lección, de curso o de alumno.
-    [Authorize]
+    /**
+    * Lista las asistencias visibles para el usuario autenticado.
+    * El personal ve todas y el estudiante solo las suyas.
+    */
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher + "," + RoleNames.Student)]
     public IActionResult Index(string? search)
     {
         // Include carga las relaciones: sin él, Lesson y Enrollment llegarían vacíos a la vista.
@@ -29,6 +32,16 @@ public class AttendancesController : Controller
             .Include(attendance => attendance.Enrollment).ThenInclude(enrollment => enrollment!.Student)
             .Include(attendance => attendance.Enrollment).ThenInclude(enrollment => enrollment!.Course)
             .AsQueryable();
+
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+
+        if (!isStaff)
+        {
+            var userId = User.GetRequiredUserId();
+
+            query = query.Where(attendance =>
+                attendance.Enrollment!.StudentId == userId);
+        }
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -52,7 +65,7 @@ public class AttendancesController : Controller
     }
 
     // Detalle de una asistencia: a qué lección, de qué alumno y de qué curso.
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher + "," + RoleNames.Student)]
     public IActionResult Details(int id)
     {
         var attendance = context.Attendances
@@ -66,12 +79,18 @@ public class AttendancesController : Controller
             return NotFound();
         }
 
+        var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
+        if ((!isStaff) && attendance.Enrollment?.StudentId != User.GetRequiredUserId())
+        {
+            return NotFound();
+        }
+
         return View(attendance);
     }
 
     // Método Edit
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     public IActionResult Edit(int id)
     {
         var attendance = context.Attendances.Find(id);
@@ -84,7 +103,7 @@ public class AttendancesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Delete(int id)
     {
@@ -102,7 +121,7 @@ public class AttendancesController : Controller
     }
 
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     public IActionResult Create(int lessonId, int enrollmentId)
     {
         var attendance = new Attendance
@@ -118,7 +137,7 @@ public class AttendancesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Create(Attendance attendance)
     {
@@ -137,7 +156,7 @@ public class AttendancesController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
     [ValidateAntiForgeryToken]
     public IActionResult Save(Attendance attendance)
     {
