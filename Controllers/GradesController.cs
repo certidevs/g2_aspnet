@@ -17,8 +17,9 @@ public class GradesController : Controller
         this.context = context;
     }
 
-    [Authorize]
-    public IActionResult Index()
+    // Devuelve las notas visibles según el rol del usuario.
+    // Admin y Teacher ven todas; un alumno solo ve sus propias notas.
+    private IQueryable<Grade> VisibleGrades()
     {
         var query = context.Grades
             .Include(g => g.Enrollment).ThenInclude(e => e!.Student)
@@ -31,6 +32,14 @@ public class GradesController : Controller
             var userId = User.GetRequiredUserId();
             query = query.Where(g => g.Enrollment!.StudentId == userId);
         }
+
+        return query;
+    }
+
+    [Authorize]
+    public IActionResult Index()
+    {
+        var query = VisibleGrades();
 
         var grades = query.OrderBy(g => g.EnrollmentId).ToList();
         return View(grades);
@@ -55,7 +64,7 @@ public class GradesController : Controller
         var isStaff = User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Teacher);
         if (!isStaff && grade.Enrollment?.StudentId != User.GetRequiredUserId())
         {
-            return NotFound();
+            return Forbid();
         }
 
         return View(grade);
@@ -65,12 +74,22 @@ public class GradesController : Controller
     // Antes era un campo numérico donde había que teclear el Id: un Id que no existe daba un error 500.
     private void LoadEnrollments(Grade grade)
     {
-        var enrollments = context.Enrollments
+        var query = context.Enrollments
             .Include(e => e.Student)
             .Include(e => e.Course)
+            .AsQueryable();
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin)
+        {
+            var teacherId = User.GetRequiredUserId();
+            query = query.Where(e => e.Course!.TeacherId == teacherId);
+        }
+
+        var enrollments = query
             .OrderBy(e => e.Id)
             .ToList()
-            .Select(e => new { e.Id, Text = $"{e.Student?.DisplayName ?? e.Student?.UserName} · {e.Course?.Name}" });
+            .Select(e => new { e.Id, Text = "{e.Student?.DisplayName ?? e.Student?.UserName} · {e.Course?.Name}" });
         ViewBag.Enrollments = new SelectList(enrollments, "Id", "Text", grade.EnrollmentId);
     }
 
@@ -83,14 +102,22 @@ public class GradesController : Controller
         return View("Form", grade);
     }
 
-    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [Authorize(Roles = RoleNames.Admin + ", " + RoleNames.Teacher)]
     [HttpGet]
     public IActionResult Edit(int id)
     {
-        var grade = context.Grades.Find(id);
+        var grade = context.Grades
+            .Include(g => g.Enrollment).ThenInclude(e => e!.Course)
+            .FirstOrDefault(g => g.Id == id);
         if (grade == null)
         {
             return NotFound();
+        }
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin && !GradeRules.EsDocenteDelCurso(context, grade.Enrollment!.CourseId, User.GetRequiredUserId()))
+        {
+            return Forbid();
         }
 
         LoadEnrollments(grade);
@@ -119,7 +146,25 @@ public class GradesController : Controller
         }
         else
         {
-            context.Grades.Update(grade);
+            var existing = context.Grades
+                .Include(g => g.Enrollment).ThenInclude(e => e!.Course)
+                .FirstOrDefault(g => g.Id == grade.Id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            var isAdmin = User.IsInRole(RoleNames.Admin);
+            if (!isAdmin && !GradeRules.EsDocenteDelCurso(context, existing.Enrollment!.CourseId, User.GetRequiredUserId()))
+            {
+                return Forbid();
+            }
+
+            existing.Value = grade.Value;
+            existing.Comments = grade.Comments;
+            existing.GradeType = grade.GradeType;
+            existing.GradedAt = DateTime.UtcNow;
+            context.Grades.Update(existing);
         }
 
         context.SaveChanges();
@@ -128,14 +173,22 @@ public class GradesController : Controller
         return RedirectToAction("Index");
     }
 
-    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Teacher)]
+    [Authorize(Roles = RoleNames.Admin + ", " + RoleNames.Teacher)]
     [HttpPost]
     public IActionResult Delete(int id)
     {
-        var grade = context.Grades.Find(id);
+        var grade = context.Grades
+            .Include(g => g.Enrollment).ThenInclude(e => e!.Course)
+            .FirstOrDefault(g => g.Id == id);
         if (grade == null)
         {
             return NotFound();
+        }
+
+        var isAdmin = User.IsInRole(RoleNames.Admin);
+        if (!isAdmin && !GradeRules.EsDocenteDelCurso(context, grade.Enrollment!.CourseId, User.GetRequiredUserId()))
+        {
+            return Forbid();
         }
 
         context.Grades.Remove(grade);
